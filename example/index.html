@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html manifest="default.appcache" lang="ru-RU">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"> <!-- Просим IE переключиться в последний режим -->
+	<meta http-equiv="Content-Language" content="ru">
+	<meta http-equiv="Cache-Control" content="no-cache"><!-- Это помогает на некоторых девайсах избавиться от неадекватных попыток восстановления страницы. То есть попытки адекватные, но не все девайсы восстанавливают страницу без багов. -->
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
+
+	<link rel="icon" href="./favicon.ico">
+
+	<title>Test SGModel</title>
+	<meta name="author" content="VediX System">
+	<meta name="copyright" content="(c) VediX System">
+	
+	<script type="text/javascript" charset="utf-8" src="../libs/pixi/pixi.js" defer></script>
+	<script type="text/javascript" charset="utf-8" src="../libs/pixi/pixi-filters.js" defer></script>
+	
+	<script type="module" charset="utf-8" src="main.js" defer></script>
+	
+	<style>
+		* { color: white }
+	</style>
+</head>
+<body style="padding: 0; margin: 0; background: #000;">
+	<div style="position: fixed; left: 0px; top: 0px; right: 0px; bottom: 0px; background: #333;">
+		<canvas id="canvas"></canvas>
+	</div>
+	<div id="title" style="position: fixed; left: 0px; right: 0px; text-align: center; padding: 5px; z-index: 10">loading...</div>
+	<div id="info" style="position: fixed; left: 0px; bottom: 0px; color: white;">FPS: <span>0</span></div>
+</body>
+</html>
