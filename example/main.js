@@ -1,3 +1,9 @@
+/**
+ * SG2D Example
+ * https://github.com/VediX/sg2d.github.io
+ * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
+ */
+
 "use strict";
 
 import SG2D from "../sg2d.js";

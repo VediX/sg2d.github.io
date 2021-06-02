@@ -1,7 +1,7 @@
 /**
  * SG2DPluginBase 1.0.0
  * Base class for the plugin
- * https://github.com/VediX/SG2D
+ * https://github.com/VediX/sg2d.github.io
  * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
  */
 

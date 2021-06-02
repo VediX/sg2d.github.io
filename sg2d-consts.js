@@ -1,6 +1,6 @@
 /**
  * SG2DConsts
- * https://github.com/VediX/SG2D
+ * https://github.com/VediX/sg2d.github.io
  */
 
 "use strict";

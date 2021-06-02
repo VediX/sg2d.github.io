@@ -1,7 +1,7 @@
 /**
  * SG2D 1.0.0
  * 2D graphics engine based on PixiJS and optimized by tile clustering
- * https://github.com/VediX/SG2D
+ * https://github.com/VediX/sg2d.github.io
  * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
  * SG2D may be freely distributed under the MIT license
  */

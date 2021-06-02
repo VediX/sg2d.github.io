@@ -25,6 +25,14 @@ export default class SceneUI {
 		this.buttonD = new SG2DSprite("ui/button_D", options, { code: "KeyD", onTap: this.onTap, player: this.player });
 		this.buttonS = new SG2DSprite("ui/button_S", options, { code: "KeyS", onTap: this.onTap, player: this.player });
 		
+		//this.buttonCameraMoveLeft = new SG2DSprite("ui/button_left", options, { code: "Numpad4" });
+		//this.buttonCameraMoveRight = new SG2DSprite("ui/button_right", options, { code: "Numpad6" });
+		//this.buttonCameraMoveUp = new SG2DSprite("ui/button_up", options, { code: "Numpad8" });
+		//this.buttonCameraMoveDown = new SG2DSprite("ui/button_down", options, { code: "Numpad2" });
+		//this.buttonCameraMoveToTank = new SG2DSprite("ui/button_down", options, { code: "Numpad5" });
+		//this.buttonCameraScaleIn = new SG2DSprite("ui/button_plus", options, { code: "NumpadAdd" });
+		//this.buttonCameraScaleOut = new SG2DSprite("ui/button_plus", options, { code: "NumpadSubtract" });
+		
 		// Place the CANVAS label in the DOM element using a graphical font
 		document.querySelector("#title").innerText = "";
 		this.sgTitle = new SG2DLabelCanvas(
