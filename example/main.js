@@ -52,7 +52,7 @@ class Application {
 				rotation: true,
 				rotate: 0,
 				position: {x: 224, y: 224}, // Start position of the camera. Default [0, 0]
-				scale_min: 1,
+				scale_min: 2,
 				scale_max: 16,
 				movement_by_pointer: SG2DCamera.MOVEMENT_BY_POINTER_RIGHT,
 				rotate_adjustment: -90 // Base offset of the camera angle in degrees. Default 0
@@ -80,10 +80,12 @@ class Application {
 			},
 			plugins: ["sg2d-transitions"]
 		});
+		
+		let camera = this.scene.camera;
 
 		// Print information to the console about the current scaling
-		/*this.scene.camera.on("scale", (scale)=>{
-			console.log("New camera scale: " + this.scene.camera.getScale().percent + "%");
+		/*camera.on("scale", (scale)=>{
+			console.log("New camera scale: " + camera.getScale().percent + "%");
 		}, void 0, void 0, true);*/
 
 		// Generate the map
@@ -92,9 +94,15 @@ class Application {
 		// Graphic effects
 		this.sceneEffect = SceneEffects.toApply(this.scene);
 		
-		this.player = new Player({ position: this.scene.clusters.getCluster(5,5).position, angle: 0 }, { mouse: this.scene.mouse, camera: this.scene.camera });
+		this.player = new Player({ position: this.scene.clusters.getCluster(5,5).position, angle: 0 }, { mouse: this.scene.mouse, camera: camera });
 		
-		this.scene.camera.followTo(this.player);
+		/**
+		* The camera can move smoothly behind the player.
+		* The camera can be moved anywhere on the map, after which it will also move in parallel with the player.
+		* The camera is rotated either relative to the center of the screen, or relative to the player (TODO).
+		* The camera is zoomed relative to the cursor position (TODO).
+		*/
+		camera.followTo(this.player);
 		
 		this.sceneUI = SceneUI.toApply(this.scene, this.player);
 		

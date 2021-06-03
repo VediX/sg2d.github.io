@@ -167,9 +167,8 @@ export default class SG2DMouse extends SGModel {
 				if (d >= SG2DMouse.CAMERA_MOVEMENT_SHIFT) {
 					SG2DMouse._startPointMouse.x =  this.properties.global.x;
 					SG2DMouse._startPointMouse.y =  this.properties.global.y;
-					SG2DMouse._startPointPXY.x = this.camera.properties.position.x;
-					SG2DMouse._startPointPXY.y = this.camera.properties.position.y;
-					this.camera.stopFollow();
+					SG2DMouse._startPointPXY.x = this.camera.properties.offset.x;
+					SG2DMouse._startPointPXY.y = this.camera.properties.offset.y;
 					this.camera.set("movement_state", SG2DCamera.STATE_MOVING);
 				}
 			} else if (this.camera.properties.movement_state === SG2DCamera.STATE_MOVING) {
@@ -179,7 +178,7 @@ export default class SG2DMouse extends SGModel {
 				let rotate = this.camera.properties.rotate - this.camera.rotate_adjustment;
 				SG2DMouse._position.x = SG2DMouse._startPointPXY.x - dx * SG2DMath.cos(rotate, 1) + dy * SG2DMath.sin(rotate, 1);
 				SG2DMouse._position.y = SG2DMouse._startPointPXY.y - dy * SG2DMath.cos(rotate, 1) - dx * SG2DMath.sin(rotate, 1);
-				this.camera.moveTo(SG2DMouse._position);
+				this.camera.set("offset", SG2DMouse._position, SGModel.OPTIONS_PRECISION_5);
 			}
 		}
 	}
@@ -202,9 +201,6 @@ export default class SG2DMouse extends SGModel {
 				let k = this.camera.scales_k[this.camera.properties.scale];
 				let dx = (this.properties.global.x - SG2DMouse._startPointMouse.x) / k;
 				let dy = (this.properties.global.y - SG2DMouse._startPointMouse.y) / k;
-				let rotate = this.camera.properties.rotate - this.camera.rotate_adjustment;
-				this.camera._followOffset.x += -dx * SG2DMath.cos(rotate, 1) + dy * SG2DMath.sin(rotate, 1);
-				this.camera._followOffset.y += -dy * SG2DMath.cos(rotate, 1) - dx * SG2DMath.sin(rotate, 1);
 				this.camera.set("movement_state", SG2DCamera.STATE_NO_MOVEMENT);
 			}
 		}

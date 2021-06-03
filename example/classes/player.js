@@ -216,10 +216,6 @@ export default class Player extends ObjectBaseLifeBand {
 		if (this.properties.load_whizbang > 0) {
 			this.set("load_whizbang", this.properties.load_whizbang - 1);
 		}
-		
-		if (! this.camera.getFollow() && ((state & Player.STATES_TRACKS_MOVING)) && (this.camera.properties.movement_state === SG2DCamera.STATE_NO_MOVEMENT)) {
-			this.camera.followTo(this);
-		}
 	}
 	
 	stateChange(state) {

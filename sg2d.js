@@ -60,6 +60,7 @@ export default class SG2D {
 		SG2DPluginBase.SG2DClusters = SG2DClusters;
 		SG2DPluginBase.SG2DTile = SG2DTile;
 		SG2DPluginBase.SG2DCamera = SG2DCamera;
+		PIXI.utils.skipHello();
 		this._initializationPromise.then(()=>{
 			SG2D._initialized = true;
 		});
@@ -156,7 +157,7 @@ export default class SG2D {
 		this.resize_out = config.resize || function(){};
 		this.canvas.oncontextmenu = function() { return false; };
 		this.canvas.onselectstart = function() { return false; };
-
+		
 		this.pixi = new PIXI.Application(pixi);
 
 		this.frame_index = 0;

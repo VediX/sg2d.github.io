@@ -20,7 +20,9 @@ export default class Area {
 			for (var j = aSpreading.length; j--;) {
 				var oSpread = aSpreading[j];
 				if (cluster = clusters.getCluster(areaX + oSpread.x, areaY + oSpread.y)) {
-					cluster._l = new landClass({ position: cluster.position });
+					if (! cluster._l) {
+						cluster._l = new landClass({ position: cluster.position });
+					}
 				}
 			}
 		}

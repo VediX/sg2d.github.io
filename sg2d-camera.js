@@ -42,6 +42,7 @@ export default class SG2DCamera extends SGModel {
 		rotation: SGModel.TYPE_BOOLEAN,
 		position: SGModel.TYPE_OBJECT_NUMBERS,
 		target: SGModel.TYPE_OBJECT_NUMBERS,
+		offset: SGModel.TYPE_OBJECT_NUMBERS,
 		wh: SGModel.TYPE_OBJECT_NUMBERS,
 		wh05: SGModel.TYPE_OBJECT_NUMBERS,
 		boundsPX: SGModel.TYPE_OBJECT_NUMBERS,
@@ -54,8 +55,8 @@ export default class SG2DCamera extends SGModel {
 	};
 	
 	/** @public */
-	static moveTo(target) {
-		SG2DCamera.getInstance().set("target", target, SGModel.OPTIONS_PRECISION_5);
+	static moveTo(...args) {
+		SG2DCamera.getInstance().moveTo.apply(SG2DCamera.getInstance(), ...args);
 	}
 	
 	static scaling(params) {
@@ -74,6 +75,7 @@ export default class SG2DCamera extends SGModel {
 			rotate: 0, // grad
 			position: {x: 0, y: 0}, // current camera position
 			target: {x: 0, y: 0}, // camera movement target
+			offset: {x: 0, y: 0},
 			wh: {w: 0, h: 0},
 			wh05: {w: 0, h: 0},
 			boundsPX: { left: 0, top: 0, right: 0, bottom: 0 },
@@ -184,7 +186,6 @@ export default class SG2DCamera extends SGModel {
 		this.set("movement_by_pointer", config.movement_by_pointer);
 		
 		this._followToTile = null;
-		this._followOffset = {x: 0, y: 0};
 	}
 	
 	/** private */
@@ -193,8 +194,10 @@ export default class SG2DCamera extends SGModel {
 		this.onResize();
 		this.sg2d.pixi.view.addEventListener("mouseenter", this.onMouseEnter);
 		this.sg2d.pixi.view.addEventListener("mouseleave", this.onMouseLeave);
-		this.set("rotate", this.properties.rotate, void 0, SGModel.FLAG_FORCE_CALLBACKS);
+		this.set("rotate", this.properties.rotate);
+		this.sg2d.viewport.angle = -this.properties.rotate + this.rotate_adjustment;
 		this.startPosition(this.properties.position || null);
+		this._calc();
 	}
 	
 	/** Own setter for rotate property*/
@@ -204,13 +207,16 @@ export default class SG2DCamera extends SGModel {
 		let prevRotate = this.properties.rotate;
 		if (this.set("rotate", newRotate, options, flags | SGModel.FLAG_IGNORE_OWN_SETTER)) {
 			this.sg2d.viewport.angle = -this.properties.rotate + this.rotate_adjustment;
-			// TODO: followOffset
-			/*let da = SG2DMath.normalize_a(newRotate - prevRotate);
-			let dx = this._followOffset.x;
-			let dy = this._followOffset.y;
-			this._followOffset.x = dx * SG2DMath.cos(da, 1) - dy * SG2DMath.sin(da, 1);
-			this._followOffset.y = dy * SG2DMath.cos(da, 1) + dx * SG2DMath.sin(da, 1);*/
-			this.set("position", void 0, void 0, SGModel.FLAG_FORCE_CALLBACKS);
+			let da = SG2DMath.normalize_a(newRotate - prevRotate);
+			let dx = this.properties.offset.x;
+			let dy = this.properties.offset.y;
+			SG2DCamera._point.x = dx * SG2DMath.cos(da, 1) - dy * SG2DMath.sin(da, 1);
+			SG2DCamera._point.y = dy * SG2DMath.cos(da, 1) + dx * SG2DMath.sin(da, 1);
+			this.set("offset", SG2DCamera._point);
+			this._calc();
+			return true;
+		} else {
+			return false;
 		}
 	}
 	
@@ -218,8 +224,7 @@ export default class SG2DCamera extends SGModel {
 	 * Set the starting position of the camera
 	 */
 	startPosition(position) {
-		this.set("position", position);
-		this.moveTo(position);
+		this.moveTo(position, true);
 	}
 	
 	/** @private */
@@ -235,6 +240,14 @@ export default class SG2DCamera extends SGModel {
 		options.precision = options.precision || 5;
 		
 		if (! this.set("position", value, options, flags | SGModel.FLAG_IGNORE_OWN_SETTER)) return false;
+		
+		this._calc();
+		
+		return true;
+	}
+	
+	/** @private */
+	_calc() {
 		
 		this.sg2d.viewport.x = this.sg2d.pixi.screen.width / 2;
 		this.sg2d.viewport.y = this.sg2d.pixi.screen.height / 2;
@@ -431,8 +444,6 @@ export default class SG2DCamera extends SGModel {
 		
 		if (bChangeBoundsPX) this.trigger("boundsPX");
 		if (bChangeBoundsCluster) this.trigger("boundsCluster");
-		
-		return true;
 	}
 	
 	/** @private */
@@ -441,12 +452,8 @@ export default class SG2DCamera extends SGModel {
 	/**
 	 * Tile that the camera will follow
 	 */
-	followTo(tile, offset = void 0) {
+	followTo(tile) {
 		this._followToTile = tile;
-		if (typeof offset === "object" && offset.x !== void 0 && offset.y !== void 0) {
-			this._followOffset.x = offset.x;
-			this._followOffset.y = offset.y
-		}
 	}
 	
 	stopFollow() {
@@ -459,15 +466,32 @@ export default class SG2DCamera extends SGModel {
 	
 	/**
 	 * Smoothly move the camera to position
+	 * @param {object|number, number} point
+	 * @param {boolean} [flag=false] Move instantly (true) or smoothly (false)
 	 */
 	moveTo(...args) {
 		if (typeof arguments[0] === "object") {
 			this.set("target", arguments[0], SGModel.OPTIONS_PRECISION_5);
+			if (arguments[1] === true) {
+				this.set("position", arguments[0], SGModel.OPTIONS_PRECISION_5);
+			}
 		} else {
 			SG2DCamera._moveToTarget.x = arguments[0];
 			SG2DCamera._moveToTarget.y = arguments[1];
 			this.set("target", SG2DCamera._moveToTarget, SGModel.OPTIONS_PRECISION_5);
+			if (arguments[2] === true) {
+				this.set("position", SG2DCamera._moveToTarget, SGModel.OPTIONS_PRECISION_5);
+			}
 		}
+	}
+											
+	moveOffset(step = SG2DConsts.CELLSIZEPIX, rotate = 0) {
+		let k = this.scales_k[this.properties.scale];
+		let d = step / k;
+		rotate = rotate - this.properties.rotate + this.rotate_adjustment;
+		SG2DCamera._point.x = this.properties.offset.x + d * SG2DMath.cos(rotate, 1);
+		SG2DCamera._point.y = this.properties.offset.y - d * SG2DMath.sin(rotate, 1);
+		this.set("offset", SG2DCamera._point);
 	}
 	
 	onResize() {
@@ -487,8 +511,8 @@ export default class SG2DCamera extends SGModel {
 	/** private */
 	_iterate() {
 		if (this._followToTile) {
-			SG2DCamera._point.x = this._followToTile.properties.position.x + this._followOffset.x;
-			SG2DCamera._point.y = this._followToTile.properties.position.y + this._followOffset.y;
+			SG2DCamera._point.x = this._followToTile.properties.position.x + this.properties.offset.x;
+			SG2DCamera._point.y = this._followToTile.properties.position.y + this.properties.offset.y;
 			this.set("target", SG2DCamera._point);
 		}	
 		if (this.properties.target.x !== this.properties.position.x || this.properties.target.y !== this.properties.position.y) {
@@ -508,11 +532,20 @@ export default class SG2DCamera extends SGModel {
 	}
 	
 	onWheelScale(e) {
-		
 		if (! this.properties.mouse_over_canvas) return;
-		
 		var delta = e.deltaY || e.detail || e.wheelDelta;
-		var scale_next = this.properties.scale + (delta < 0 ? 1 : -1);
+		this.zoomInc(delta < 0 ? 1 : -1);
+	}
+	
+	zoom(scale = SG2DCamera.SCALE_NORMAL) {
+		scale = Math.max(this.properties.scale_min, scale);
+		scale = Math.min(this.properties.scale_max, scale);
+		this.set("scale", scale);
+		this.onResize();
+	}
+	
+	zoomInc(scaleIncrement = 1) {
+		var scale_next = this.properties.scale + scaleIncrement;
 		scale_next = Math.max(this.properties.scale_min, scale_next);
 		scale_next = Math.min(this.properties.scale_max, scale_next);
 		this.set("scale", scale_next);

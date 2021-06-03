@@ -18,7 +18,7 @@ export default class GraphicsPreparer {
 			SG2DFonts.addFont({
 				name: "metal_yellow_big",
 				texture: "fonts/metal_yellow_big_48x50h",
-				schema: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789?!().,"
+				schema: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789?!().:"
 			});
 
 			// Get the mouse cursor icons
@@ -27,11 +27,10 @@ export default class GraphicsPreparer {
 			this.cursors.move = "url('" + URL.createObjectURL(await SG2DUtils.getTextureAsBlob("ui/cursor_move")) + "') 16 16,auto";
 
 			// Process sprites to eliminate stripe artifacts
-			for (var t in PIXI.utils.TextureCache) {
-				if (! PIXI.utils.BaseTextureCache[t]) {
-					SG2DUtils.borderAlphaTexture(PIXI.utils.TextureCache[t], 0.995, 1);
-				}
-			}
+			SG2DUtils.borderAlphaTextures([
+				"lands/concrete", "lands/grass", "lands/sand",
+				"elements/block-corner-45", "elements/block-corner-135", "elements/block-corner-225", "elements/block-corner-315"
+			], 0.995);
 
 			this.promise.resolve();
 		});

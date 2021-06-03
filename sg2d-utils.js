@@ -126,7 +126,27 @@ export default class SG2DUtils {
 	}
 	
 	/**
+	 * Make the border of the sprites semi-transparent (to eliminate artifacts in the form of stripes at the edges of terrain tiles)
+	 * @param {array} amTextures Array of textures
+	 * @param {number} [alpha1=0.5] Transparency for the outermost border (1 pixel from the edge)
+	 * @param {number} [alpha2=1] Transparency for the border 2 pixels from the edge
+	 */
+	static borderAlphaTextures(amTextures, alpha1 = 0.5, alpha2 = 1) {
+		for (var i = 0; i < amTextures.length; i++) {
+			var texture = typeof amTextures[i] === "object" ? amTextures[i] : PIXI.utils.TextureCache[amTextures[i]];
+			if (texture) {
+				this.borderAlphaTexture(PIXI.utils.TextureCache[amTextures[i]], alpha1, alpha2);
+			} else {
+				console.warn("Texture with name \"" + amTextures[i] + "\" not found!");
+			}
+		}
+	}
+	
+	/**
 	 * Make the border of the sprite semi-transparent (to eliminate artifacts in the form of stripes at the edges of terrain tiles)
+	 * @param {PIXI.Texture|string} mTexture
+	 * @param {number} [alpha1=0.5] Transparency for the outermost border (1 pixel from the edge)
+	 * @param {number} [alpha2=1] Transparency for the border 2 pixels from the edge
 	 */
 	static borderAlphaTexture(mTexture, alpha1 = 0.5, alpha2 = 1) {
 		
@@ -176,9 +196,12 @@ export default class SG2DUtils {
 	}*/
 	// /TODO DEL.
 	
+	/** @private */
 	static _ibt = [];
+	
 	/**
 	 * Generate intermediate textures to gradually transform one texture to another (without using alpha)
+	 * @param {object} config
 	 */
 	static createInBetweenTextures(config) {
 		config.start;
@@ -186,7 +209,7 @@ export default class SG2DUtils {
 		config.count = Math.max(2, config.count || 2);
 		config.name;
 		
-		if (config.count <= 2) return; // TODO?
+		if (config.count <= 2) return;
 		
 		let canvasStart = this.getTextureAsCanvas(config.start);
 		let canvasEnd = this.getTextureAsCanvas(config.end);

@@ -31,6 +31,7 @@ export class SG2DLabel {
 		this.options = options || {};
 		options.x = options.x || 0;
 		options.y = options.y || 0;
+		options.scale = options.scale || 1;
 		
 		this.setText(text);
 	}
@@ -57,13 +58,15 @@ export class SG2DLabel {
 				var sprite = new PIXI.Sprite(texture);
 				sprite.position.x = this.options.x + px;
 				sprite.position.y = this.options.y;
+				sprite.scale.set(this.options.scale);
+				if (this.options.tint) sprite.tint = this.options.tint;
 				this.container.addChild(sprite);
 			} else {
 				if (c !== " ") {
 					console.warn("Error! The symbol \"" + c + "\" is missing in the font \"" + this.options.font + "\"!");
 				}
 			}
-			px += font.w;
+			px += font.w * this.options.scale;
 		}
 		
 		var sg2d = this.options.sg2d || SG2D.getInstance();
