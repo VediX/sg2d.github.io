@@ -19,9 +19,6 @@ import Player from "./classes/player.js";
 
 class Application {
 	
-	static AREASIZE = 128;
-	static CELLSIZEPIX = 64;
-	
 	constructor() {
 		
 		window.app = this;
@@ -43,14 +40,14 @@ class Application {
 		//PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.MEDIUM;
 		this.scene =  new SG2D({
 			canvasId: "canvas",
-			cellsizepix: Application.CELLSIZEPIX,
+			cellsizepix: 64,
 			pixi: { // config passed to PIXI.Application constructor
 				antialias: true,
 				autoStart: false
 			},
 			camera: {
 				rotation: true,
-				rotate: 0,
+				rotate: 45,
 				position: {x: 224, y: 224}, // Start position of the camera. Default [0, 0]
 				scale_min: 2,
 				scale_max: 16,
@@ -58,7 +55,7 @@ class Application {
 				rotate_adjustment: -90 // Base offset of the camera angle in degrees. Default 0
 			},
 			clusters: {
-				areasize: Application.AREASIZE
+				areasize: 128
 			},
 			mouse: {
 				cursors: {
@@ -94,7 +91,7 @@ class Application {
 		// Graphic effects
 		this.sceneEffect = SceneEffects.toApply(this.scene);
 		
-		this.player = new Player({ position: this.scene.clusters.getCluster(5,5).position, angle: 0 }, { mouse: this.scene.mouse, camera: camera });
+		this.player = new Player({ position: this.scene.clusters.getCluster(5,5).position, angle: 45 }, { mouse: this.scene.mouse, camera: camera });
 		
 		/**
 		* The camera can move smoothly behind the player.

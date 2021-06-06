@@ -105,12 +105,13 @@ export default class SceneUI {
 		this.buttonCameraScaleOut.sprite.position.set(x_base, y_base - w - w);
 		this.buttonCameraScaleIn.sprite.position.set(x_base, y_base - w);
 		
-		x_base = w + 5;
-		y_base = this.scene.canvas.height - w - w - 10;
-		this.buttonCameraMoveLeft.sprite.position.set(x_base - w - 5, y_base);
-		this.buttonCameraMoveRight.sprite.position.set(x_base + w + 5, y_base);
-		this.buttonCameraMoveUp.sprite.position.set(x_base, y_base - w - 5);
-		this.buttonCameraMoveDown.sprite.position.set(x_base, y_base + w + 5);
-		this.buttonCameraMoveToPlayer.sprite.position.set(x_base, y_base);
+		x_base = 5;
+		y_base = this.scene.canvas.height - 5;
+		this.buttonCameraMoveUp.sprite.position.set(x_base, y_base - 5 * w - 20);
+		this.buttonCameraMoveLeft.sprite.position.set(x_base, y_base - 4 * w - 15);
+		this.buttonCameraMoveToPlayer.sprite.position.set(x_base, y_base - 3 * w - 10);
+		this.buttonCameraMoveRight.sprite.position.set(x_base, y_base - w - w - 5);
+		this.buttonCameraMoveDown.sprite.position.set(x_base, y_base - w);
+		
 	}
 }

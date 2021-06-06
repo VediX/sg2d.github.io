@@ -27,10 +27,13 @@ export default class GraphicsPreparer {
 			this.cursors.move = "url('" + URL.createObjectURL(await SG2DUtils.getTextureAsBlob("ui/cursor_move")) + "') 16 16,auto";
 
 			// Process sprites to eliminate stripe artifacts
-			SG2DUtils.borderAlphaTextures([
-				"lands/concrete", "lands/grass", "lands/sand",
-				"elements/block-corner-45", "elements/block-corner-135", "elements/block-corner-225", "elements/block-corner-315"
-			], 0.995);
+			SG2DUtils.setBorderAlphaTextures();
+			
+			// Processing sprites to eliminate ribbing when rotating sprites
+			SG2DUtils.addBorderAlphaTextures({
+				textures: ["elements/block-standard", "elements/block-corner-45", "elements/block-corner-135", "elements/block-corner-225", "elements/block-corner-315", "elements/block-steel"],
+				all: true
+			});
 
 			this.promise.resolve();
 		});

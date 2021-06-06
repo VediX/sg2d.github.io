@@ -275,13 +275,13 @@ export default class SG2D {
 		
 		this.mouse.iterate();
 		
-		if (this.camera.properties.scale > 2) {
+		//if (this.camera.properties.scale > 2) {
 			for (var cluster of this.camera.clustersInCamera) {
 				for (var tile of cluster.tiles) {
 					if (tile.iterateAnimations) tile.iterateAnimations(this.frame_index);
 				}
 			}
-		}
+		//}
 		
 		this.iterate_out();
 

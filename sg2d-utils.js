@@ -119,41 +119,58 @@ export default class SG2DUtils {
 		canvasMask._pixiId = config.name;
 		var texture = PIXI.Texture.from(canvasMask);
 		texture.canvas = canvasMask;
+		texture._isFinalTexture = true;
 		
 		//(new Image()).src = canvasMask.toDataURL();
 		
 		return canvasMask;
 	}
 	
+	/** @private */
+	static _optionsBAT = {};
+	
 	/**
 	 * Make the border of the sprites semi-transparent (to eliminate artifacts in the form of stripes at the edges of terrain tiles)
-	 * @param {array} amTextures Array of textures
-	 * @param {number} [alpha1=0.5] Transparency for the outermost border (1 pixel from the edge)
-	 * @param {number} [alpha2=1] Transparency for the border 2 pixels from the edge
+	 * @param {object} options
+	 * @param {array}		[options.textures=void 0] Array of textures
+	 * @param {number}		[options.alpha=0.995] Transparency for the outermost border (1 pixel from the edge)
+	 * @param {number}		[options.alpha2=1] Transparency for the border 2 pixels from the edge
 	 */
-	static borderAlphaTextures(amTextures, alpha1 = 0.5, alpha2 = 1) {
-		for (var i = 0; i < amTextures.length; i++) {
-			var texture = typeof amTextures[i] === "object" ? amTextures[i] : PIXI.utils.TextureCache[amTextures[i]];
+	static setBorderAlphaTextures(options={}) {
+		options.textures = options.textures || [];
+		if (! options.textures.length) {
+			this._getFinalTextures(options.textures);
+		}
+		for (var i = 0; i < options.textures.length; i++) {
+			var texture = typeof options.textures[i] === "object" ? options.textures[i] : PIXI.utils.TextureCache[options.textures[i]];
 			if (texture) {
-				this.borderAlphaTexture(PIXI.utils.TextureCache[amTextures[i]], alpha1, alpha2);
+				this._optionsBAT.texture = texture;
+				this._optionsBAT.alpha = options.alpha;
+				this._optionsBAT.alpha2 = options.alpha2;
+				this.setBorderAlphaTexture(this._optionsBAT);
 			} else {
-				console.warn("Texture with name \"" + amTextures[i] + "\" not found!");
+				console.warn("Texture with name \"" + options.textures[i] + "\" not found!");
 			}
 		}
 	}
 	
 	/**
 	 * Make the border of the sprite semi-transparent (to eliminate artifacts in the form of stripes at the edges of terrain tiles)
-	 * @param {PIXI.Texture|string} mTexture
-	 * @param {number} [alpha1=0.5] Transparency for the outermost border (1 pixel from the edge)
-	 * @param {number} [alpha2=1] Transparency for the border 2 pixels from the edge
+	 * @param {object} options
+	 * @param {PIXI.Texture|string}	options.texture
+	 * @param {number}				[options.alpha=0.995] Transparency for the outermost border (1 pixel from the edge)
+	 * @param {number}				[options.alpha2=1] Transparency for the border 2 pixels from the edge
 	 */
-	static borderAlphaTexture(mTexture, alpha1 = 0.5, alpha2 = 1) {
+	static setBorderAlphaTexture(options={}) {
 		
-		alpha1 = ~~(alpha1 * 256);
-		alpha2 = ~~(alpha2 * 256);
+		if (options.alpha === void 0) options.alpha = 0.995;
+		if (options.alpha2 === void 0) options.alpha2 = 1;
 		
-		let canvas = this.getTextureAsCanvas(mTexture);
+		options.alpha = ~~(options.alpha * 256);
+		options.alpha2 = ~~(options.alpha2 * 256);
+		
+		let texture_src = typeof options.texture === "object" ? options.texture : PIXI.utils.TextureCache(options.texture);
+		let canvas = this.getTextureAsCanvas(texture_src);
 		var ctx = canvas.getContext("2d");
 		var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 		var l = canvas.width * canvas.height * 4;
@@ -162,19 +179,61 @@ export default class SG2DUtils {
 			var y = Math.floor(p / canvas.width);
 			var x = p - y * canvas.width;
 			if (x === 0 || y === 0 || x === canvas.width-1 || y === canvas.height-1) {
-				imageData.data[i+3] = Math.min(imageData.data[i+3], alpha1);
+				imageData.data[i+3] = Math.min(imageData.data[i+3], options.alpha);
 			}
-			if (alpha2 < 255 && (x === 1 || y === 1 || x === canvas.width-2 || y === canvas.height-2)) {
-				imageData.data[i+3] = Math.min(imageData.data[i+3], alpha2);
+			if (options.alpha2 < 255 && (x === 1 || y === 1 || x === canvas.width-2 || y === canvas.height-2)) {
+				imageData.data[i+3] = Math.min(imageData.data[i+3], options.alpha2);
 			}
 		}
 		ctx.putImageData(imageData, 0, 0);
 		
 		PIXI.Texture.removeFromCache(canvas.texture);
+		PIXI.BaseTexture.removeFromCache(canvas.texture);
 		
 		canvas._pixiId = canvas.texture;
-		var texture = PIXI.Texture.from(canvas);
-		texture.canvas = canvas;
+		var texture_dest = PIXI.Texture.from(canvas);
+		texture_dest.canvas = canvas;
+		texture_dest._isFinalTexture = texture_src._isFinalTexture;
+	}
+	
+	/**
+	 * Adds a transparent border to a 1 pixel sprite so that PIXI smooths the edges of the sprite when rotated.
+	 * @param {object} options
+	 * @param {array}		[options.textures=void 0]
+	 * @param {boolean}	[options.all=false] If TRUE then a transparent border is added if the sprite has opaque pixels on the border.
+	 */
+	static addBorderAlphaTextures(options) {
+		options.textures = options.textures || [];
+		if (! options.textures.length) {
+			this._getFinalTextures(options.textures);
+		}
+		for (var i = 0; i < options.textures.length; i++) {
+			var texture = typeof options.textures[i] === "object" ? options.textures[i] : PIXI.utils.TextureCache[options.textures[i]];
+			if (texture) {
+				var srcCanvas = SG2DUtils.getTextureAsCanvas(texture);
+				var destCanvas = SG2DUtils.createCanvas(texture.width + 2, texture.height + 2);
+				var destCtx = destCanvas.getContext("2d");
+				destCtx.drawImage(srcCanvas, 1, 1);
+				destCanvas._pixiId = texture.textureCacheIds[0] || texture.canvas._pixiId;
+				PIXI.Texture.removeFromCache(destCanvas._pixiId);
+				PIXI.BaseTexture.removeFromCache(destCanvas._pixiId);
+				var textureDest = PIXI.Texture.from(destCanvas);
+				textureDest.canvas = destCanvas;
+				textureDest._isFinalTexture = texture._isFinalTexture;
+			} else {
+				console.warn("Texture with name \"" + options.textures[i] + "\" not found!");
+			}
+		}
+	}
+	
+	/** @private */
+	static _getFinalTextures(textures) {
+		for (var name in PIXI.utils.TextureCache) {
+			var texture = PIXI.utils.TextureCache[name];
+			if (texture._isFinalTexture) {
+				textures.push(texture);
+			}
+		}
 	}
 	
 	// TODO DEL: (не исп-ся?)
@@ -285,6 +344,7 @@ export default class SG2DUtils {
 			canvas._pixiId = config.name.replace("%", j);
 			var texture = PIXI.Texture.from(canvas);
 			texture.canvas = canvas;
+			texture._isFinalTexture = true;
 			
 			dataPrev = data;
 		}
@@ -293,12 +353,14 @@ export default class SG2DUtils {
 		if (! PIXI.utils.TextureCache[nameStart]) {
 			canvasStart._pixiId = nameStart;
 			var texture = PIXI.Texture.from(canvasStart);
+			texture._isFinalTexture = true;
 		}
 		
 		var nameEnd = config.name.replace("%", config.count);
 		if (! PIXI.utils.TextureCache[nameEnd]) {
 			canvasEnd._pixiId = nameEnd;
 			var texture = PIXI.Texture.from(canvasEnd);
+			texture._isFinalTexture = true;
 		}
 	}
 	
@@ -307,10 +369,12 @@ export default class SG2DUtils {
 			if (r.substr(-6, 6) === "_image") continue;
 			var resource = resources[r];
 			for (var code in resource.textures) {
+				
+				var baseTexture = resource.textures[code];
+				
 				var m = code.match(/(.+)_(\d+)x(\d+)(\w)?(\.\w+)?$/); // Search for pictures with a specific name, for example: "explosion_64x64.png"
 				if (m) {
-					var baseTexture = resource.textures[code];
-					
+					baseTexture._isFinalTexture = false;
 					//SG2DUtils.getTextureUrl(code).then((res)=>{ (new Image()).src = res; }); // debugging
 					
 					var name = m[1];
@@ -335,14 +399,20 @@ export default class SG2DUtils {
 								rect.height = h;
 								rect.x = baseTexture.frame.x + px;
 								rect.y = baseTexture.frame.y + py;
-								var tex = new PIXI.Texture(baseTexture, rect);
-								PIXI.Texture.addToCache(tex, texture_name);
+								var texture = new PIXI.Texture(baseTexture, rect);
+								PIXI.Texture.addToCache(texture, texture_name);
+								texture._isFinalTexture = true;
 								//SG2DUtils.getTextureUrl(name + "_" + index).then((res)=>{ (new Image()).src = res; }); // debugging
 							}
 						}
 					} else {
 						throw "dir vertical no supported! (TODO)";
 					}
+					
+					PIXI.Texture.removeFromCache(baseTexture);
+					PIXI.BaseTexture.removeFromCache(baseTexture);
+				} else {
+					baseTexture._isFinalTexture = true;
 				}
 			}
 		}
@@ -356,6 +426,11 @@ export default class SG2DUtils {
 			} else {
 				const loader = new PIXI.Loader()
 				loader.add(SG2DConsts.SYSTEM_TILES).load((loader, resources)=>{
+					for (var i = 0; i < SG2DConsts.SYSTEM_TILES.length; i++) {
+						PIXI.Texture.removeFromCache( SG2DConsts.SYSTEM_TILES[i].url );
+						PIXI.BaseTexture.removeFromCache( SG2DConsts.SYSTEM_TILES[i].url );
+						PIXI.utils.TextureCache[ SG2DConsts.SYSTEM_TILES[i].name ]._isFinalTexture = true;
+					}
 					resolve();
 				});
 			}

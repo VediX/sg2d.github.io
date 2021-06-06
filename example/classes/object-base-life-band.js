@@ -37,6 +37,25 @@ export default class ObjectBaseLifeBand extends SG2DTile {
 		}, SG2DTile.defaultProperties);
 	}
 	
+	initialize(...args) {
+		super.initialize(...args);
+		
+		this.onCameraRotate = this.onCameraRotate.bind(this);
+		this.camera.on("rotate", this.onCameraRotate, void 0, void 0, SGModel.FLAG_IMMEDIATELY);
+	}
+	
+	// the life bar is always at the bottom of the sprite, taking into account the rotation of the camera
+	onCameraRotate(rotate) {
+		if (this.camera.properties.rotation) {
+			this.set("angle", rotate - this.camera.rotate_adjustment, {
+				sprites: [
+					this.sprites.lifeband_base,
+					this.sprites.lifeband_value
+				]
+			});
+		}
+	}
+	
 	setHealth(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
 		if (this.set("health", value, options, flags | SGModel.FLAG_IGNORE_OWN_SETTER)) {
 			this.set("scale", { x: this.properties.health / this.constructor.HEALTH_MAX, y: 1 }, { sprite: this.sprites.lifeband_value });

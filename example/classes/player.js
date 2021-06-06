@@ -106,28 +106,14 @@ export default class Player extends ObjectBaseLifeBand {
 		this.keyProcess = this.keyProcess.bind(this);
 		this.mouse.pointerclick = this.pointerClick.bind(this);
 		this.calcTurretAngleTarget = this.calcTurretAngleTarget.bind(this);
-		this.onCameraRotate = this.onCameraRotate.bind(this);
 		
 		this.mouse.on("pxy", this.calcTurretAngleTarget);
 		document.addEventListener("keydown", this.keyProcess);
 		document.addEventListener("keyup", this.keyProcess);
-		this.camera.on("rotate", this.onCameraRotate);
 		
 		this.on("state", this.stateChange);
 		
 		this.set("angle", this.properties.angle, { sprites: [this.sprites.platform, this.sprites.track_left, this.sprites.track_right] });
-	}
-	
-	// the life bar is always at the bottom of the sprite, taking into account the rotation of the camera
-	onCameraRotate(rotate) {
-		if (this.camera.properties.rotation) {
-			this.set("angle", rotate - this.camera.rotate_adjustment, {
-				sprites: [
-					this.sprites.lifeband_base,
-					this.sprites.lifeband_value
-				]
-			});
-		}
 	}
 	
 	keyProcess(e) {
