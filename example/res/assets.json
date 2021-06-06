@@ -464,6 +464,14 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
 	"sourceSize": {"w":64,"h":64}
 },
+"lands/water":
+{
+	"frame": {"x":64,"y":354,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
 "objects/enemy-a-platform":
 {
 	"frame": {"x":307,"y":626,"w":100,"h":79},
@@ -715,6 +723,6 @@
 	"format": "RGBA8888",
 	"size": {"w":512,"h":1477},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:aef3d7b6efd97c10fca1a794fafc6cc5:575cb16415af0025001e5c5cb945991e:a759b6bbc8381ac9c472b28f589ad0d6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:e0ab2f4611e7ab70b851245b5e0741fd:b217c476634a9b38e3c41321e1e53ab8:a759b6bbc8381ac9c472b28f589ad0d6$"
 }
 }

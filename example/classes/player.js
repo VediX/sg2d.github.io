@@ -202,6 +202,8 @@ export default class Player extends ObjectBaseLifeBand {
 		if (this.properties.load_whizbang > 0) {
 			this.set("load_whizbang", this.properties.load_whizbang - 1);
 		}
+		
+		this.set("alpha", this.centerCluster._f && ! this.centerCluster._r ? 0.5 : 1);
 	}
 	
 	stateChange(state) {

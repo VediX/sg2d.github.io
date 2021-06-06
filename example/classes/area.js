@@ -1,27 +1,46 @@
 import SG2DTile from "../../sg2d-tile.js";
-import {Grass, Sand, BlockStandard, BlockSteel, BlockTriangle, Medikit, Tree} from "./tiles.js";
+import {Water, Grass, Sand, BlockStandard, BlockSteel, BlockTriangle, Medikit, Tree} from "./tiles.js";
 import Utils from "./utils.js";
 
 export default class Area {
 	
 	static build(clusters) {
 		
+		let cluster;
+		
+		// Water
+		let areaX = clusters.areasize>>1, areaY = clusters.areasize>>1;
+		let aSpreading = Utils.getSpreadingRandom( Math.floor(500 + Math.random() * 200));
+		for (var j = aSpreading.length; j--;) {
+			var oSpread = aSpreading[j];
+			if (cluster = clusters.getCluster(areaX + oSpread.x, areaY + oSpread.y)) {
+				if (! cluster._f) {
+					cluster._f = new Water({ position: cluster.position });
+				}
+			}
+		}
+		
+		// Grass
 		let innerSize = clusters.areasize;
 		let q = Math.round(innerSize * innerSize / 100);
 		let aGrounds = [Grass];
 		let aSpreadCounts = [300];
-		let cluster;
+		let landClass, index;
 		for (var i = 1; i <= q; i++) {
-			var	areaX = 5 + Math.floor(Math.random() * (innerSize - 10)),
-				areaY = 5 + Math.floor(Math.random() * (innerSize - 10)),
-				index = Math.floor( Math.random() * aGrounds.length),
-				landClass = aGrounds[index];
-			var aSpreading = Utils.getSpreadingRandom( Math.floor(50 + Math.random() * (aSpreadCounts[index] - 50)));
+			areaX = 5 + Math.floor(Math.random() * (innerSize - 10));
+			areaY = 5 + Math.floor(Math.random() * (innerSize - 10));
+			index = Math.floor( Math.random() * aGrounds.length);
+			landClass = aGrounds[index];
+			aSpreading = Utils.getSpreadingRandom( Math.floor(50 + Math.random() * (aSpreadCounts[index] - 50)));
 			for (var j = aSpreading.length; j--;) {
 				var oSpread = aSpreading[j];
 				if (cluster = clusters.getCluster(areaX + oSpread.x, areaY + oSpread.y)) {
-					if (! cluster._l) {
-						cluster._l = new landClass({ position: cluster.position });
+					if (! cluster._l && ! cluster._f) {
+						if (SG2DClusters.nearestClusters45(cluster, (c)=>{ return !! c._f; })) {
+							// no code (cells are in contact with water)
+						} else {
+							cluster._l = new landClass({ position: cluster.position });
+						}
 					}
 				}
 			}
@@ -30,9 +49,11 @@ export default class Area {
 		clusters.each((cluster)=>{
 			
 			// If you need to use the plug-in for smooth transitions between different soil types (SG2DTransitions), then you can't do without classes
-			if (! cluster._l) {
+			if (! cluster._l && ! cluster._f) {
 				cluster._l = new Sand({ position: cluster.position });
 			}
+			
+			if (cluster._f || SG2DClusters.nearestClusters45(cluster, (c)=>{ return !! c._f; })) return true;
 			
 			// Simple tiles without any functionality can be created directly using the SG2DTile class
 			let bConcrete = false;
@@ -68,14 +89,16 @@ export default class Area {
 				if (cc[a]._e instanceof BlockStandard && cc[a + 90]._e instanceof BlockStandard && ! cc[a + 180]._e && ! cc[a + 270]._e) {
 					cluster._e = new BlockTriangle({ position: cluster.position, type: SG2DMath.normalize_a(a + 45) });
 				} else if (cc[a]._e && cc[a + 90]._e && cc[a + 180]._e && ! cc[a + 270]._e && Math.random() < 0.4) {
-					cluster._m = new Medikit( {position: cluster.position });
+					if (! cluster._f) {
+						cluster._m = new Medikit( {position: cluster.position });
+					}
 				}
 			}
 		});
 		
 		// Trees and bushes
 		clusters.each((cluster)=>{
-			if (! cluster._r && ! cluster._e && ! cluster._m && Math.random() < 0.1) {
+			if (! cluster._f && ! cluster._r && ! cluster._e && ! cluster._m && Math.random() < 0.1) {
 				cluster._e = new Tree( {position: cluster.position });
 			}
 		});

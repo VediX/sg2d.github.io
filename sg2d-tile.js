@@ -98,6 +98,9 @@ export default class SG2DTile extends SGModel {
 	/** @type {boolean} */
 	static isBody = false;
 	
+	/** @type {boolean} */
+	static noDraw = false;
+	
 	/** Ignore common sprite property setters (without options.<sprite|sprites>) */
 	static FLAG_ONLY_OPTIONS_SPRITE = true;
 	
@@ -356,7 +359,7 @@ export default class SG2DTile extends SGModel {
 	
 	/** @private */
 	_pixiSprite(sprite) {
-		if (SG2D._initialized) {
+		if (SG2D._initialized && this.constructor.noDraw === false) {
 			var pixiSprite = sprite.pixiSprite;
 			if (sprite.visible) {
 				if (! pixiSprite) {

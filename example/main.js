@@ -50,12 +50,12 @@ class Application {
 				rotate: 45,
 				position: {x: 224, y: 224}, // Start position of the camera. Default [0, 0]
 				scale_min: 2,
-				scale_max: 16,
+				scale_max: 8,
 				movement_by_pointer: SG2DCamera.MOVEMENT_BY_POINTER_RIGHT,
 				rotate_adjustment: -90 // Base offset of the camera angle in degrees. Default 0
 			},
 			clusters: {
-				areasize: 128
+				areasize: 64
 			},
 			mouse: {
 				cursors: {
@@ -68,8 +68,8 @@ class Application {
 			resize: this.resize.bind(this),
 			layers_enabled: true,
 			layers: {
-				grounds: {},
 				fluids: {},
+				grounds: {},
 				roads: {},
 				bodies: {},
 				animations: {},
@@ -114,6 +114,8 @@ class Application {
 		if (this.scene.frame_index % 30 === 0) {
 			document.querySelector("#info > span").innerText = (1 / this.scene.tRequestAnimationFrame).toFixed(0); // FPS info
 		}
+		
+		this.sceneEffect.waterFluctuations.iterate();
 	}
 	
 	resize() {

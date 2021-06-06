@@ -34,6 +34,8 @@ export default class GraphicsPreparer {
 				textures: ["elements/block-standard", "elements/block-corner-45", "elements/block-corner-135", "elements/block-corner-225", "elements/block-corner-315", "elements/block-steel"],
 				all: true
 			});
+			
+			SG2DUtils.setBorderAlphaTextures({ textures: ["lands/concrete"], alpha: 0.5});
 
 			this.promise.resolve();
 		});

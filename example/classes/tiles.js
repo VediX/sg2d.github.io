@@ -20,6 +20,12 @@ export class Grass extends SG2DTile {
 	static altitude = 2;
 }
 
+export class Water extends SG2DTile {
+	static texture = "lands/water";
+	static layer = "fluids";
+	static noDraw = true;
+}
+
 export class BlockSteel extends SG2DTile {
 	static texture = "elements/block-steel";
 	static layer = "bodies";
