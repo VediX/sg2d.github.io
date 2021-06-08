@@ -692,6 +692,6 @@ export default class SGModel {
 	}
 }
 
-if (typeof window !== "undefined") window.SGModel = SGModel;
-if (typeof self !== "undefined") self.SGModel = SGModel;
+if (typeof window === "object") window.SGModel = SGModel;
+if (typeof self === "object") self.SGModel = SGModel;
 if (typeof _root === "object") _root.SGModel = SGModel;

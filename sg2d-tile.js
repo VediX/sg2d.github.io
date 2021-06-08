@@ -231,7 +231,9 @@ export default class SG2DTile extends SGModel {
 			for (var p in SG2DTile._defaultSpriteValues) {
 				if (properties[p] !== void 0) this.sprite[p] = properties[p];
 			}
-			if (this.properties.layer !== void 0) this.sprite.layer = this.properties.layer;
+			if (this.properties.layer !== void 0) {
+				this.sprite.layer = this.properties.layer;
+			}
 		}
 		
 		SG2DUtils.objectForEach(this.sprites, sprite=>{
@@ -626,5 +628,5 @@ export default class SG2DTile extends SGModel {
 	}
 }
 
-//if (typeof window !== "undefined") window.SG2DTile = SG2DTile;
+//if (typeof window === "object") window.SG2DTile = SG2DTile;
 //if (typeof _root === "object") _root.SG2DTile = SG2DTile;

@@ -519,5 +519,5 @@ export default class SG2DUtils {
 
 SG2DUtils.clone = Object.clone;
 
-if (typeof window !== "undefined") window.SG2DUtils = SG2DUtils;
+if (typeof window === "object") window.SG2DUtils = SG2DUtils;
 if (typeof _root === "object") _root.SG2DUtils = SG2DUtils;

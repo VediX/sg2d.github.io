@@ -164,5 +164,5 @@ export default class SG2DClusters {
 	}
 }
 
-if (typeof window !== "undefined") window.SG2DClusters = SG2DClusters;
+if (typeof window === "object") window.SG2DClusters = SG2DClusters;
 if (typeof _root === "object") _root.SG2DClusters = SG2DClusters;

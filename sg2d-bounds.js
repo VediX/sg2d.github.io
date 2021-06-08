@@ -57,5 +57,5 @@ export default class SG2DBounds {
 	}
 }
 
-if (typeof window !== "undefined") window.SG2DBounds = SG2DBounds;
+if (typeof window === "object") window.SG2DBounds = SG2DBounds;
 if (typeof _root === "object") _root.SG2DBounds = SG2DBounds;

@@ -188,7 +188,7 @@ export default class SG2DCamera extends SGModel {
 		this._followToTile = null;
 	}
 	
-	/** private */
+	/** @private */
 	_sg2dconnect(sg2d) {
 		this.sg2d = sg2d;
 		this.onResize();
@@ -508,7 +508,7 @@ export default class SG2DCamera extends SGModel {
 		this.set("position", void 0, void 0, SG2DCamera.FLAG_FORCE_CALLBACKS);
 	}
 	
-	/** private */
+	/** @private */
 	_iterate() {
 		if (this._followToTile) {
 			SG2DCamera._point.x = this._followToTile.properties.position.x + this.properties.offset.x;
@@ -594,5 +594,5 @@ export default class SG2DCamera extends SGModel {
 	}
 }
 
-if (typeof window !== "undefined") window.SG2DCamera = SG2DCamera;
+if (typeof window === "object") window.SG2DCamera = SG2DCamera;
 if (typeof _root === "object") _root.SG2DCamera = SG2DCamera;

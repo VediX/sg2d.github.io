@@ -24,6 +24,7 @@ export default class SG2D {
 	
 	/** @private */
 	static _instance = null;
+	
 	static getInstance(bIgnoreEmpty) {
 		if (this._instance) {
 			return this._instance;
@@ -343,5 +344,5 @@ export default class SG2D {
 
 SG2D._initializationPromise = SG2DUtils._loadSystemTextures();
 
-if (typeof window !== "undefined") window.SG2D = SG2D;
+if (typeof window === "object") window.SG2D = SG2D;
 if (typeof _root === "object") _root.SG2D = SG2D;

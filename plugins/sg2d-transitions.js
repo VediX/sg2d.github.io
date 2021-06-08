@@ -261,4 +261,4 @@ export default class SG2DTransitions extends SG2DPluginBase {
 	}
 }
 
-if (typeof window !== "undefined") window.SG2DTransitions = SG2DTransitions;
+if (typeof window === "object") window.SG2DTransitions = SG2DTransitions;

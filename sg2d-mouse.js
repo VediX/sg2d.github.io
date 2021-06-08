@@ -59,7 +59,7 @@ export default class SG2DMouse extends SGModel {
 		this.target.pxy_local = {x: void 0, y: void 0};
 	}
 	
-	/** private */
+	/** @private */
 	_sg2dconnect(sg2d) {
 		
 		this.sg2d = sg2d;
@@ -218,5 +218,5 @@ export default class SG2DMouse extends SGModel {
 	}
 }
 
-if (typeof window !== "undefined") window.SG2DMouse = SG2DMouse;
+if (typeof window === "object") window.SG2DMouse = SG2DMouse;
 if (typeof _root === "object") _root.SG2DMouse = SG2DMouse;

@@ -16,8 +16,8 @@ export class Grass extends SG2DTile {
 	static layer = "grounds";
 	
 	static useTransitions = true;
-	static char = "g";
-	static altitude = 2;
+	static char = "g"; // One-character tile code for SG2DTransitions plugin
+	static altitude = 2; // Tile height for SG2DTransitions plugin
 }
 
 export class Water extends SG2DTile {
@@ -54,15 +54,23 @@ export class BlockTriangle extends SG2DTile {
 
 export class Tree extends SG2DTile {
 	static texture = "elements/trees/tree_";
-	static layer = "bodies";
+	static layer = "trees";
 	static zindex = 20;
-	static zindexForBush = 9;
-	static bushes = [2,9,12,13,16,24];
 	initialize(...args) {
 		super.initialize(...args);
-		let n = Math.floor(1 + Math.random() * 47);
+		let n = Math.floor(1 + Math.random() * 41);
 		this.set("texture", Tree.texture + (n<10?"0":"") + n);
-		if (Tree.bushes.indexOf(n) !== -1) this.zindex = Tree.zindexForBush;
+	}
+}
+
+export class Bush extends SG2DTile {
+	static texture = "elements/bushes/bush_";
+	static layer = "bodies";
+	static zindex = 9;
+	initialize(...args) {
+		super.initialize(...args);
+		let n = Math.floor(1 + Math.random() * 6);
+		this.set("texture", Bush.texture + (n<10?"0":"") + n);
 	}
 }
 

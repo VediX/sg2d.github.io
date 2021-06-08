@@ -1,5 +1,5 @@
 import SG2DTile from "../../sg2d-tile.js";
-import {Water, Grass, Sand, BlockStandard, BlockSteel, BlockTriangle, Medikit, Tree} from "./tiles.js";
+import {Water, Grass, Sand, BlockStandard, BlockSteel, BlockTriangle, Medikit, Tree, Bush} from "./tiles.js";
 import Utils from "./utils.js";
 
 export default class Area {
@@ -98,8 +98,13 @@ export default class Area {
 		
 		// Trees and bushes
 		clusters.each((cluster)=>{
-			if (! cluster._f && ! cluster._r && ! cluster._e && ! cluster._m && Math.random() < 0.1) {
-				cluster._e = new Tree( {position: cluster.position });
+			if (! cluster._f && ! cluster._r && ! cluster._e && ! cluster._m) {
+				var r = Math.random();
+				if (r < 0.1) {
+					cluster._e = new Tree( {position: cluster.position });
+				} else if (r < 0.12) {
+					cluster._e = new Bush( {position: cluster.position });
+				}
 			}
 		});
 	}

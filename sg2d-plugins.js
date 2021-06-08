@@ -44,4 +44,4 @@ export default class SG2DPlugins {
 	}
 }
 
-if (typeof window !== "undefined") window.SG2DPlugins = SG2DPlugins;
+if (typeof window === "object") window.SG2DPlugins = SG2DPlugins;

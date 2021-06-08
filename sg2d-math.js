@@ -204,5 +204,5 @@ export default SG2DMath;
 	};
 })();
 
-if (typeof window !== "undefined") window.SG2DMath = SG2DMath;
+if (typeof window === "object") window.SG2DMath = SG2DMath;
 if (typeof _root === "object") _root.SG2DMath = SG2DMath;

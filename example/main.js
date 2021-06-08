@@ -68,10 +68,12 @@ class Application {
 			resize: this.resize.bind(this),
 			layers_enabled: true,
 			layers: {
+				bottom: {},
 				fluids: {},
 				grounds: {},
 				roads: {},
 				bodies: {},
+				trees: {},
 				animations: {},
 				interface: { position: SG2D.LAYER_POSITION_FIXED, zindex: 10 }
 			},
@@ -116,6 +118,7 @@ class Application {
 		}
 		
 		this.sceneEffect.waterFluctuations.iterate();
+		this.sceneEffect.treesFluctuations.iterate();
 	}
 	
 	resize() {
