@@ -116,9 +116,6 @@ class Application {
 		if (this.scene.frame_index % 30 === 0) {
 			document.querySelector("#info > span").innerText = (1 / this.scene.tRequestAnimationFrame).toFixed(0); // FPS info
 		}
-		
-		this.sceneEffect.waterFluctuations.iterate();
-		this.sceneEffect.treesFluctuations.iterate();
 	}
 	
 	resize() {

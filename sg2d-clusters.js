@@ -58,6 +58,7 @@ export default class SG2DClusters {
 		if (SG2DClusters.permissible_sizes.indexOf(SG2DConsts.AREASIZE) === -1) throw "Side of map size cannot differ from " + SG2DClusters.permissible_sizes.join(",") + "! Now SG2DConsts.AREASIZE=" + SG2DConsts.AREASIZE;
 
 		this.areasize = this.width = this.height = SG2DConsts.AREASIZE;
+		this.areasizepix = this.areasize * SG2DConsts.CELLSIZEPIX;
 
 		this.clusters = [];
 		this.tiles = SG2DClusters.tiles;

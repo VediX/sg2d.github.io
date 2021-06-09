@@ -627,6 +627,3 @@ export default class SG2DTile extends SGModel {
 		super.destroy();
 	}
 }
-
-//if (typeof window === "object") window.SG2DTile = SG2DTile;
-//if (typeof _root === "object") _root.SG2DTile = SG2DTile;

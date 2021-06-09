@@ -43,7 +43,7 @@ export default class SG2DMouse extends SGModel {
 		
 		// passed to thisProps: { sg2d: this }
 		
-		this.camera = this.sg2d.camera;
+		//this.camera = this.sg2d.camera;
 		
 		if (! SG2DMouse._newPosition) SG2DMouse._newPosition = new PIXI.Point();
 		
@@ -63,6 +63,7 @@ export default class SG2DMouse extends SGModel {
 	_sg2dconnect(sg2d) {
 		
 		this.sg2d = sg2d;
+		this.camera = this.sg2d.camera;
 		
 		this.properties.global = this.sg2d.pixi.renderer.plugins.interaction.mouse.global;
 		

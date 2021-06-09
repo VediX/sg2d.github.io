@@ -16,6 +16,7 @@ import SG2DCamera from './sg2d-camera.js';
 import SG2DMouse from './sg2d-mouse.js';
 import SG2DMath from './sg2d-math.js';
 import SG2DUtils from './sg2d-utils.js';
+import SG2DEffects from './sg2d-effects.js';
 import SG2DPlugins from './sg2d-plugins.js';
 import SG2DPluginBase from './sg2d-plugin-base.js';
 import SG2DDebugging from './sg2d-debugging.js';
@@ -228,13 +229,16 @@ export default class SG2D {
 		this.camera = config.camera instanceof SG2DCamera ? config.camera : new SG2DCamera(config.camera);
 		this.camera._sg2dconnect && this.camera._sg2dconnect(this);
 		
-		this.mouse = config.mouse instanceof SG2DMouse ? config.mouse : new SG2DMouse(config.mouse, { sg2d: this });
+		this.mouse = config.mouse instanceof SG2DMouse ? config.mouse : new SG2DMouse(config.mouse);
 		this.mouse._sg2dconnect && this.mouse._sg2dconnect(this);
 		
 		this.resize = SG2DUtils.debounce(this.resize, 100).bind(this);
 		addEventListener("resize", this.resize);
 		
 		SG2D._pluginsPromise = SG2DPlugins.load(config.plugins);
+		
+		this.effects = config.effects instanceof SG2DEffects ? config.effects : new SG2DEffects(config.effects);
+		this.effects._sg2dconnect && this.effects._sg2dconnect(this);
 		
 		this.state = SG2D.STATE_IDLE;
 		if (autoStart) this.run();
@@ -276,13 +280,15 @@ export default class SG2D {
 		
 		this.mouse.iterate();
 		
-		//if (this.camera.properties.scale > 2) {
-			for (var cluster of this.camera.clustersInCamera) {
-				for (var tile of cluster.tiles) {
-					if (tile.iterateAnimations) tile.iterateAnimations(this.frame_index);
-				}
+		for (var cluster of this.camera.clustersInCamera) {
+			for (var tile of cluster.tiles) {
+				if (tile.iterateAnimations) tile.iterateAnimations(this.frame_index);
 			}
-		//}
+		}
+		
+		for (var effect of this.effects.effects) {
+			effect.iterate && effect.iterate();
+		}
 		
 		this.iterate_out();
 
