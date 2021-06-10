@@ -1,0 +1,31 @@
+{
+	"name": "SG2D",
+	"version": "1.0.0",
+	"description": "SG2D is a 2D graphics engine based on PixiJS and MatterJS, optimized for large maps through matrix tile clustering",
+	"main": "build/sg2d.js",
+	"scripts": {
+		"build": "webpack"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/VediX/sg2d.github.io.git"
+	},
+	"author": "Kalashnikov Ilya <ilyak@sg2d.ru> (http://sg2d.ru/)",
+	"license": "MIT",
+	"homepage": "sg2d.ru",
+	"keywords": [
+		"sg2d",
+		"graphics",
+		"2D",
+		"game",
+		"pixijs"
+	],
+	"devDependencies": {
+		"babel-core": "^6.22.1",
+		"babel-loader": "^6.2.10",
+		"babel-preset-es2015": "^6.22.0",
+		"case": "^1.4.2",
+		"webpack": "^2.2.1"
+	},
+	"dependencies": {}
+}

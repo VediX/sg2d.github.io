@@ -1,4 +1,6 @@
 /_nogit
 /nbproject/private/
 /nbproject
-/assets
+/node_modules
+/package-lock.json
+/docs/assets
