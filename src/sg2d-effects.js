@@ -1,17 +1,16 @@
 /**
  * SG2DEffects
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
+ * (c) 2019-2021 Kalashnikov Ilya
  */
 
 "use strict";
 
+import SG2DConsts from "./sg2d-consts.js";
+import SG2DUtils from "./sg2d-utils.js";
+
 export default class SG2DEffects {
 	
-	static TYPE_SHADOWS = 1;
-	static TYPE_BEVELS = 2;
-	static TYPE_DISPLACEMENT = 3;
-		
 	constructor() {
 		this.effects = new Set();
 	}
@@ -128,5 +127,6 @@ export default class SG2DEffects {
 	}
 }
 
-if (typeof window === "object") window.SG2DEffects = SG2DEffects;
-if (typeof _root === "object") _root.SG2DEffects = SG2DEffects;
+SG2DEffects.TYPE_SHADOWS = 1;
+SG2DEffects.TYPE_BEVELS = 2;
+SG2DEffects.TYPE_DISPLACEMENT = 3;

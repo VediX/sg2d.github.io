@@ -1,73 +1,18 @@
 /**
  * SG2DCamera
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
+ * (c) 2019-2021 Kalashnikov Ilya
  */
 
 "use strict";
 
 import SGModel from './libs/sg-model.js';
-import SG2D from './sg2d.js';
 import SG2DConsts from './sg2d-consts.js';
 import SG2DMath from './sg2d-math.js';
 import SG2DDebugging from './sg2d-debugging.js';
 
 export default class SG2DCamera extends SGModel {
 		
-	static singleInstance = true;
-	
-	static ROTATE_ADJUSTMENT = 0; // default
-	
-	static SCALE_MIN = 2;
-	static SCALE_NORMAL = 8;
-	static SCALE_MAX = 10;
-	
-	static MOVEMENT_BY_POINTER = 0b00000001;
-	static MOVEMENT_BY_POINTER_LEFT = 0b00000001;
-	static MOVEMENT_BY_POINTER_RIGHT = 0b00000010;
-	static MOVEMENT_BY_POINTER_MIDDLE = 0b00000100;
-	
-	static STATE_NO_MOVEMENT = 0;
-	static STATE_MOVEMENT_WAITING_SHIFT = 1;
-	static STATE_MOVING = 2;
-	
-	/**
-	 * Camera smoothness factor
-	 * @public
-	 */
-	static SMOOTHNESS_FACTOR = 0.25;
-	
-	static typeProperties = {
-		rotate: SGModel.TYPE_NUMBER,
-		rotation: SGModel.TYPE_BOOLEAN,
-		position: SGModel.TYPE_OBJECT_NUMBERS,
-		target: SGModel.TYPE_OBJECT_NUMBERS,
-		offset: SGModel.TYPE_OBJECT_NUMBERS,
-		wh: SGModel.TYPE_OBJECT_NUMBERS,
-		wh05: SGModel.TYPE_OBJECT_NUMBERS,
-		boundsPX: SGModel.TYPE_OBJECT_NUMBERS,
-		boundsCluster: SGModel.TYPE_OBJECT_NUMBERS
-	};
-	
-	static ownSetters = {
-		rotate: true,
-		position: true
-	};
-	
-	/** @public */
-	static moveTo(...args) {
-		SG2DCamera.getInstance().moveTo.apply(SG2DCamera.getInstance(), ...args);
-	}
-	
-	static scaling(params) {
-		if (SG2DCamera.getInstance().properties.scale_wheel) {
-			SG2DCamera.getInstance().onWheelScale({deltaY: params.action === "-" ? 1 : -1});
-		}
-	}
-	
-	/** @private */
-	static _point = {x: void 0, y: void 0};
-	
 	defaults() {
 		return {
 			scale: SG2DCamera.SCALE_NORMAL, // Scaling, for example: 16 -> 128px (200%), ..., 9 -> 72px (112%),  8 -> 64px (100%), 7 -> 56px, 6 -> 48px, 5 -> 40px, 4 -> 32px, 3 -> 24px, 2 -> 16px, 1-> 8px (12.5%)
@@ -226,12 +171,6 @@ export default class SG2DCamera extends SGModel {
 	startPosition(position) {
 		this.moveTo(position, true);
 	}
-	
-	/** @private */
-	static _boundsPX = {};
-	
-	/** @private */
-	static _boundsCluster = {};
 	
 	/** Own setter for position property*/
 	setPosition(value, options = SGModel.OBJECT_EMPTY, flags = 0) {
@@ -446,9 +385,6 @@ export default class SG2DCamera extends SGModel {
 		if (bChangeBoundsCluster) this.trigger("boundsCluster");
 	}
 	
-	/** @private */
-	static _moveToTarget = {x: 0, y: 0};
-	
 	/**
 	 * Tile that the camera will follow
 	 */
@@ -469,7 +405,7 @@ export default class SG2DCamera extends SGModel {
 	 * @param {object|number, number} point
 	 * @param {boolean} [flag=false] Move instantly (true) or smoothly (false)
 	 */
-	moveTo(...args) {
+	moveTo() {
 		if (typeof arguments[0] === "object") {
 			this.set("target", arguments[0], SGModel.OPTIONS_PRECISION_5);
 			if (arguments[1] === true) {
@@ -594,5 +530,65 @@ export default class SG2DCamera extends SGModel {
 	}
 }
 
-if (typeof window === "object") window.SG2DCamera = SG2DCamera;
-if (typeof _root === "object") _root.SG2DCamera = SG2DCamera;
+SG2DCamera.singleInstance = true;
+
+SG2DCamera.ROTATE_ADJUSTMENT = 0; // default
+
+SG2DCamera.SCALE_MIN = 2;
+SG2DCamera.SCALE_NORMAL = 8;
+SG2DCamera.SCALE_MAX = 10;
+
+SG2DCamera.MOVEMENT_BY_POINTER = 0b00000001;
+SG2DCamera.MOVEMENT_BY_POINTER_LEFT = 0b00000001;
+SG2DCamera.MOVEMENT_BY_POINTER_RIGHT = 0b00000010;
+SG2DCamera.MOVEMENT_BY_POINTER_MIDDLE = 0b00000100;
+
+SG2DCamera.STATE_NO_MOVEMENT = 0;
+SG2DCamera.STATE_MOVEMENT_WAITING_SHIFT = 1;
+SG2DCamera.STATE_MOVING = 2;
+
+/**
+ * Camera smoothness factor
+ * @public
+ */
+SG2DCamera.SMOOTHNESS_FACTOR = 0.25;
+
+SG2DCamera.typeProperties = {
+	rotate: SGModel.TYPE_NUMBER,
+	rotation: SGModel.TYPE_BOOLEAN,
+	position: SGModel.TYPE_OBJECT_NUMBERS,
+	target: SGModel.TYPE_OBJECT_NUMBERS,
+	offset: SGModel.TYPE_OBJECT_NUMBERS,
+	wh: SGModel.TYPE_OBJECT_NUMBERS,
+	wh05: SGModel.TYPE_OBJECT_NUMBERS,
+	boundsPX: SGModel.TYPE_OBJECT_NUMBERS,
+	boundsCluster: SGModel.TYPE_OBJECT_NUMBERS
+};
+
+SG2DCamera.ownSetters = {
+	rotate: true,
+	position: true
+};
+
+/** @public */
+SG2DCamera.moveTo = function(...args) {
+	SG2DCamera.getInstance().moveTo.apply(SG2DCamera.getInstance(), ...args);
+}
+
+SG2DCamera.scaling = function(params) {
+	if (SG2DCamera.getInstance().properties.scale_wheel) {
+		SG2DCamera.getInstance().onWheelScale({deltaY: params.action === "-" ? 1 : -1});
+	}
+}
+
+/** @private */
+SG2DCamera._point = {x: void 0, y: void 0};
+
+/** @private */
+SG2DCamera._boundsPX = {};
+
+/** @private */
+SG2DCamera._boundsCluster = {};
+
+/** @private */
+SG2DCamera._moveToTarget = {x: 0, y: 0};

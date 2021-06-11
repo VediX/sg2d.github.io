@@ -1,4 +1,4 @@
-import SG2DTransitions from "./../../plugins/sg2d-transitions.js";
+import SG2DTransitions from "./../libs/sg2d/plugins/sg2d-transitions.js";
 
 export default class SceneEffects {
 	static toApply(scene) {

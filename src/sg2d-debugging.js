@@ -1,18 +1,19 @@
 /**
  * SG2DDebugging
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
+ * (c) 2019-2021 Kalashnikov Ilya
  */
 
 "use strict";
 
-import SG2D from './sg2d.js';
+import SG2DApplication from './sg2d-application.js';
 import SG2DConsts from './sg2d-consts.js';
+import SG2DMath from "./sg2d-math.js";
 
-export default class SG2DDebugging {
-	static drawDebug() {
+var SG2DDebugging = {
+	drawDebug: function() {
 		
-		let sg2d = SG2D.getInstance();
+		let sg2d = SG2DApplication.getInstance();
 		let clusters = sg2d.clusters;
 		let camera = sg2d.camera;
 		
@@ -166,11 +167,11 @@ export default class SG2DDebugging {
 			}
 			this._temp115 = void 0;
 		}
-	}
+	},
 	
-	static drawDebug2() {
+	drawDebug2: function() {
 		
-		let sg2d = SG2D.getInstance();
+		let sg2d = SG2DApplication.getInstance();
 		let camera = sg2d.camera;
 		
 		if (SG2DConsts.DEBUGGING.CAMERA.SHOW.CLUSTERS_IN_OUT) {
@@ -215,11 +216,12 @@ export default class SG2DDebugging {
 			}
 			this._temp113 = void 0;
 		}
-	}
+	},
 	
 	/** @private */
-	static _bodiesDrawed = new Set();
-	static drawSG2DBodyLines(tile) {
+	_bodiesDrawed: new Set(),
+	
+	drawSG2DBodyLines: function(tile) {
 		if (tile && tile.body && tile.body.vertices && tile.body.vertices.length) {
 			if (! this._bodiesDrawed.has(tile.body)) {
 				this._bodiesDrawed.add(tile.body);
@@ -245,14 +247,16 @@ export default class SG2DDebugging {
 				SG2D._instance.viewport.addChild(graphics);
 			}
 		}
-	}
-	static undrawSG2DBodyLines(tile) {
+	},
+	
+	undrawSG2DBodyLines: function(tile) {
 		if (tile && tile.body && this._bodiesDrawed.has(tile.body)) {
 			SG2D._instance.viewport.removeChild(tile.body._sg2dLines);
 			this._bodiesDrawed.delete(tile.body);
 		}
-	}
-	static redrawSG2DBodiesLines() {
+	},
+	
+	redrawSG2DBodiesLines: function() {
 		for (var body of this._bodiesDrawed) {
 			if (body.removed) {
 				SG2D._instance.viewport.removeChild(body._sg2dLines);
@@ -264,9 +268,11 @@ export default class SG2DDebugging {
 			body._sg2dLines.y = body.position.y;
 			body._sg2dLines.angle = (body.angle - body._sg2dLines.angle_init) / SG2DMath.PI180;
 		}
-	}
+	},
 	
-	static clear() {
+	clear: function() {
 		this._bodiesDrawed.clear();
 	}
 };
+
+export default SG2DDebugging;

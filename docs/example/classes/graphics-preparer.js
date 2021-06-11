@@ -1,5 +1,4 @@
-import Deferred from "../../libs/deferred.js";
-import SG2DFonts from "../../sg2d-fonts.js";
+import Deferred from "../libs/deferred.js";
 
 export default class GraphicsPreparer {
 	static promise = Deferred();
@@ -12,30 +11,30 @@ export default class GraphicsPreparer {
 		]).load(async(loader, resources)=>{
 
 			// Parsing composite images, for example, "explosion_64x64.png" will be decomposed into several images
-			SG2DUtils.parseTexturePack(resources);
+			SG2D.Utils.parseTexturePack(resources);
 
 			// Prepare the graphic font
-			SG2DFonts.addFont({
+			SG2D.Fonts.addFont({
 				name: "metal_yellow_big",
 				texture: "fonts/metal_yellow_big_48x50h",
 				schema: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789?!().:"
 			});
 
 			// Get the mouse cursor icons
-			this.cursors.default = "url('" + URL.createObjectURL(await SG2DUtils.getTextureAsBlob("ui/cursor_default")) + "'),auto";
-			this.cursors.target = "url('" + URL.createObjectURL(await SG2DUtils.getTextureAsBlob("ui/cursor_target")) + "') 16 16,auto";
-			this.cursors.move = "url('" + URL.createObjectURL(await SG2DUtils.getTextureAsBlob("ui/cursor_move")) + "') 16 16,auto";
+			this.cursors.default = "url('" + URL.createObjectURL(await SG2D.Utils.getTextureAsBlob("ui/cursor_default")) + "'),auto";
+			this.cursors.target = "url('" + URL.createObjectURL(await SG2D.Utils.getTextureAsBlob("ui/cursor_target")) + "') 16 16,auto";
+			this.cursors.move = "url('" + URL.createObjectURL(await SG2D.Utils.getTextureAsBlob("ui/cursor_move")) + "') 16 16,auto";
 
 			// Process sprites to eliminate stripe artifacts
-			SG2DUtils.setBorderAlphaTextures();
+			SG2D.Utils.setBorderAlphaTextures();
 			
 			// Processing sprites to eliminate ribbing when rotating sprites
-			SG2DUtils.addBorderAlphaTextures({
+			SG2D.Utils.addBorderAlphaTextures({
 				textures: ["elements/block-standard", "elements/block-corner-45", "elements/block-corner-135", "elements/block-corner-225", "elements/block-corner-315", "elements/block-steel"],
 				all: true
 			});
 			
-			SG2DUtils.setBorderAlphaTextures({ textures: ["lands/concrete"], alpha: 0.5});
+			SG2D.Utils.setBorderAlphaTextures({ textures: ["lands/concrete"], alpha: 0.5});
 
 			this.promise.resolve();
 		});

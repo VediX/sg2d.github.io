@@ -1,42 +1,16 @@
 /**
  * SG2DClusters
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
+ * (c) 2019-2021 Kalashnikov Ilya
  */
 
 "use strict";
 
-import SG2D from './sg2d.js';
 import SG2DConsts from './sg2d-consts.js';
 import SG2DMath from './sg2d-math.js';
 import SG2DCluster from './sg2d-cluster.js';
 
 export default class SG2DClusters {
-	
-	static permissible_sizes = [8,16,32,64,128,256,512,1024];
-	static _x = 0;
-	static _y = 0;
-	
-	static _instance = null;
-	static getInstance() {
-		if (this._instance) {
-			return this._instance;
-		} else {
-			throw "Error! SG2DClusters._instance is empty!";
-		}
-	}
-	
-	static tiles = []; // all tiles (Array is faster than Set in Mozilla)
-	static tilesset = new Set(); // all tiles
-	static bodies = new Set(); // all colliding bodies
-	
-	static each(f) { return SG2DClusters.getInstance().each(f); }
-	static getCluster(x, y) { return SG2DClusters.getInstance().getCluster(x, y); }
-	static getClusterCXY(cxy) { return SG2DClusters.getInstance().getClusterCXY(cxy); }
-	static inArea(x, y) { return SG2DClusters.getInstance().inArea(x, y); }
-	static outArea(x, y) { return SG2DClusters.getInstance().outArea(x, y); }
-	static nearestClusters90(cluster, checker) { return SG2DClusters.getInstance().nearestClusters90(cluster, checker); }
-	static nearestClusters45(cluster, checker) { return SG2DClusters.getInstance().nearestClusters45(cluster, checker); }
 	
 	/**
 	 * Config parameters and default values:
@@ -165,5 +139,27 @@ export default class SG2DClusters {
 	}
 }
 
-if (typeof window === "object") window.SG2DClusters = SG2DClusters;
-if (typeof _root === "object") _root.SG2DClusters = SG2DClusters;
+SG2DClusters.permissible_sizes = [8,16,32,64,128,256,512,1024];
+SG2DClusters._x = 0;
+SG2DClusters._y = 0;
+
+SG2DClusters._instance = null;
+SG2DClusters.getInstance = function() {
+	if (this._instance) {
+		return this._instance;
+	} else {
+		throw "Error! SG2DClusters._instance is empty!";
+	}
+}
+
+SG2DClusters.tiles = []; // all tiles (Array is faster than Set in Mozilla)
+SG2DClusters.tilesset = new Set(); // all tiles
+SG2DClusters.bodies = new Set(); // all colliding bodies
+
+SG2DClusters.each = function(f) { return SG2DClusters.getInstance().each(f); }
+SG2DClusters.getCluster = function(x, y) { return SG2DClusters.getInstance().getCluster(x, y); }
+SG2DClusters.getClusterCXY = function(cxy) { return SG2DClusters.getInstance().getClusterCXY(cxy); }
+SG2DClusters.inArea = function(x, y) { return SG2DClusters.getInstance().inArea(x, y); }
+SG2DClusters.outArea = function(x, y) { return SG2DClusters.getInstance().outArea(x, y); }
+SG2DClusters.nearestClusters90 = function(cluster, checker) { return SG2DClusters.getInstance().nearestClusters90(cluster, checker); }
+SG2DClusters.nearestClusters45 = function(cluster, checker) { return SG2DClusters.getInstance().nearestClusters45(cluster, checker); }

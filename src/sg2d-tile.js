@@ -1,13 +1,13 @@
 /**
  * SG2DTile
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
+ * (c) 2019-2021 Kalashnikov Ilya
  */
 
 "use strict";
 
 import SGModel from './libs/sg-model.js';
-import SG2D from './sg2d.js';
+import SG2DApplication from './sg2d-application.js';
 import SG2DConsts from './sg2d-consts.js';
 import SG2DUtils from './sg2d-utils.js';
 import SG2DMath from './sg2d-math.js';
@@ -16,196 +16,6 @@ import SG2DBounds from './sg2d-bounds.js';
 import SG2DDebugging from './sg2d-debugging.js';
 
 export default class SG2DTile extends SGModel {
-	
-	static typeProperties = { // overriden with Object.assign(...)
-		texture: SGModel.TYPE_STRING,
-		position: SGModel.TYPE_OBJECT_NUMBERS,
-		angle: SGModel.TYPE_NUMBER,
-		anchor: SGModel.TYPE_NUMBER_OR_XY,
-		scale: SGModel.TYPE_NUMBER_OR_XY,
-		alpha: SGModel.TYPE_NUMBER,
-		visible: SGModel.TYPE_BOOLEAN,
-		zindex: SGModel.TYPE_NUMBER,
-		cxy: SGModel.TYPE_OBJECT_NUMBERS
-	};
-	
-	/**@type {(void 0|string)} */
-	static layer = void 0; // if equal to void 0, the default layer is used (PIXI.Container)
-	
-	/**@type {string} */
-	static texture = SG2DConsts.TILE_OVERRIDE; // overriden 
-	
-	/**@type {number} */
-	static angle = 0;
-	
-	/**@type {number} */
-	static anchor = 0.5;
-	
-	/**@type {number} */
-	static scale = 1;
-	
-	/**@type {number} */
-	static alpha = 1;
-	
-	/**@type {boolean} */
-	static visible = true;
-	
-	/**
-	 * Main zindex is added to zindex of sprites, except for sprite with name="main"
-	 * @type {number}
-	 */
-	static zindex = 0;
-	
-	/**
-	* @typedef SG2DAnimationConfig
-	* @type {object}
-	* @property {number} [start=1]
-	* @property {number} count
-	* @property {number} [sleep=1]
-	* @property {boolean} [running=false]
-	* @property {boolean} [loop=false]
-	* @property {function} [onComplete=void 0]
-	*
-	* @type {SG2DAnimationConfig}
-	static animation = { start: 1, count: 8, sleep: 2, basetexture: "objects/tank_shot_", running: true }; // example
-	*/
-	
-	/**
-	* @typedef SG2DSpriteConfig
-	* @type {object}
-	* @property {string} texture
-	* @property {(number|object)} [anchor=0.5]
-	* @property {number} [angle=0] - in degrees
-	* @property {(number|object)} [scale=1]
-	* @property {number} [zindex=0]
-	* @property {SG2DAnimationConfig} [animation]
-	* 
-	* @type {SG2DSpriteConfig[]}
-	static sprites = { // example
-		tank_platform: { texture: "objects/tank-platform", zindex: 2 },
-		tank_turret: { texture: "objects/tank-turret", anchor: { x: 0.5, y: 0.2 }, zindex: 3 }
-		tank_track_left: { texture: "objects/tank-track", offset: { x: -40, y: 0 }, zindex: 1, basetexture: { count: 8, sleep: 2 } }
-		tank_track_right { texture: "objects/tank-track", offset: {x: 40, y: 0}, zindex: 1, basetexture: { count: 8, sleep: 2 } }
-	};
-	*/
-	
-	/**
-	 * @type {boolean}
-	 * @readonly
-	 */
-	static isTile = true;
-	
-	/** @type {boolean} */
-	static isBody = false;
-	
-	/** @type {boolean} */
-	static noDraw = false;
-	
-	/** Ignore common sprite property setters (without options.<sprite|sprites>) */
-	static FLAG_ONLY_OPTIONS_SPRITE = true;
-	
-	// To handle a click on a tile class, define this method in the tile class
-	// static click(target, options) {...}
-	
-	/** @private */
-	static _initPrevPosition = {x: -1, y: -1};
-	
-	/** @private */
-	static _point = {x: void 0, y: void 0};
-	
-	static ownSetters = { // overriden with Object.assign(...)
-		position: true,
-		angle: true,
-		anchor: true,
-		scale: true,
-		alpha: true,
-		visible: true,
-		zindex: true,
-		texture: true
-	};
-	
-	static defaultProperties = {
-		id: void 0,
-		position: {x: 0, y: 0},
-		angle: 0,
-		anchor: 0.5,
-		scale: 1,
-		alpha: 1,
-		visible: true,
-		zindex: 0,
-		layer: void 0,
-		cxy: {x: 0, y: 0},
-		drawed: false
-	}
-	
-	/** @private */
-	static _defaultSpriteValues = {
-		angle: 0,
-		anchor: 0.5,
-		scale: 1,
-		alpha: 1,
-		visible: true,
-		zindex: 0
-	};
-	
-	/** @private */
-	static _prepareStaticConfigSprites() {
-		
-		if (this.hasOwnProperty("_spritesPrepared")) {
-			return;
-		} else {
-			this._spritesPrepared = true;
-		}
-		
-		if (! this.hasOwnProperty("sprites")) {
-			this.sprites = { main: this._prepareSpriteProperties({ name: "main" }, this) }
-		} else {
-			this.sprites = this._prepareMultipleSprites(this.sprites);
-		}
-		
-		if (this.sprites.main) this.sprite = this.sprites.main;
-		if (this.sprite) {
-			if (this.animation !== void 0) {
-				this.sprite.animation = SGModel.clone(this.animation);
-			}
-		}
-		
-		if (this.zindex !== void 0) {
-			SG2DUtils.objectForEach(this.sprites, sprite=>{
-				if (sprite.name !== "main") {
-					sprite.zindex += this.zindex;
-				}
-			});
-		}
-	}
-	
-	/** @private */
-	static  _prepareMultipleSprites(sprites, parentSprite = void 0) {
-		for (var name in sprites) {
-			const sprite = sprites[name];
-			sprite.name = name;
-			if (parentSprite) {
-				sprite.parent = parentSprite.name;
-				sprite.setter_flag = SG2DTile.FLAG_ONLY_OPTIONS_SPRITE;
-			}
-			this._prepareSpriteProperties(sprite);
-			if (sprite.sprites) {
-				sprites = {...sprites, ...this._prepareMultipleSprites(sprite.sprites, sprite)};
-			}
-		}
-		return sprites;
-	}
-	
-	/** @private */
-	static _prepareSpriteProperties(dest, src = void 0) {
-		if (! src) src = dest;
-		dest.texture = typeof src.texture !== void 0 ? src.texture : SG2DConsts.TILE_OVERRIDE;
-		for (var p in SG2DTile._defaultSpriteValues) {
-			dest[p] = SG2DUtils.ifUndefined(src[p], SG2DTile._defaultSpriteValues[p]);
-		}
-		dest.layer = src.layer || this.layer;
-		return dest;
-	}
 	
 	initialize(properties, thisProps, options) {
 		
@@ -335,7 +145,7 @@ export default class SG2DTile extends SGModel {
 	 * For moving sprites, checks if drawing is required when hitting the camera
 	 */
 	drawUndraw(sprite = void 0) {
-		if (! SG2DConsts.ONLY_LOGIC && SG2D._initialized) {
+		if (! SG2DConsts.ONLY_LOGIC && SG2DApplication._initialized) {
 			if (! this.clusters) debugger; // TODO DEL DEBUG
 			for (var cluster of this.clusters) {
 				if (cluster.drawed) {
@@ -361,18 +171,18 @@ export default class SG2DTile extends SGModel {
 	
 	/** @private */
 	_pixiSprite(sprite) {
-		if (SG2D._initialized && this.constructor.noDraw === false) {
+		if (SG2DApplication._initialized && this.constructor.noDraw === false) {
 			var pixiSprite = sprite.pixiSprite;
 			if (sprite.visible) {
 				if (! pixiSprite) {
 					let texture = this.updateSpriteTexture(sprite, sprite.animation && sprite.animation.running ? this.getAnimationTexture(sprite) : sprite.texture);
 					pixiSprite = sprite.pixiSprite = new PIXI.Sprite(texture);
 					pixiSprite.tile = this;
-					SG2D.drawSprite(pixiSprite, sprite.layer);
+					SG2DApplication.drawSprite(pixiSprite, sprite.layer);
 				}
 			} else {
 				if (pixiSprite) {
-					SG2D.removeSprite(sprite.pixiSprite);//, {children: true}); // TODO? Bush transform=null!!!=>Error in pixi.js
+					SG2DApplication.removeSprite(sprite.pixiSprite);//, {children: true}); // TODO? Bush transform=null!!!=>Error in pixi.js
 					delete sprite.pixiSprite;
 				}
 			}
@@ -389,15 +199,12 @@ export default class SG2DTile extends SGModel {
 		}
 	}
 	
-	/** @private */
-	static _textures_not_founded = [];
-	
 	removeSprites() { // default (override if there is a complicated rendering or several pictures)
 		if (this.properties.drawed) {
 			for (var name in this.sprites) {
 				var sprite = this.sprites[name];
 				if (sprite.pixiSprite) {
-					SG2D.removeSprite(sprite.pixiSprite);//, {children: true}); // TODO? Bush transform=null!!!=>Error in pixi.js
+					SG2DApplication.removeSprite(sprite.pixiSprite);//, {children: true}); // TODO? Bush transform=null!!!=>Error in pixi.js
 					delete sprite.pixiSprite;
 				}
 				if (sprite.animation) {
@@ -544,9 +351,6 @@ export default class SG2DTile extends SGModel {
 	}
 	
 	/** @private */
-	static _spritesFromOptions = new Set();
-	
-	/** @private */
 	_spritesFromOptions(options = SGModel.OBJECT_EMPTY) {
 		SG2DTile._spritesFromOptions.clear();
 		if (options.sprite) {
@@ -627,3 +431,199 @@ export default class SG2DTile extends SGModel {
 		super.destroy();
 	}
 }
+
+SG2DTile.typeProperties = { // overriden with Object.assign(...)
+	texture: SGModel.TYPE_STRING,
+	position: SGModel.TYPE_OBJECT_NUMBERS,
+	angle: SGModel.TYPE_NUMBER,
+	anchor: SGModel.TYPE_NUMBER_OR_XY,
+	scale: SGModel.TYPE_NUMBER_OR_XY,
+	alpha: SGModel.TYPE_NUMBER,
+	visible: SGModel.TYPE_BOOLEAN,
+	zindex: SGModel.TYPE_NUMBER,
+	cxy: SGModel.TYPE_OBJECT_NUMBERS
+};
+
+/**@type {(void 0|string)} */
+SG2DTile.layer = void 0; // if equal to void 0, the default layer is used (PIXI.Container)
+
+/**@type {string} */
+SG2DTile.texture = SG2DConsts.TILE_OVERRIDE; // overriden 
+
+/**@type {number} */
+SG2DTile.angle = 0;
+
+/**@type {number} */
+SG2DTile.anchor = 0.5;
+
+/**@type {number} */
+SG2DTile.scale = 1;
+
+/**@type {number} */
+SG2DTile.alpha = 1;
+
+/**@type {boolean} */
+SG2DTile.visible = true;
+
+/**
+ * Main zindex is added to zindex of sprites, except for sprite with name="main"
+ * @type {number}
+ */
+SG2DTile.zindex = 0;
+
+/**
+* @typedef SG2DAnimationConfig
+* @type {object}
+* @property {number} [start=1]
+* @property {number} count
+* @property {number} [sleep=1]
+* @property {boolean} [running=false]
+* @property {boolean} [loop=false]
+* @property {function} [onComplete=void 0]
+*
+* @type {SG2DAnimationConfig}
+static animation = { start: 1, count: 8, sleep: 2, basetexture: "objects/tank_shot_", running: true }; // example
+*/
+
+/**
+* @typedef SG2DSpriteConfig
+* @type {object}
+* @property {string} texture
+* @property {(number|object)} [anchor=0.5]
+* @property {number} [angle=0] - in degrees
+* @property {(number|object)} [scale=1]
+* @property {number} [zindex=0]
+* @property {SG2DAnimationConfig} [animation]
+* 
+* @type {SG2DSpriteConfig[]}
+static sprites = { // example
+	tank_platform: { texture: "objects/tank-platform", zindex: 2 },
+	tank_turret: { texture: "objects/tank-turret", anchor: { x: 0.5, y: 0.2 }, zindex: 3 }
+	tank_track_left: { texture: "objects/tank-track", offset: { x: -40, y: 0 }, zindex: 1, basetexture: { count: 8, sleep: 2 } }
+	tank_track_right { texture: "objects/tank-track", offset: {x: 40, y: 0}, zindex: 1, basetexture: { count: 8, sleep: 2 } }
+};
+*/
+
+/**
+ * @type {boolean}
+ * @readonly
+ */
+SG2DTile.isTile = true;
+
+/** @type {boolean} */
+SG2DTile.isBody = false;
+
+/** @type {boolean} */
+SG2DTile.noDraw = false;
+
+/** Ignore common sprite property setters (without options.<sprite|sprites>) */
+SG2DTile.FLAG_ONLY_OPTIONS_SPRITE = true;
+
+// To handle a click on a tile class, define this method in the tile class
+// SG2DTile.click(target, options) {...}
+
+/** @private */
+SG2DTile._initPrevPosition = {x: -1, y: -1};
+
+/** @private */
+SG2DTile._point = {x: void 0, y: void 0};
+
+SG2DTile.ownSetters = { // overriden with Object.assign(...)
+	position: true,
+	angle: true,
+	anchor: true,
+	scale: true,
+	alpha: true,
+	visible: true,
+	zindex: true,
+	texture: true
+};
+
+SG2DTile.defaultProperties = {
+	id: void 0,
+	position: {x: 0, y: 0},
+	angle: 0,
+	anchor: 0.5,
+	scale: 1,
+	alpha: 1,
+	visible: true,
+	zindex: 0,
+	layer: void 0,
+	cxy: {x: 0, y: 0},
+	drawed: false
+}
+
+/** @private */
+SG2DTile._defaultSpriteValues = {
+	angle: 0,
+	anchor: 0.5,
+	scale: 1,
+	alpha: 1,
+	visible: true,
+	zindex: 0
+};
+
+/** @private */
+SG2DTile._prepareStaticConfigSprites = function() {
+
+	if (this.hasOwnProperty("_spritesPrepared")) {
+		return;
+	} else {
+		this._spritesPrepared = true;
+	}
+
+	if (! this.hasOwnProperty("sprites")) {
+		this.sprites = { main: this._prepareSpriteProperties({ name: "main" }, this) }
+	} else {
+		this.sprites = this._prepareMultipleSprites(this.sprites);
+	}
+
+	if (this.sprites.main) this.sprite = this.sprites.main;
+	if (this.sprite) {
+		if (this.animation !== void 0) {
+			this.sprite.animation = SGModel.clone(this.animation);
+		}
+	}
+
+	if (this.zindex !== void 0) {
+		SG2DUtils.objectForEach(this.sprites, sprite=>{
+			if (sprite.name !== "main") {
+				sprite.zindex += this.zindex;
+			}
+		});
+	}
+}
+
+/** @private */
+SG2DTile. _prepareMultipleSprites = function(sprites, parentSprite = void 0) {
+	for (var name in sprites) {
+		const sprite = sprites[name];
+		sprite.name = name;
+		if (parentSprite) {
+			sprite.parent = parentSprite.name;
+			sprite.setter_flag = SG2DTile.FLAG_ONLY_OPTIONS_SPRITE;
+		}
+		this._prepareSpriteProperties(sprite);
+		if (sprite.sprites) {
+			sprites = {...sprites, ...this._prepareMultipleSprites(sprite.sprites, sprite)};
+		}
+	}
+	return sprites;
+}
+
+/** @private */
+SG2DTile._prepareSpriteProperties = function(dest, src = void 0) {
+	if (! src) src = dest;
+	dest.texture = typeof src.texture !== void 0 ? src.texture : SG2DConsts.TILE_OVERRIDE;
+	for (var p in SG2DTile._defaultSpriteValues) {
+		dest[p] = SG2DUtils.ifUndefined(src[p], SG2DTile._defaultSpriteValues[p]);
+	}
+	dest.layer = src.layer || this.layer;
+	return dest;
+}
+
+/** @private */
+SG2DTile._textures_not_founded = [];
+
+/** @private */
+SG2DTile._spritesFromOptions = new Set();

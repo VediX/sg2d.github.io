@@ -2,7 +2,7 @@
  * SG2DPluginBase 1.0.0
  * Base class for the plugin
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
+ * (c) 2019-2021 Kalashnikov Ilya
  */
 
 "use strict";
@@ -45,3 +45,5 @@ export default class SG2DPluginBase {
 		this.constructor.ready();
 	}
 }
+
+//if (typeof window === "object") window.SG2DPluginBase = SG2DPluginBase;

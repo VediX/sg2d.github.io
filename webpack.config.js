@@ -1,55 +1,39 @@
 "use strict";
 
 const webpack = require('webpack');
-const fs = require('fs');
 const path = require('path');
 const pkg = require('./package.json');
-const Case = require('case');
-const name = Case.kebab(pkg.name);
-const date = new Date().toISOString().slice(0, 10);
-const author = pkg.author.slice(0, pkg.author.indexOf(' <'));
-const banner = `${name} ${pkg.version} by ${author} ${date}
-${pkg.homepage}
-License ${pkg.license}`;
+const fs = require('fs');
 
-module.exports = {
-	entry: {
-		[name]: './sg2d.js',
-		[name + '.min']: './sg2d.js'
-	},
-	output: {
-		library: Case.pascal(name),
-		path: path.resolve(__dirname, './build'),
-		publicPath: '/libs',
-		filename: '[name].js',
-		libraryTarget: 'module'
-	},
-	/*externals: {
-		'matter-js': {
-			commonjs: 'matter-js',
-			commonjs2: 'matter-js',
-			amd: 'matter-js',
-			root: 'Matter'
+module.exports = (env = {}) => {
+	const minimize = !! env.MINIMIZE || false;
+	const version = pkg.version;
+	const license = fs.readFileSync('LICENSE', 'utf8');
+	const resolve = relativePath => path.resolve(__dirname, relativePath);
+
+	const banner = 
+`${pkg.name} ${version} by @ilyak
+${pkg.homepage}
+License ${pkg.license}${!minimize ? '\n\n' + license : ''}`;
+
+	return {
+		entry: { 'sg2d': './src/sg2d.js' },
+		node: false,
+		output: {
+			library: 'SG2D',
+			libraryExport: 'default',
+			umdNamedDefine: true,
+			libraryTarget: 'umd',
+			globalObject: 'this',
+			path: resolve('./build'),
+			filename: `[name]${minimize ? '.min' : ''}.js`
 		},
-		'pixi-js': {
-			commonjs: 'pixi-js',
-			commonjs2: 'pixi-js',
-			amd: 'pixi-js',
-			root: 'PIXI'
-		}
-	},*/
-	module: {
-		loaders: [{
-			test: /\.js$/,
-			exclude: /node_modules/,
-			loader: 'babel-loader'
-		}]
-	},
-	plugins: [
-		new webpack.optimize.UglifyJsPlugin({
-			include: /\.min\.js$/,
-			minimize: true
-		}),
-		new webpack.BannerPlugin(banner)
-	]
+		optimization: { minimize },
+		plugins: [
+			new webpack.BannerPlugin(banner),
+			new webpack.DefinePlugin({
+				__SG2D_VERSION__: JSON.stringify(version),
+			})
+		]
+	};
 };

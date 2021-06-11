@@ -1,7 +1,7 @@
 /**
  * SG2DMath
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
+ * (c) 2019-2021 Kalashnikov Ilya
  */
 
 
@@ -204,5 +204,5 @@ export default SG2DMath;
 	};
 })();
 
-if (typeof window === "object") window.SG2DMath = SG2DMath;
-if (typeof _root === "object") _root.SG2DMath = SG2DMath;
+//if (typeof window === "object") window.SG2DMath = SG2DMath;
+//if (typeof _root === "object") _root.SG2DMath = SG2DMath;

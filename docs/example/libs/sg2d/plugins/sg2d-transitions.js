@@ -4,15 +4,15 @@
  * Tiles or their constructors can specify the layer index (0..31) and the transition type (TRANSITIONS_STANDARD, ...) where the transition is generated.
  * The plugin only processes tiles with the static property useTransition=true and uses the texture from the static property of the tile!
  * https://github.com/VediX/SG2D
- * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
+ * (c) 2019-2021 Kalashnikov Ilya
  * SG2DTransitions may be freely distributed under the MIT license
  */
 
 "use strict";
 
-import SG2DPluginBase from "./../sg2d-plugin-base.js";
+//import SG2DPluginBase from "./../sg2d-plugin-base.js";
 
-export default class SG2DTransitions extends SG2DPluginBase {
+export default class SG2DTransitions extends SG2D.PluginBase {
 		
 	static code = "transitions";
 	
@@ -25,7 +25,7 @@ export default class SG2DTransitions extends SG2DPluginBase {
 		
 		super(...args);
 		
-		class VirtualTransitionsTile extends SG2DPluginBase.SG2DTile {
+		class VirtualTransitionsTile extends SG2D.PluginBase.SG2DTile {
 			static char = " ";
 			static texture = "vtt";
 			static useTransitions = true;
@@ -44,32 +44,32 @@ export default class SG2DTransitions extends SG2DPluginBase {
 	
 	static createMask() {
 		this.masks = [];
-		this.masks[this.TRANSITIONS_STANDARD] = SG2DPluginBase.SG2DUtils.addMask({
+		this.masks[this.TRANSITIONS_STANDARD] = SG2D.PluginBase.SG2DUtils.addMask({
 			name: "mask_transitions_" + this.TRANSITIONS_STANDARD,
 			iterate: (x, y, radius, p_index)=>{
-				return { r: 0, g: 0, b: 0, a: (radius >= SG2DPluginBase.SG2DConsts.CELLSIZEPIX05 ? 255 : 0) };
+				return { r: 0, g: 0, b: 0, a: (radius >= SG2D.PluginBase.SG2DConsts.CELLSIZEPIX05 ? 255 : 0) };
 			},
-			width: SG2DPluginBase.SG2DConsts.CELLSIZEPIX,
-			height: SG2DPluginBase.SG2DConsts.CELLSIZEPIX
+			width: SG2D.PluginBase.SG2DConsts.CELLSIZEPIX,
+			height: SG2D.PluginBase.SG2DConsts.CELLSIZEPIX
 		});
 		
-		var rStrict = this.K_STRICT * SG2DPluginBase.SG2DConsts.CELLSIZEPIX05;
-		this.masks[this.TRANSITIONS_STRICT] = SG2DPluginBase.SG2DUtils.addMask({
+		var rStrict = this.K_STRICT * SG2D.PluginBase.SG2DConsts.CELLSIZEPIX05;
+		this.masks[this.TRANSITIONS_STRICT] = SG2D.PluginBase.SG2DUtils.addMask({
 			name: "mask_transitions_" + this.TRANSITIONS_STRICT,
 			iterate: (x, y, radius, p_index)=>{
 				return { r: 0, g: 0, b: 0, a: (radius >= rStrict ? 255 : 0) };
 			},
-			width: SG2DPluginBase.SG2DConsts.CELLSIZEPIX,
-			height: SG2DPluginBase.SG2DConsts.CELLSIZEPIX
+			width: SG2D.PluginBase.SG2DConsts.CELLSIZEPIX,
+			height: SG2D.PluginBase.SG2DConsts.CELLSIZEPIX
 		});
 		
-		SG2DPluginBase.SG2DUtils.addMask({
+		SG2D.PluginBase.SG2DUtils.addMask({
 			name: this.VirtualTransitionsTile.texture,
 			iterate: (x, y, radius, p_index)=>{
 				return { r: 0, g: 0, b: 0, a: 0 };
 			},
-			width: SG2DPluginBase.SG2DConsts.CELLSIZEPIX,
-			height: SG2DPluginBase.SG2DConsts.CELLSIZEPIX
+			width: SG2D.PluginBase.SG2DConsts.CELLSIZEPIX,
+			height: SG2D.PluginBase.SG2DConsts.CELLSIZEPIX
 		}).virtualTile = true;
 	}
 	
@@ -86,9 +86,9 @@ export default class SG2DTransitions extends SG2DPluginBase {
 		
 		this.area = area;
 		
-		this.canvasTemp = this.canvasTemp || SG2DPluginBase.SG2DUtils.createCanvas(
-			SG2DPluginBase.SG2DConsts.CELLSIZEPIX05,
-			SG2DPluginBase.SG2DConsts.CELLSIZEPIX05
+		this.canvasTemp = this.canvasTemp || SG2D.PluginBase.SG2DUtils.createCanvas(
+			SG2D.PluginBase.SG2DConsts.CELLSIZEPIX05,
+			SG2D.PluginBase.SG2DConsts.CELLSIZEPIX05
 		);
 		this.ctxTemp = this.canvasTemp.getContext("2d");
 		
@@ -109,13 +109,13 @@ export default class SG2DTransitions extends SG2DPluginBase {
 		this.area.each((cluster)=>{
 			for (layer in layers) {
 				cluster.getLayerTiles(layer, tiles);
-				if (tiles.length === 0 && SG2DPluginBase.SG2DClusters.nearestClusters45(cluster, (nc)=>{
+				if (tiles.length === 0 && SG2D.PluginBase.SG2DClusters.nearestClusters45(cluster, (nc)=>{
 					nc.getLayerTiles(layer, tiles);
 					for (var i = 0; i < tiles.length; i++) {
 						if (tiles[i].constructor !== this.VirtualTransitionsTile) return true;
 					}
 				})) {
-					tile = new this.VirtualTransitionsTile({id: ++this.VirtualTransitionsTile._uid, position: SG2DPluginBase.SGModel.clone(cluster.position), layer: layer });
+					tile = new this.VirtualTransitionsTile({id: ++this.VirtualTransitionsTile._uid, position: SG2D.PluginBase.SGModel.clone(cluster.position), layer: layer });
 				}
 			}
 		});
@@ -194,11 +194,11 @@ export default class SG2DTransitions extends SG2DPluginBase {
 	static genTransitions(tileMain, texture_name) {
 	
 		var mainClass = tileMain.constructor;
-		var imgMain = SG2DPluginBase.SG2DUtils.getTextureAsCanvas(mainClass.texture);
+		var imgMain = SG2D.PluginBase.SG2DUtils.getTextureAsCanvas(mainClass.texture);
 		var w = imgMain.width, h = imgMain.height;
 		var w05 = Math.round(w/2), h05 = Math.round(h/2);
 		var outClass;
-		var canvasResult = SG2DPluginBase.SG2DUtils.createCanvas(w, h);
+		var canvasResult = SG2D.PluginBase.SG2DUtils.createCanvas(w, h);
 		var ctxResult = canvasResult.getContext("2d");
 
 		ctxResult.drawImage(imgMain, 0, 0);
@@ -207,7 +207,7 @@ export default class SG2DTransitions extends SG2DPluginBase {
 			if ((outClass = tileMain.transitions[a]) && outClass.texture) {
 				var smx = Math.round(w * this.quarters[a][0]);
 				var smy = Math.round(h * this.quarters[a][1]);
-				var outCanvas = SG2DPluginBase.SG2DUtils.getTextureAsCanvas(outClass.texture);
+				var outCanvas = SG2D.PluginBase.SG2DUtils.getTextureAsCanvas(outClass.texture);
 				var transitionsMask = (outClass.altitude > mainClass.altitude ? outClass.transitionsMask : mainClass.transitionsMask) || this.TRANSITIONS_STANDARD;
 				if (outClass === this.VirtualTransitionsTile) {
 					transitionsMask = mainClass.transitionsMask;

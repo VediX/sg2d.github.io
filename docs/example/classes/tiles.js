@@ -1,7 +1,6 @@
-import SG2DTile from "../../sg2d-tile.js";
-import SG2DTransitions from "../../plugins/sg2d-transitions.js";
+import SG2DTransitions from "./../libs/sg2d/plugins/sg2d-transitions.js";
 
-export class Sand extends SG2DTile {
+export class Sand extends SG2D.Tile {
 	static texture = "lands/sand";
 	static layer = "grounds";
 	
@@ -11,7 +10,7 @@ export class Sand extends SG2DTile {
 	static transitionsMask = SG2DTransitions.TRANSITIONS_STANDARD; // Transition type for SG2DTransitions plugin
 }
 
-export class Grass extends SG2DTile {
+export class Grass extends SG2D.Tile {
 	static texture = "lands/grass";
 	static layer = "grounds";
 	
@@ -20,27 +19,27 @@ export class Grass extends SG2DTile {
 	static altitude = 2; // Tile height for SG2DTransitions plugin
 }
 
-export class Water extends SG2DTile {
+export class Water extends SG2D.Tile {
 	static texture = "lands/water";
 	static layer = "fluids";
 	static noDraw = true;
 }
 
-export class BlockSteel extends SG2DTile {
+export class BlockSteel extends SG2D.Tile {
 	static texture = "elements/block-steel";
 	static layer = "bodies";
 	static zindex = 20;
 	static blockage = true;
 }
 
-export class BlockStandard extends SG2DTile {
+export class BlockStandard extends SG2D.Tile {
 	static texture = "elements/block-standard";
 	static layer = "bodies";
 	static zindex = 20;
 	static blockage = true;
 }
 
-export class BlockTriangle extends SG2DTile {
+export class BlockTriangle extends SG2D.Tile {
 	static baseTexture = "elements/block-corner-";
 	static texture = "elements/block-corner-45";
 	static layer = "bodies";
@@ -52,7 +51,7 @@ export class BlockTriangle extends SG2DTile {
 	}
 }
 
-export class Tree extends SG2DTile {
+export class Tree extends SG2D.Tile {
 	static texture = "elements/trees/tree_";
 	static layer = "trees";
 	static zindex = 20;
@@ -63,7 +62,7 @@ export class Tree extends SG2DTile {
 	}
 }
 
-export class Bush extends SG2DTile {
+export class Bush extends SG2D.Tile {
 	static texture = "elements/bushes/bush_";
 	static layer = "bodies";
 	static zindex = 9;
@@ -74,7 +73,7 @@ export class Bush extends SG2DTile {
 	}
 }
 
-export class Medikit extends SG2DTile {
+export class Medikit extends SG2D.Tile {
 	static texture = "objects/medikit100_1";
 	static layer = "bodies";
 	static scale = 0.7;
@@ -108,7 +107,7 @@ export class Medikit extends SG2DTile {
 	}
 }
 
-export class Whizbang extends SG2DTile {
+export class Whizbang extends SG2D.Tile {
 	static texture = "objects/whizbang";
 	static layer = "animations";
 	static animation = {
@@ -126,9 +125,9 @@ export class Whizbang extends SG2DTile {
 	static STATE_EXPLODE = 2;
 	
 	defaults() {
-		return SGModel.defaults({
+		return SG2D.Model.defaults({
 			state: Whizbang.STATE_FLY
-		}, SG2DTile.defaultProperties);
+		}, SG2D.Tile.defaultProperties);
 	}
 	
 	iterate() {
@@ -149,8 +148,8 @@ export class Whizbang extends SG2DTile {
 					}
 
 					this.set("position", {
-						x: this.properties.position.x + 10 * SG2DMath.cos(this.properties.angle, 1),
-						y: this.properties.position.y + 10 * SG2DMath.sin(this.properties.angle, 1)
+						x: this.properties.position.x + 10 * SG2D.Math.cos(this.properties.angle, 1),
+						y: this.properties.position.y + 10 * SG2D.Math.sin(this.properties.angle, 1)
 					});
 					
 					break;

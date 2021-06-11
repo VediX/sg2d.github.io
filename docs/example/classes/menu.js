@@ -1,4 +1,4 @@
-import Deferred from "../../libs/deferred.js";
+import Deferred from "../libs/deferred.js";
 import GraphicsPreparer from "./graphics-preparer.js";
 
 export default class Menu {

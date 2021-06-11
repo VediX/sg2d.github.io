@@ -1,4 +1,3 @@
-import SG2DTile from "../../sg2d-tile.js";
 import ObjectBaseLifeBand from "./object-base-life-band.js";
 import {Whizbang} from "./tiles.js";
 
@@ -29,7 +28,7 @@ export default class Player extends ObjectBaseLifeBand {
 								running: false,
 								basetexture: "objects/player-smoke-shot_"
 							},
-							setter_flag: SG2DTile.FLAG_ONLY_OPTIONS_SPRITE
+							setter_flag: SG2D.Tile.FLAG_ONLY_OPTIONS_SPRITE
 						}
 					}
 				}
@@ -92,7 +91,7 @@ export default class Player extends ObjectBaseLifeBand {
 	};
 	
 	defaults() {
-		return SGModel.defaults({
+		return SG2D.Model.defaults({
 			turret_angle_target: 0,
 			load_whizbang: 0,
 			state: 0
@@ -130,21 +129,21 @@ export default class Player extends ObjectBaseLifeBand {
 	}
 	
 	calcTurretAngleTarget(pxy) {
-		if (SG2DMath.distance_p(pxy, this.properties.position) > 64) {
-			this.set("turret_angle_target", SG2DMath.angle_p1p2_deg(this.properties.position, pxy, 1));
+		if (SG2D.Math.distance_p(pxy, this.properties.position) > 64) {
+			this.set("turret_angle_target", SG2D.Math.angle_p1p2_deg(this.properties.position, pxy, 1));
 		}
 	}
 	
 	// shot
 	pointerClick(target, options) {
-		if (options.button === SG2DMouse.POINTER_LEFT && this.properties.load_whizbang <= 0) {
+		if (options.button === SG2D.Mouse.POINTER_LEFT && this.properties.load_whizbang <= 0) {
 			this.set("load_whizbang", Player.LOAD_WHIZBANG_FRAMES);
 			this.startAnimation(this.sprites.smoke_shot);
 			let whizbang = new Whizbang({
 				angle: this.sprites.turret.angle,
 				position: {
-					x: this.properties.position.x + 110 * SG2DMath.cos(this.sprites.turret.angle, 1),
-					y: this.properties.position.y + 110 * SG2DMath.sin(this.sprites.turret.angle, 1)
+					x: this.properties.position.x + 110 * SG2D.Math.cos(this.sprites.turret.angle, 1),
+					y: this.properties.position.y + 110 * SG2D.Math.sin(this.sprites.turret.angle, 1)
 				}
 			});
 		}
@@ -157,12 +156,12 @@ export default class Player extends ObjectBaseLifeBand {
 		let angle = this.properties.angle;
 		let accelerator = (state & Player.STATE_ACCELERATOR ? 2 : 1);
 		if (state & Player.STATE_MOVE_FORWARD) {
-			dx += Player.POWER_MOVE * accelerator * SG2DMath.cos(this.properties.angle, 1);
-			dy += Player.POWER_MOVE * accelerator * SG2DMath.sin(this.properties.angle, 1);
+			dx += Player.POWER_MOVE * accelerator * SG2D.Math.cos(this.properties.angle, 1);
+			dy += Player.POWER_MOVE * accelerator * SG2D.Math.sin(this.properties.angle, 1);
 		}
 		if (state & Player.STATE_MOVE_BACKWARD) {
-			dx -= Player.POWER_MOVE * SG2DMath.cos(this.properties.angle, 1);
-			dy -= Player.POWER_MOVE * SG2DMath.sin(this.properties.angle, 1);
+			dx -= Player.POWER_MOVE * SG2D.Math.cos(this.properties.angle, 1);
+			dy -= Player.POWER_MOVE * SG2D.Math.sin(this.properties.angle, 1);
 		}
 		if (state & Player.STATE_ROTATE_LEFT) angle -= Player.POWER_ROTATE_PLATFORM;
 		if (state & Player.STATE_ROTATE_RIGHT) angle += Player.POWER_ROTATE_PLATFORM;
@@ -183,9 +182,9 @@ export default class Player extends ObjectBaseLifeBand {
 		this.camera.set("rotate", this.properties.angle);
 		
 		// tank turret rotation
-		var da = Math.abs(SG2DMath.betweenAnglesDeg(this.sprites.turret.angle, this.properties.turret_angle_target));
+		var da = Math.abs(SG2D.Math.betweenAnglesDeg(this.sprites.turret.angle, this.properties.turret_angle_target));
 		if (da > 0.1) {
-			var dir = SG2DMath.nearestDirRotate(this.sprites.turret.angle, this.properties.turret_angle_target);
+			var dir = SG2D.Math.nearestDirRotate(this.sprites.turret.angle, this.properties.turret_angle_target);
 			var a = this.sprites.turret.angle + Math.min(da, Player.POWER_ROTATE_TURRET) * dir;
 			this.set("angle", a, { sprite: this.sprites.turret });
 			if (! this.sprites.smoke_shot.animation.running) {

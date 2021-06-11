@@ -1,4 +1,3 @@
-import SG2DTile from "../../sg2d-tile.js";
 import {Water, Grass, Sand, BlockStandard, BlockSteel, BlockTriangle, Medikit, Tree, Bush} from "./tiles.js";
 import Utils from "./utils.js";
 
@@ -36,7 +35,7 @@ export default class Area {
 				var oSpread = aSpreading[j];
 				if (cluster = clusters.getCluster(areaX + oSpread.x, areaY + oSpread.y)) {
 					if (! cluster._l && ! cluster._f) {
-						if (SG2DClusters.nearestClusters45(cluster, (c)=>{ return !! c._f; })) {
+						if (SG2D.Clusters.nearestClusters45(cluster, (c)=>{ return !! c._f; })) {
 							// no code (cells are in contact with water)
 						} else {
 							cluster._l = new landClass({ position: cluster.position });
@@ -53,12 +52,12 @@ export default class Area {
 				cluster._l = new Sand({ position: cluster.position });
 			}
 			
-			if (cluster._f || SG2DClusters.nearestClusters45(cluster, (c)=>{ return !! c._f; })) return true;
+			if (cluster._f || SG2D.Clusters.nearestClusters45(cluster, (c)=>{ return !! c._f; })) return true;
 			
 			// Simple tiles without any functionality can be created directly using the SG2DTile class
 			let bConcrete = false;
 			if ((cluster.x - 1) % 16 === 0 || (cluster.y - 1) % 16 === 0) {
-				cluster._r = new SG2DTile({ texture: "lands/concrete", position: cluster.position, layer: "roads" });
+				cluster._r = new SG2D.Tile({ texture: "lands/concrete", position: cluster.position, layer: "roads" });
 				bConcrete = true;
 			}
 
@@ -87,7 +86,7 @@ export default class Area {
 			for (var a = 0; a <= 270; a+=90) {
 				if (! cc[a]) break;
 				if (cc[a]._e instanceof BlockStandard && cc[a + 90]._e instanceof BlockStandard && ! cc[a + 180]._e && ! cc[a + 270]._e) {
-					cluster._e = new BlockTriangle({ position: cluster.position, type: SG2DMath.normalize_a(a + 45) });
+					cluster._e = new BlockTriangle({ position: cluster.position, type: SG2D.Math.normalize_a(a + 45) });
 				} else if (cc[a]._e && cc[a + 90]._e && cc[a + 180]._e && ! cc[a + 270]._e && Math.random() < 0.4) {
 					if (! cluster._f) {
 						cluster._m = new Medikit( {position: cluster.position });

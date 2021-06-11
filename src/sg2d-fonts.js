@@ -1,12 +1,14 @@
 /**
  * SG2DFonts
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
+ * (c) 2019-2021 Kalashnikov Ilya
  */
 
 "use strict";
 
-import SG2D from './sg2d.js';
+import SG2DUtils from "./sg2d-utils.js";
+
+import SG2DApplication from './sg2d-application.js';
 
 export default class SG2DFonts {
 	static addFont(options) {
@@ -69,7 +71,7 @@ export class SG2DLabel {
 			px += font.w * this.options.scale;
 		}
 		
-		var sg2d = this.options.sg2d || SG2D.getInstance();
+		var sg2d = this.options.sg2d || SG2DApplication.getInstance();
 		var container = (this.options.layer ? sg2d.layers[this.options.layer].container : sg2d.viewport);
 		container.addChild(this.container);
 	}
@@ -110,3 +112,9 @@ export class SG2DLabelCanvas {
 		}
 	}
 }
+
+//if (typeof window === "object") {
+//	window.SG2DFonts = SG2DFonts;
+//	window.SG2DLabel = SG2DLabel;
+//	window.SG2DLabelCanvas = SG2DLabelCanvas;
+//}

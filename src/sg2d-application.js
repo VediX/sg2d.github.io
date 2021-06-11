@@ -1,9 +1,7 @@
 /**
- * SG2D 1.0.0
- * 2D graphics engine based on PixiJS and optimized by tile clustering
+ * SG2DApplication 1.0.0
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
- * SG2D may be freely distributed under the MIT license
+ * (c) 2019-2021 Kalashnikov Ilya
  */
 
 "use strict";
@@ -21,91 +19,10 @@ import SG2DPlugins from './sg2d-plugins.js';
 import SG2DPluginBase from './sg2d-plugin-base.js';
 import SG2DDebugging from './sg2d-debugging.js';
 
-export default class SG2D {
-	
-	/** @private */
-	static _instance = null;
-	
-	static getInstance(bIgnoreEmpty) {
-		if (this._instance) {
-			return this._instance;
-		} else if (! bIgnoreEmpty) {
-			throw "Error! SG2D._instance is empty!";
-		}
-		return null;
-	}
-	
-	/** @public */
-	static STATE_IDLE = 0;
-	static STATE_RUN = 1;
-	static STATE_PAUSE = 2;
-	static STATE_DESTROY = 1<<31; // leftmost bit
-	
-	/** @public */
-	static plugins = null;
-	
-	/** @private */
-	static _pluginsPromise = null;
-	
-	/** @private */
-	static _initialized = false;
-	
-	/** @private */
-	static _initializationPromise = null;
-	
-	/** @private */
-	static _initialize() {
-		SG2D.plugins = SG2DPlugins;
-		SG2DPluginBase.SGModel = SGModel;
-		SG2DPluginBase.SG2DConsts = SG2DConsts;
-		SG2DPluginBase.SG2DUtils = SG2DUtils;
-		SG2DPluginBase.SG2DClusters = SG2DClusters;
-		SG2DPluginBase.SG2DTile = SG2DTile;
-		SG2DPluginBase.SG2DCamera = SG2DCamera;
-		PIXI.utils.skipHello();
-		this._initializationPromise.then(()=>{
-			SG2D._initialized = true;
-		});
-	}
-	
-	/** @public */
-	static LAYER_POSITION_ABSOLUTE = 0;
-	static LAYER_POSITION_FIXED = 1;
-	
-	/** @readonly */
-	static spritesCount = 0;
-	
-	/** @private */
-	static _drawSprite(sprite, layer) {
-		if (layer === void 0 || ! SG2D._instance.layers[layer]) {
-			SG2D._instance.viewport.addChild(sprite);
-		} else {
-			SG2D._instance.layers[layer].container.addChild(sprite);
-		}
-		SG2D.spritesCount++;
-		
-		if (SG2DConsts.DRAW_BODY_LINES) SG2DDebugging.drawSG2DBodyLines(sprite.tile);
-	}
-	
-	/** @private */
-	static _removeSprite(sprite) {
-		if (! sprite || ! sprite.parent) debugger; // TODO DEL
-		sprite.parent.removeChild(sprite);
-		//sprite.destroy();
-		SG2D.spritesCount--;
-		
-		if (SG2DConsts.DRAW_BODY_LINES) SG2DDebugging.undrawSG2DBodyLines(sprite.tile);
-	}
-	
-	/** @public */
-	static setCellSizePix(v) {
-		SG2DConsts.CELLSIZEPIX = +v;
-		SG2DConsts.CELLSIZEPIX05 = (+v)>>1;
-		SG2DConsts.CELLSIZELOG2 = Math.ceil(Math.log2(SG2DConsts.CELLSIZEPIX));
-	}
+export default class SG2DApplication {
 	
 	/**
-	 * SG2D constructor
+	 * SG2DApplication constructor
 	 * @param {object} config
 	 * @param {string}		[config.canvasId]
 	 * @param {number}		[config.cellsizepix=32]
@@ -134,14 +51,14 @@ export default class SG2D {
 	 */
 	constructor(config) {
 		
-		if (SG2D._instance) throw "SG2D Error! There is an instance of the class! You must execute .destroy() on the previous instance!";
-		SG2D._instance = this;
+		if (SG2DApplication._instance) throw "SG2DApplication Error! There is an instance of the class! You must execute .destroy() on the previous instance!";
+		SG2DApplication._instance = this;
 		
-		SG2D._initialized ? Promise.resolve() : SG2D._initialize();
+		SG2DApplication._initialized ? Promise.resolve() : SG2DApplication._initialize();
 		
-		if (! config) throw "SG2D Error! config is empty!";
+		if (! config) throw "SG2DApplication Error! config is empty!";
 		
-		if (+config.cellsizepix) SG2D.setCellSizePix(config.cellsizepix);
+		if (+config.cellsizepix) SG2DApplication.setCellSizePix(config.cellsizepix);
 		
 		let pixi = config.pixi = config.pixi || {};
 		this.canvas = pixi.view = pixi.view || document.getElementById(config.canvasId) || document.querySelector("CANVAS");
@@ -152,8 +69,8 @@ export default class SG2D {
 		let autoStart = pixi.autoStart !== void 0 ? pixi.autoStart : true;
 		pixi.autoStart = false;
 
-		SG2D.drawSprite = SG2D._drawSprite.bind(this);
-		SG2D.removeSprite = SG2D._removeSprite.bind(this);
+		SG2DApplication.drawSprite = SG2DApplication._drawSprite.bind(this);
+		SG2DApplication.removeSprite = SG2DApplication._removeSprite.bind(this);
 		this.iterate = this.iterate.bind(this);
 		this.iterate_out = config.iterate || function(){};
 		this.resize_out = config.resize || function(){};
@@ -182,7 +99,7 @@ export default class SG2D {
 		for (var l in config.layers) {
 			if (bNumbers) l = +l;
 			var layer_cfg = config.layers[l];
-			if (layer_cfg.position === SG2D.LAYER_POSITION_FIXED) { bAbsContainer = true; break; }
+			if (layer_cfg.position === SG2DApplication.LAYER_POSITION_FIXED) { bAbsContainer = true; break; }
 		}
 		
 		if (bAbsContainer) {
@@ -200,17 +117,17 @@ export default class SG2D {
 			if (bNumbers) l = +l;
 			var layer_cfg = config.layers[l];
 			var layer = this.layers[l] = {
-				position: layer_cfg.position || SG2D.LAYER_POSITION_ABSOLUTE,
+				position: layer_cfg.position || SG2DApplication.LAYER_POSITION_ABSOLUTE,
 				zindex: layer_cfg.zindex || ++zindex,
 				sortableChildren: layer_cfg.sortableChildren === void 0 ? true : layer_cfg.sortableChildren
 			};
-			var container = layer.container = (l === "main" ? this.viewport : (config.layers_enabled || layer.position === SG2D.LAYER_POSITION_FIXED ? new PIXI.Container() : this.viewport));
-			if (config.layers_enabled || layer.position === SG2D.LAYER_POSITION_FIXED) {
+			var container = layer.container = (l === "main" ? this.viewport : (config.layers_enabled || layer.position === SG2DApplication.LAYER_POSITION_FIXED ? new PIXI.Container() : this.viewport));
+			if (config.layers_enabled || layer.position === SG2DApplication.LAYER_POSITION_FIXED) {
 				container.sortableChildren = layer.sortableChildren;
 				container.zIndex = layer.zindex;
 			}
 			if (l !== "main") {
-				if (layer.position === SG2D.LAYER_POSITION_FIXED) {
+				if (layer.position === SG2DApplication.LAYER_POSITION_FIXED) {
 					this.pixi.stage.addChild(container);
 				} else {
 					if (config.layers_enabled) {
@@ -235,23 +152,23 @@ export default class SG2D {
 		this.resize = SG2DUtils.debounce(this.resize, 100).bind(this);
 		addEventListener("resize", this.resize);
 		
-		SG2D._pluginsPromise = SG2DPlugins.load(config.plugins);
+		SG2DApplication._pluginsPromise = SG2DPlugins.load(config.plugins);
 		
 		this.effects = config.effects instanceof SG2DEffects ? config.effects : new SG2DEffects(config.effects);
 		this.effects._sg2dconnect && this.effects._sg2dconnect(this);
 		
-		this.state = SG2D.STATE_IDLE;
+		this.state = SG2DApplication.STATE_IDLE;
 		if (autoStart) this.run();
 	}
 	
 	run() {
 		Promise.all([
-			SG2D._initializationPromise,
-			SG2D._pluginsPromise
+			SG2DApplication._initializationPromise,
+			SG2DApplication._pluginsPromise
 		]).then(()=>{
 			this.initClustersInCamera();
 			this.pixi.start();
-			this.state = SG2D.STATE_RUN;
+			this.state = SG2DApplication.STATE_RUN;
 		}, (e)=>{
 			throw "Error 50713888! Message: " + e;
 		});
@@ -269,7 +186,7 @@ export default class SG2D {
 
 	iterate(t) {
 		
-		if (this.state !== SG2D.STATE_RUN) return;
+		if (this.state !== SG2DApplication.STATE_RUN) return;
 		
 		var tStart = SG2DUtils.getTime();
 
@@ -301,12 +218,12 @@ export default class SG2D {
 
 	pause() {
 		this.pixi.stop();
-		this.state = SG2D.STATE_PAUSE;
+		this.state = SG2DApplication.STATE_PAUSE;
 	}
 
 	destroy() {
 		
-		this.state = SG2D.STATE_DESTROY;
+		this.state = SG2DApplication.STATE_DESTROY;
 		
 		removeEventListener("resize", this.resize);
 		this.mouse.destroy();
@@ -327,10 +244,10 @@ export default class SG2D {
 			this.pixi = null;
 		}, 500);
 		
-		SG2D.drawSprite = null
-		SG2D.removeSprite = null
-		SG2D.spritesCount = 0;
-		SG2D._instance = null;
+		SG2DApplication.drawSprite = null
+		SG2DApplication.removeSprite = null
+		SG2DApplication.spritesCount = 0;
+		SG2DApplication._instance = null;
 	}
 	
 	resize() {
@@ -338,17 +255,93 @@ export default class SG2D {
 		this.resize_out();
 	}
 	
-	static drawCircle(x, y, r, c) {
+	/*static drawCircle(x, y, r, c) {
 		var graphics = new PIXI.Graphics();
 		graphics.beginFill(c || 0xff2222);
 		graphics.drawCircle(x || 0, y || 0, r || 3);
 		graphics.endFill();
 		graphics.zIndex = 99999;
-		SG2D.drawSprite(graphics);
-	}
+		SG2DApplication.drawSprite(graphics);
+	}*/
 }
 
-SG2D._initializationPromise = SG2DUtils._loadSystemTextures();
+/** @private */
+SG2DApplication._initializationPromise = SG2DUtils._loadSystemTextures();
 
-if (typeof window === "object") window.SG2D = SG2D;
-if (typeof _root === "object") _root.SG2D = SG2D;
+/** @private */
+SG2DApplication._instance = null;
+
+SG2DApplication.getInstance = function(bIgnoreEmpty) {
+	if (this._instance) {
+		return this._instance;
+	} else if (! bIgnoreEmpty) {
+		throw "Error! SG2DApplication._instance is empty!";
+	}
+	return null;
+}
+
+/** @public */
+SG2DApplication.STATE_IDLE = 0;
+SG2DApplication.STATE_RUN = 1;
+SG2DApplication.STATE_PAUSE = 2;
+SG2DApplication.STATE_DESTROY = 1<<31; // leftmost bit
+
+/** @public */
+SG2DApplication.plugins = null;
+
+/** @private */
+SG2DApplication._pluginsPromise = null;
+
+/** @private */
+SG2DApplication._initialized = false;
+
+/** @private */
+SG2DApplication._initialize = function() {
+	SG2DApplication.plugins = SG2DPlugins;
+	SG2DPluginBase.SGModel = SGModel;
+	SG2DPluginBase.SG2DConsts = SG2DConsts;
+	SG2DPluginBase.SG2DUtils = SG2DUtils;
+	SG2DPluginBase.SG2DClusters = SG2DClusters;
+	SG2DPluginBase.SG2DTile = SG2DTile;
+	SG2DPluginBase.SG2DCamera = SG2DCamera;
+	PIXI.utils.skipHello();
+	this._initializationPromise.then(()=>{
+		SG2DApplication._initialized = true;
+	});
+}
+
+/** @public */
+SG2DApplication.LAYER_POSITION_ABSOLUTE = 0;
+SG2DApplication.LAYER_POSITION_FIXED = 1;
+
+/** @readonly */
+SG2DApplication.spritesCount = 0;
+
+/** @private */
+SG2DApplication._drawSprite = function(sprite, layer) {
+	if (layer === void 0 || ! SG2DApplication._instance.layers[layer]) {
+		SG2DApplication._instance.viewport.addChild(sprite);
+	} else {
+		SG2DApplication._instance.layers[layer].container.addChild(sprite);
+	}
+	SG2DApplication.spritesCount++;
+
+	if (SG2DConsts.DRAW_BODY_LINES) SG2DDebugging.drawSG2DBodyLines(sprite.tile);
+}
+
+/** @private */
+SG2DApplication._removeSprite = function(sprite) {
+	if (! sprite || ! sprite.parent) debugger; // TODO DEL
+	sprite.parent.removeChild(sprite);
+	//sprite.destroy();
+	SG2DApplication.spritesCount--;
+
+	if (SG2DConsts.DRAW_BODY_LINES) SG2DDebugging.undrawSG2DBodyLines(sprite.tile);
+}
+
+/** @public */
+SG2DApplication.setCellSizePix = function(v) {
+	SG2DConsts.CELLSIZEPIX = +v;
+	SG2DConsts.CELLSIZEPIX05 = (+v)>>1;
+	SG2DConsts.CELLSIZELOG2 = Math.ceil(Math.log2(SG2DConsts.CELLSIZEPIX));
+}

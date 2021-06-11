@@ -1,6 +1,3 @@
-import SG2DSprite from './../../sg2d-sprite.js';
-import {SG2DLabelCanvas, SG2DLabel} from "./../../sg2d-fonts.js";
-
 export default class SceneUI {
 	
 	static TYPE_PLAYER = 1;
@@ -24,31 +21,31 @@ export default class SceneUI {
 			alpha: 0.5
 		};
 		
-		this.buttonA = new SG2DSprite("ui/button_A", options, { sceneUI: this, code: "KeyA", type: SceneUI.TYPE_PLAYER });
-		this.buttonW = new SG2DSprite("ui/button_W", options, { sceneUI: this, code: "KeyW", type: SceneUI.TYPE_PLAYER });
-		this.buttonD = new SG2DSprite("ui/button_D", options, { sceneUI: this, code: "KeyD", type: SceneUI.TYPE_PLAYER });
-		this.buttonS = new SG2DSprite("ui/button_S", options, { sceneUI: this, code: "KeyS", type: SceneUI.TYPE_PLAYER });
+		this.buttonA = new SG2D.Sprite("ui/button_A", options, { sceneUI: this, code: "KeyA", type: SceneUI.TYPE_PLAYER });
+		this.buttonW = new SG2D.Sprite("ui/button_W", options, { sceneUI: this, code: "KeyW", type: SceneUI.TYPE_PLAYER });
+		this.buttonD = new SG2D.Sprite("ui/button_D", options, { sceneUI: this, code: "KeyD", type: SceneUI.TYPE_PLAYER });
+		this.buttonS = new SG2D.Sprite("ui/button_S", options, { sceneUI: this, code: "KeyS", type: SceneUI.TYPE_PLAYER });
 		
-		this.buttonCameraMoveLeft = new SG2DSprite("ui/button_left", options, { sceneUI: this, code: "CameraMoveLeft", type: SceneUI.TYPE_CAMERA });
-		this.buttonCameraMoveRight = new SG2DSprite("ui/button_right", options, { sceneUI: this, code: "CameraMoveRight", type: SceneUI.TYPE_CAMERA });
-		this.buttonCameraMoveUp = new SG2DSprite("ui/button_up", options, { sceneUI: this, code: "CameraMoveUp", type: SceneUI.TYPE_CAMERA });
-		this.buttonCameraMoveDown = new SG2DSprite("ui/button_down", options, { sceneUI: this, code: "CameraMoveDown", type: SceneUI.TYPE_CAMERA });
-		this.buttonCameraMoveToPlayer = new SG2DSprite("ui/button_center", options, { sceneUI: this, code: "CameraMoveToPlayer", type: SceneUI.TYPE_CAMERA });
-		this.buttonCameraScaleIn = new SG2DSprite("ui/button_plus", options, { sceneUI: this, code: "CameraScaleIn", type: SceneUI.TYPE_CAMERA });
-		this.buttonCameraScaleOut = new SG2DSprite("ui/button_minus", options, { sceneUI: this, code: "CameraScaleOut", type: SceneUI.TYPE_CAMERA });
+		this.buttonCameraMoveLeft = new SG2D.Sprite("ui/button_left", options, { sceneUI: this, code: "CameraMoveLeft", type: SceneUI.TYPE_CAMERA });
+		this.buttonCameraMoveRight = new SG2D.Sprite("ui/button_right", options, { sceneUI: this, code: "CameraMoveRight", type: SceneUI.TYPE_CAMERA });
+		this.buttonCameraMoveUp = new SG2D.Sprite("ui/button_up", options, { sceneUI: this, code: "CameraMoveUp", type: SceneUI.TYPE_CAMERA });
+		this.buttonCameraMoveDown = new SG2D.Sprite("ui/button_down", options, { sceneUI: this, code: "CameraMoveDown", type: SceneUI.TYPE_CAMERA });
+		this.buttonCameraMoveToPlayer = new SG2D.Sprite("ui/button_center", options, { sceneUI: this, code: "CameraMoveToPlayer", type: SceneUI.TYPE_CAMERA });
+		this.buttonCameraScaleIn = new SG2D.Sprite("ui/button_plus", options, { sceneUI: this, code: "CameraScaleIn", type: SceneUI.TYPE_CAMERA });
+		this.buttonCameraScaleOut = new SG2D.Sprite("ui/button_minus", options, { sceneUI: this, code: "CameraScaleOut", type: SceneUI.TYPE_CAMERA });
 		
 		// Place the CANVAS label in the DOM element using a graphical font
 		document.querySelector("#title").innerText = "";
-		this.sgTitle = new SG2DLabelCanvas("SG2D EXAMPLE", {
+		this.sgTitle = new SG2D.LabelCanvas("SG2D EXAMPLE", {
 			font: "metal_yellow_big",
 			parent: document.querySelector("#title")
 		});
 		
-		this.scoreLabel = new SG2DLabel("SCORE:", {
+		this.scoreLabel = new SG2D.Label("SCORE:", {
 			font: "metal_yellow_big",
 			x: 5, y: 5, scale: 0.4, angle: 0, layer: "interface", tint: 0xAAFFAA
 		});
-		this.scoreValue = new SG2DLabel("0", {
+		this.scoreValue = new SG2D.Label("0", {
 			font: "metal_yellow_big",
 			x: 60, y: 5, scale: 0.4, angle: 0, layer: "interface", tint: 0xFF44FF
 		});

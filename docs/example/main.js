@@ -6,10 +6,6 @@
 
 "use strict";
 
-import SG2D from "../sg2d.js";
-import SG2DTile from "../sg2d-tile.js";
-import SG2DCamera from "../sg2d-camera.js";
-
 import GraphicsPreparer from "./classes/graphics-preparer.js";
 import SceneEffects from "./classes/scene-effects.js";
 import SceneUI from "./classes/scene-ui.js";
@@ -38,7 +34,7 @@ class Application {
 		//PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.LINEAR; // LINEAR (smooth) | NEAREST (pixel)
 		//PIXI.settings.WRAP_MODE = PIXI.WRAP_MODES.CLAMP; // CLAMP | REPEAT | MIRRORED_REPEAT
 		//PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.MEDIUM;
-		this.scene =  new SG2D({
+		this.scene =  new SG2D.Application({
 			canvasId: "canvas",
 			cellsizepix: 64,
 			pixi: { // config passed to PIXI.Application constructor
@@ -51,7 +47,7 @@ class Application {
 				position: {x: 224, y: 224}, // Start position of the camera. Default [0, 0]
 				scale_min: 2,
 				scale_max: 8,
-				movement_by_pointer: SG2DCamera.MOVEMENT_BY_POINTER_RIGHT,
+				movement_by_pointer: SG2D.Camera.MOVEMENT_BY_POINTER_RIGHT,
 				rotate_adjustment: -90 // Base offset of the camera angle in degrees. Default 0
 			},
 			clusters: {
@@ -75,7 +71,7 @@ class Application {
 				bodies: {},
 				trees: {},
 				animations: {},
-				interface: { position: SG2D.LAYER_POSITION_FIXED, zindex: 10 }
+				interface: { position: SG2D.Application.LAYER_POSITION_FIXED, zindex: 10 }
 			},
 			plugins: ["sg2d-transitions"]
 		});

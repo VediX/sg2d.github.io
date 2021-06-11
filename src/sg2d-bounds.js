@@ -1,7 +1,7 @@
 /**
  * SG2DBounds
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
+ * (c) 2019-2021 Kalashnikov Ilya
  */
 
 "use strict";
@@ -57,5 +57,5 @@ export default class SG2DBounds {
 	}
 }
 
-if (typeof window === "object") window.SG2DBounds = SG2DBounds;
-if (typeof _root === "object") _root.SG2DBounds = SG2DBounds;
+//if (typeof window === "object") window.SG2DBounds = SG2DBounds;
+//if (typeof _root === "object") _root.SG2DBounds = SG2DBounds;

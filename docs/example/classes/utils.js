@@ -8,8 +8,8 @@ export default class Utils {
 			var iSpread = Math.floor( Math.random() * aSpreading.length),
 				oSpread = aSpreading[ iSpread ],
 				angle = Math.floor(90 * Math.floor(Math.random() * 4));
-			var	newX = oSpread.x + Math.round( SG2DMath.sin(angle) ),
-				newY = oSpread.y - Math.round( SG2DMath.cos(angle) );
+			var	newX = oSpread.x + Math.round( SG2D.Math.sin(angle) ),
+				newY = oSpread.y - Math.round( SG2D.Math.cos(angle) );
 			if (aaSpreding[newX] && aaSpreding[newX][newY]) continue;
 			if (! aaSpreding[newX]) aaSpreding[newX] = [];
 			var o = { x: newX, y: newY };

@@ -1,18 +1,17 @@
 /**
  * SG2DSprite 1.0.0
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
+ * (c) 2019-2021 Kalashnikov Ilya
  */
 
 "use strict";
 
-import SG2D from './sg2d.js';
+import SG2DApplication from './sg2d-application.js';
 
 /**
  * SG2DSprite - custom sprite, for example, an icon opposite the resource counter
  */
 export default class SG2DSprite {
-	static _options = {};
 	/**
 	 * @param {string|object} texture
 	 * @param {object} options
@@ -56,10 +55,12 @@ export default class SG2DSprite {
 		if (options.pointerover) this.sprite.on("pointerover", options.pointerover);
 		if (options.pointerout) this.sprite.on("pointerout", options.pointerout);
 		
-		var container = (options.layer ? SG2D.getInstance().layers[options.layer].container : SG2D.getInstance().viewport);
+		var container = (options.layer ? SG2DApplication.getInstance().layers[options.layer].container : SG2DApplication.getInstance().viewport);
 		container.addChild(this.sprite);
 		
 		if (typeof data === "object") Object.assign(this, data);
 		this.sprite.sg2dSprite = this;
 	}
 }
+
+SG2DSprite._options = {};

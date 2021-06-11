@@ -1,7 +1,7 @@
 /**
  * SG2DMouse
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
+ * (c) 2019-2021 Kalashnikov Ilya
  */
 
 "use strict";
@@ -9,35 +9,10 @@
 import SGModel from './libs/sg-model.js';
 import SG2DConsts from './sg2d-consts.js';
 import SG2DUtils from './sg2d-utils.js';
+import SG2DMath from "./sg2d-math.js";
 import SG2DCamera from './sg2d-camera.js';
 
 export default class SG2DMouse extends SGModel {
-	
-	static typeProperties = {
-		global: SGModel.TYPE_OBJECT_NUMBERS,
-		camera: SGModel.TYPE_OBJECT_NUMBERS,
-		pxy: SGModel.TYPE_OBJECT_NUMBERS,
-		cxy: SGModel.TYPE_OBJECT_NUMBERS
-	};
-	
-	static POINTER_LEFT = 0;
-	static POINTER_MIDDLE = 1;
-	static POINTER_RIGHT = 2;
-	
-	static CAMERA_MOVEMENT_SHIFT = 10; // pixels
-	
-	/** @private */
-	static _newPosition= void 0;
-	
-	static target = { cluster: void 0, tile: void 0, sprite: void 0, pxy: void 0, cxy: void 0 }; //, pxy_local: void 0 };
-	static options = { type: void 0, button: void 0 };
-	
-	static defaultProperties = {
-		global: void 0, // relative to the screen
-		pxy: { x: 0, y: 0 }, // in the coordinates of the game world: PX
-		cxy: { x: 0, y: 0 }, // in the coordinates of the game world: Cluster
-		cursors: { default: "", hover: "", move: "", /*...*/} // cursor icons
-	}
 	
 	initialize(properties, thisProps, options) {
 		
@@ -106,12 +81,6 @@ export default class SG2DMouse extends SGModel {
 		return SG2DMouse._target;
 	}*/
 	
-	/** @private */
-	static _startPointMouse = { x: 0, y: 0 };
-	
-	/** @private */
-	static _startPointPXY = { x: 0, y: 0 };
-	
 	pointerdown(e) {
 		
 		if (! this.sg2d.clusters) return;
@@ -157,8 +126,6 @@ export default class SG2DMouse extends SGModel {
 			}
 		}
 	}
-	
-	static _position = {x: 0, y: 0};
 	
 	pointermove(e) {
 		if (this.camera.properties.movement_by_pointer) {
@@ -219,5 +186,37 @@ export default class SG2DMouse extends SGModel {
 	}
 }
 
-if (typeof window === "object") window.SG2DMouse = SG2DMouse;
-if (typeof _root === "object") _root.SG2DMouse = SG2DMouse;
+SG2DMouse.typeProperties = {
+	global: SGModel.TYPE_OBJECT_NUMBERS,
+	camera: SGModel.TYPE_OBJECT_NUMBERS,
+	pxy: SGModel.TYPE_OBJECT_NUMBERS,
+	cxy: SGModel.TYPE_OBJECT_NUMBERS
+};
+
+SG2DMouse.POINTER_LEFT = 0;
+SG2DMouse.POINTER_MIDDLE = 1;
+SG2DMouse.POINTER_RIGHT = 2;
+
+SG2DMouse.CAMERA_MOVEMENT_SHIFT = 10; // pixels
+
+/** @private */
+SG2DMouse._newPosition= void 0;
+
+SG2DMouse.target = { cluster: void 0, tile: void 0, sprite: void 0, pxy: void 0, cxy: void 0 }; //, pxy_local: void 0 };
+SG2DMouse.options = { type: void 0, button: void 0 };
+
+SG2DMouse.defaultProperties = {
+	global: void 0, // relative to the screen
+	pxy: { x: 0, y: 0 }, // in the coordinates of the game world: PX
+	cxy: { x: 0, y: 0 }, // in the coordinates of the game world: Cluster
+	cursors: { default: "", hover: "", move: "", /*...*/} // cursor icons
+}
+
+/** @private */
+SG2DMouse._position = {x: 0, y: 0};
+
+/** @private */
+SG2DMouse._startPointMouse = { x: 0, y: 0 };
+
+/** @private */
+SG2DMouse._startPointPXY = { x: 0, y: 0 };

@@ -1,13 +1,12 @@
 /**
  * SG2DCluster
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
+ * (c) 2019-2021 Kalashnikov Ilya
  */
 
 "use strict";
 
 import SG2DConsts from './sg2d-consts.js';
-import SG2D from './sg2d.js';
 
 export default class SG2DCluster {
 	
@@ -44,7 +43,6 @@ export default class SG2DCluster {
 		}
 	}
 	
-	static _tiles = [];
 	getLayerTiles(layer, aResult = null) {
 		if (aResult) {
 			aResult.length = 0;
@@ -83,3 +81,6 @@ export default class SG2DCluster {
 		for (tile of this.tiles) tile.destroy();
 	}*/
 };
+
+/** @private */
+SG2DCluster._tiles = [];
