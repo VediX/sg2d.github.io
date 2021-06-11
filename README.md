@@ -6,7 +6,7 @@ API documentation in progress ...
 
 ### Examples
 
-Example of realizing game on the engine SG2D and SG2DTransitions plugin: [https://sg2d.ru/example/index.html](https://sg2d.ru/example/index.html)
+Example of realizing game on the engine SG2D and SG2DTransitions plugin: [https://sg2d.ru/example/index.html](https://sg2d.ru/example/)
 
 ### Ready installation
 

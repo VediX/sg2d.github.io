@@ -56,6 +56,3 @@ export default class SG2DBounds {
 		return this.max.y - this.min.y;
 	}
 }
-
-//if (typeof window === "object") window.SG2DBounds = SG2DBounds;
-//if (typeof _root === "object") _root.SG2DBounds = SG2DBounds;

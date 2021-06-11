@@ -36,7 +36,4 @@ let SG2DConsts = {
 	PIXI_TEXTURE_STRICT: false // If "true", then throws an exception if there is no texture
 };
 
-//if (typeof window === "object") window.SG2DConsts = SG2DConsts;
-//if (typeof _root === "object") _root.SG2DConsts = SG2DConsts;
-
 export default SG2DConsts;

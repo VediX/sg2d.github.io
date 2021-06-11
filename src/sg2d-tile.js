@@ -244,18 +244,20 @@ export default class SG2DTile extends SGModel {
 		}
 	}
 	
-	stopAnimation(name_or_sprite = void 0) {
+	stopAnimation(name_or_sprite = void 0, options = void 0) {
 		let sprite = this._checkSpriteAnimation(name_or_sprite);
 		if (sprite) {
 			sprite.animation.running = false;
 		}
+		if (options && options.visible !== void 0) this.set("visible", options.visible, { sprite: sprite });
 	}
 	
-	resumeAnimation(name_or_sprite = void 0) {
+	resumeAnimation(name_or_sprite = void 0, options = void 0) {
 		let sprite = this._checkSpriteAnimation(name_or_sprite);
 		if (sprite) {
 			sprite.animation.running = true;
 		}
+		if (options && options.visible !== void 0) this.set("visible", options.visible, { sprite: sprite });
 	}
 	
 	stepAnimation(name_or_sprite = void 0, count = 1) {

@@ -34,6 +34,19 @@ export default class Player extends ObjectBaseLifeBand {
 				}
 			}
 		},
+		accelerator: {
+			texture: "animations/accelerator_1",
+			layer: "animations",
+			anchor: { x: 2.7, y: 0.45 },
+			zindex: 0,
+			visible: false,
+			animation: {
+				count: 3,
+				sleep: 3,
+				running: false,
+				basetexture: "animations/accelerator_"
+			}
+		},
 		track_left: {
 			texture: "objects/player-track_1",
 			anchor: { x: -3.2, y: 2.3 },
@@ -112,7 +125,7 @@ export default class Player extends ObjectBaseLifeBand {
 		
 		this.on("state", this.stateChange);
 		
-		this.set("angle", this.properties.angle, { sprites: [this.sprites.platform, this.sprites.track_left, this.sprites.track_right] });
+		this.set("angle", this.properties.angle, { sprites: [this.sprites.platform, this.sprites.track_left, this.sprites.track_right, this.sprites.accelerator] });
 	}
 	
 	keyProcess(e) {
@@ -193,9 +206,12 @@ export default class Player extends ObjectBaseLifeBand {
 			
 		}
 		
-		if ((state & Player.STATES_TRACKS_MOVING) && (accelerator >= 2)) {
+		if ((state & Player.STATE_MOVE_FORWARD) && (accelerator >= 2)) {
 			this.stepAnimation(this.sprites.track_left);
 			this.stepAnimation(this.sprites.track_right);
+			this.resumeAnimation(this.sprites.accelerator, { visible: true });
+		} else {
+			this.stopAnimation(this.sprites.accelerator, { visible: false });
 		}
 		
 		if (this.properties.load_whizbang > 0) {

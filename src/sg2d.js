@@ -8,8 +8,6 @@
 
 "use strict";
 
-//import "@babel/polyfill";
-
 import SGModel from './libs/sg-model.js';
 import SG2DConsts from './sg2d-consts.js';
 import SG2DMath from './sg2d-math.js';

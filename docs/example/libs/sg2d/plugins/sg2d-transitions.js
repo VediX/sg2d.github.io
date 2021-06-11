@@ -3,14 +3,12 @@
  * Generator of smooth transitions between different types of terrain.
  * Tiles or their constructors can specify the layer index (0..31) and the transition type (TRANSITIONS_STANDARD, ...) where the transition is generated.
  * The plugin only processes tiles with the static property useTransition=true and uses the texture from the static property of the tile!
- * https://github.com/VediX/SG2D
+ * https://github.com/VediX/sg2d.github.io
  * (c) 2019-2021 Kalashnikov Ilya
  * SG2DTransitions may be freely distributed under the MIT license
  */
 
 "use strict";
-
-//import SG2DPluginBase from "./../sg2d-plugin-base.js";
 
 export default class SG2DTransitions extends SG2D.PluginBase {
 		
@@ -260,5 +258,3 @@ export default class SG2DTransitions extends SG2D.PluginBase {
 		return texture;
 	}
 }
-
-if (typeof window === "object") window.SG2DTransitions = SG2DTransitions;

@@ -203,6 +203,3 @@ export default SG2DMath;
 		return _avgVertext;
 	};
 })();
-
-//if (typeof window === "object") window.SG2DMath = SG2DMath;
-//if (typeof _root === "object") _root.SG2DMath = SG2DMath;

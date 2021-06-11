@@ -19,15 +19,15 @@ export default class SG2DPluginBase {
 	//static _ready = null; // override
 	
 	/** @public */
-	static ready(success = void 0, failed = void 0) {
+	static ready(_success = void 0, _failed = void 0) {
 		if (! this._ready) {
 			this._ready = new Promise((success, failed)=>{
 				this.success = success;
 				this.failed = failed;
 			});
 		}
-		if (success || failed) {
-			this._ready.then(success || (()=>{}), failed || (()=>{}));
+		if (_success || _failed) {
+			this._ready.then(_success || (()=>{}), _failed || (()=>{}));
 		}
 		return this._ready;
 	}
@@ -45,5 +45,3 @@ export default class SG2DPluginBase {
 		this.constructor.ready();
 	}
 }
-
-//if (typeof window === "object") window.SG2DPluginBase = SG2DPluginBase;

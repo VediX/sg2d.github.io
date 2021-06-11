@@ -112,9 +112,3 @@ export class SG2DLabelCanvas {
 		}
 	}
 }
-
-//if (typeof window === "object") {
-//	window.SG2DFonts = SG2DFonts;
-//	window.SG2DLabel = SG2DLabel;
-//	window.SG2DLabelCanvas = SG2DLabelCanvas;
-//}

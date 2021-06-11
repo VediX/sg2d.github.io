@@ -13,17 +13,17 @@ SG2DPlugins.classes = {};
 SG2DPlugins.instances = {};
 
 /** @public */
-SG2DPlugins.load = function(plugins) {
-	plugins = typeof plugins === "object"
-	? (Array.isArray(plugins)
-		? plugins.reduce((accumulator, currentValue)=>{
+SG2DPlugins.load = function(asPlugins) {
+	asPlugins = typeof asPlugins === "object"
+	? (Array.isArray(asPlugins)
+		? asPlugins.reduce((accumulator, currentValue)=>{
 			accumulator[currentValue] = {};
 			return accumulator
 		}, {})
-		: plugins)
+		: asPlugins)
 	: {};
 	let promises = [];
-	for (let p in plugins) {
+	for (let p in asPlugins) {
 		if (! this.files[p]) {
 			let promise = new Promise((success, failed)=>{
 				this.files[p] = import(/* webpackIgnore: true */"./plugins/"+p+'.js').then((result)=>{
@@ -32,7 +32,7 @@ SG2DPlugins.load = function(plugins) {
 					if (_class.ready) {
 						_class.ready(success, failed);
 					} else {
-						throw "The plugin class \"" + _class.name + "\" must have a static ready() method! Maybe you didn't inherit the class from SG2DPluginBase or you didn't call super() in the constructor!";
+						throw "The plugin class \"" + _class.name + "\" must have a static ready() method! Maybe you didn't inherit the class from SG2D.PluginBase or you didn't call super() in the constructor!";
 					}
 				});
 			});

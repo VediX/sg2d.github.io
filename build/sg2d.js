@@ -867,9 +867,6 @@ let SG2DConsts = {
 	PIXI_TEXTURE_STRICT: false // If "true", then throws an exception if there is no texture
 };
 
-//if (typeof window === "object") window.SG2DConsts = SG2DConsts;
-//if (typeof _root === "object") _root.SG2DConsts = SG2DConsts;
-
 /* harmony default export */ var sg2d_consts = (SG2DConsts);
 // CONCATENATED MODULE: ./src/sg2d-math.js
 /**
@@ -1077,9 +1074,6 @@ let SG2DMath = {};
 		return _avgVertext;
 	};
 })();
-
-//if (typeof window === "object") window.SG2DMath = SG2DMath;
-//if (typeof _root === "object") _root.SG2DMath = SG2DMath;
 // CONCATENATED MODULE: ./src/sg2d-utils.js
 /**
  * SG2D Utilities
@@ -1661,9 +1655,6 @@ class SG2DBounds {
 		return this.max.y - this.min.y;
 	}
 }
-
-//if (typeof window === "object") window.SG2DBounds = SG2DBounds;
-//if (typeof _root === "object") _root.SG2DBounds = SG2DBounds;
 // CONCATENATED MODULE: ./src/sg2d-cluster.js
 /**
  * SG2DCluster
@@ -2443,18 +2434,20 @@ class sg2d_tile_SG2DTile extends SGModel {
 		}
 	}
 	
-	stopAnimation(name_or_sprite = void 0) {
+	stopAnimation(name_or_sprite = void 0, options = void 0) {
 		let sprite = this._checkSpriteAnimation(name_or_sprite);
 		if (sprite) {
 			sprite.animation.running = false;
 		}
+		if (options && options.visible !== void 0) this.set("visible", options.visible, { sprite: sprite });
 	}
 	
-	resumeAnimation(name_or_sprite = void 0) {
+	resumeAnimation(name_or_sprite = void 0, options = void 0) {
 		let sprite = this._checkSpriteAnimation(name_or_sprite);
 		if (sprite) {
 			sprite.animation.running = true;
 		}
+		if (options && options.visible !== void 0) this.set("visible", options.visible, { sprite: sprite });
 	}
 	
 	stepAnimation(name_or_sprite = void 0, count = 1) {
@@ -3793,17 +3786,17 @@ SG2DPlugins.classes = {};
 SG2DPlugins.instances = {};
 
 /** @public */
-SG2DPlugins.load = function(plugins) {
-	plugins = typeof plugins === "object"
-	? (Array.isArray(plugins)
-		? plugins.reduce((accumulator, currentValue)=>{
+SG2DPlugins.load = function(asPlugins) {
+	asPlugins = typeof asPlugins === "object"
+	? (Array.isArray(asPlugins)
+		? asPlugins.reduce((accumulator, currentValue)=>{
 			accumulator[currentValue] = {};
 			return accumulator
 		}, {})
-		: plugins)
+		: asPlugins)
 	: {};
 	let promises = [];
-	for (let p in plugins) {
+	for (let p in asPlugins) {
 		if (! this.files[p]) {
 			let promise = new Promise((success, failed)=>{
 				this.files[p] = import(/* webpackIgnore: true */"./plugins/"+p+'.js').then((result)=>{
@@ -3812,7 +3805,7 @@ SG2DPlugins.load = function(plugins) {
 					if (_class.ready) {
 						_class.ready(success, failed);
 					} else {
-						throw "The plugin class \"" + _class.name + "\" must have a static ready() method! Maybe you didn't inherit the class from SG2DPluginBase or you didn't call super() in the constructor!";
+						throw "The plugin class \"" + _class.name + "\" must have a static ready() method! Maybe you didn't inherit the class from SG2D.PluginBase or you didn't call super() in the constructor!";
 					}
 				});
 			});
@@ -3844,15 +3837,15 @@ class SG2DPluginBase {
 	//static _ready = null; // override
 	
 	/** @public */
-	static ready(success = void 0, failed = void 0) {
+	static ready(_success = void 0, _failed = void 0) {
 		if (! this._ready) {
 			this._ready = new Promise((success, failed)=>{
 				this.success = success;
 				this.failed = failed;
 			});
 		}
-		if (success || failed) {
-			this._ready.then(success || (()=>{}), failed || (()=>{}));
+		if (_success || _failed) {
+			this._ready.then(_success || (()=>{}), _failed || (()=>{}));
 		}
 		return this._ready;
 	}
@@ -3870,8 +3863,6 @@ class SG2DPluginBase {
 		this.constructor.ready();
 	}
 }
-
-//if (typeof window === "object") window.SG2DPluginBase = SG2DPluginBase;
 // CONCATENATED MODULE: ./src/sg2d-application.js
 /**
  * SG2DApplication 1.0.0
@@ -3923,6 +3914,7 @@ class sg2d_application_SG2DApplication {
 	 * @param {boolean}		[config.pixi.autoStart=true]
 	 * @param {number}			[config.pixi.width=100]
 	 * @param {number}			[config.pixi.height=100]
+	 * @param {array}		[plugins=void 0] Array of string, example: ["sg2d-transitions", ...]
 	 */
 	constructor(config) {
 		
@@ -4335,12 +4327,6 @@ class sg2d_fonts_SG2DLabelCanvas {
 		}
 	}
 }
-
-//if (typeof window === "object") {
-//	window.SG2DFonts = SG2DFonts;
-//	window.SG2DLabel = SG2DLabel;
-//	window.SG2DLabelCanvas = SG2DLabelCanvas;
-//}
 // CONCATENATED MODULE: ./src/sg2d-sprite.js
 /**
  * SG2DSprite 1.0.0
@@ -4418,8 +4404,6 @@ sg2d_sprite_SG2DSprite._options = {};
  */
 
 
-
-//import "@babel/polyfill";
 
 
 

@@ -48,6 +48,7 @@ export default class SG2DApplication {
 	 * @param {boolean}		[config.pixi.autoStart=true]
 	 * @param {number}			[config.pixi.width=100]
 	 * @param {number}			[config.pixi.height=100]
+	 * @param {array}		[plugins=void 0] Array of string, example: ["sg2d-transitions", ...]
 	 */
 	constructor(config) {
 		
