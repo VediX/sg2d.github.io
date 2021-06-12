@@ -2,7 +2,7 @@
 
 ### Documentation
 
-API documentation in progress ...
+[See Wiki for API documentation](https://github.com/VediX/sg2d.github.io/wiki)
 
 ### Examples
 
@@ -23,7 +23,7 @@ Library connection:
 
 	<script src="sg2d/sg2d.js" type="text/javascript"></script>
 	
-Plugin connection for example SG2DTransition:
+Plugin connection using ES6 import and SG2DTransition as example:
 
 	import SG2DTransitions from "./sg2d/plugins/sg2d-transitions.js";
 
