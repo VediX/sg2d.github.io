@@ -168,6 +168,7 @@ export default class Player extends ObjectBaseLifeBand {
 		let dy = 0;
 		let angle = this.properties.angle;
 		let accelerator = (state & Player.STATE_ACCELERATOR ? 2 : 1);
+		if (this.centerCluster._f && ! this.centerCluster._r) accelerator *= 0.5;
 		if (state & Player.STATE_MOVE_FORWARD) {
 			dx += Player.POWER_MOVE * accelerator * SG2D.Math.cos(this.properties.angle, 1);
 			dy += Player.POWER_MOVE * accelerator * SG2D.Math.sin(this.properties.angle, 1);
