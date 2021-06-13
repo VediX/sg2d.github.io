@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en-US" style=""><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Documentation | sg2d.github.io</title>
+<meta name="generator" content="Jekyll v3.9.0">
+<meta property="og:title" content="Documentation">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="SG2D is a 2D graphics engine based on PixiJS and optimized for large maps through matrix tile clustering. Written in modern ES6. Supported by the latest versions of Chrome, Opera, Mozilla and Yandex browsers.">
+<meta property="og:description" content="SG2D is a 2D graphics engine based on PixiJS and optimized for large maps through matrix tile clustering. Written in modern ES6. Supported by the latest versions of Chrome, Opera, Mozilla and Yandex browsers.">
+<link rel="canonical" href="https://sg2d.ru/">
+<meta property="og:url" content="https://sg2d.ru/">
+<meta property="og:site_name" content="sg2d.github.io">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="Documentation">
+<script type="application/ld+json">
+{"description":"SG2D is a 2D graphics engine based on PixiJS and optimized for large maps through matrix tile clustering. Written in modern ES6. Supported by the latest versions of Chrome, Opera, Mozilla and Yandex browsers.","url":"https://sg2d.ru/","@type":"WebSite","headline":"Documentation","name":"sg2d.github.io","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=2c2a7180a72349e57d43fc23edb61dcded82d261">
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+    <script src="/assets/js/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="/assets/css/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header" style="text-align: center;">
+        <nav style="display: block; background: transparent;">
+          <li class="fork" style="float: none"><a href="https://github.com/VediX/sg2d.github.io">View On GitHub</a></li>
+          
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>sg2d.github.io</h1>
+          <p>SG2D is a 2D graphics engine based on PixiJS and optimized for large maps through matrix tile clustering. Written in modern ES6. Supported by the latest versions of Chrome, Opera, Mozilla and Yandex browsers.</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/VediX">VediX</a></span>
+          <span class="credits right">Hosted on GitHub Pages — Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h2 id="documentation">Documentation</h2>
+
+<p><a href="https://github.com/VediX/sg2d.github.io/wiki/SG2D-API">See Wiki for API documentation</a></p>
+
+<h2 id="ready-installation">Ready installation</h2>
+
+<ul>
+  <li><a href="https://raw.githubusercontent.com/VediX/sg2d.github.io/main/build/sg2d.js">sg2d.js (160KB)</a></li>
+  <li><a href="https://raw.githubusercontent.com/VediX/sg2d.github.io/main/build/sg2d.min.js">sg2d.min.js (80KB)</a></li>
+</ul>
+
+<h2 id="plugins">Plugins</h2>
+
+<ul>
+  <li><a href="https://raw.githubusercontent.com/VediX/sg2d.github.io/main/build/plugins/sg2d-transitions.js">sg2d-transitions.js</a></li>
+</ul>
+
+<h2 id="connection-in-html5-application">Connection in HTML5 application</h2>
+
+<p>Library connection (for example index.html):</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"sg2d/sg2d.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;&lt;/script&gt;</span>
+</code></pre></div></div>
+
+<h2 id="plugins-connection">Plugins connection:</h2>
+
+<p>Plugin registration in SG2D application:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">myApp</span> <span class="o">=</span>  <span class="k">new</span> <span class="nx">SG2D</span><span class="p">.</span><span class="nx">Application</span><span class="p">({</span>
+	<span class="p">...</span>
+	<span class="na">plugins</span><span class="p">:</span> <span class="p">[</span><span class="dl">"</span><span class="s2">sg2d-transitions</span><span class="dl">"</span><span class="p">,</span> <span class="p">...]</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>To use the functionality of plugin, you can connect it in your scripts using ES6 import:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">SG2DTransitions</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./sg2d/plugins/sg2d-transitions.js</span><span class="dl">"</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h2 id="examples">Examples</h2>
+
+<p>Example of realizing game on the engine SG2D and SG2DTransitions plugin: <a href="https://sg2d.ru/example/">https://sg2d.ru/example/</a></p>
+
+<p><img src="https://sg2d.ru/example.png" alt="SG2D Example 2D game" title="SG2D Example 2D game"></p>
+
+<h2 id="license">License</h2>
+
+<p>SG2D is licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a><br>
+Copyright (c) 2021 Ilya Kalashnikov</p>
+
+<p>This license is also supplied with the release and source code.
+As stated in the license, absolutely no warranty is provided.</p>
+
+
+      </section>
+
+    </div>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)}; m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})	   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym"); ym(80080672, "init", { clickmap:true, trackLinks:true, accurateTrackBounce:true });</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/80080672" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+  
+
+</body></html>
