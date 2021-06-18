@@ -17,6 +17,7 @@ import SG2DApplication from './sg2d-application.js';
 import SG2DClusters from './sg2d-clusters.js';
 import SG2DCluster from './sg2d-cluster.js';
 import SG2DTile from './sg2d-tile.js';
+import SG2DTileBody from './sg2d-tilebody.js';
 import SG2DCamera from './sg2d-camera.js';
 import SG2DMouse from './sg2d-mouse.js';
 import SG2DEffects from './sg2d-effects.js';
@@ -36,6 +37,7 @@ var SG2D = {
 	Clusters: SG2DClusters,
 	Camera: SG2DCamera,
 	Tile: SG2DTile,
+	TileBody: SG2DTileBody,
 	Mouse: SG2DMouse,
 	Effects: SG2DEffects,
 	Plugins: SG2DPlugins,
@@ -47,12 +49,11 @@ var SG2D = {
 	Label: SG2DLabel,
 	LabelCanvas: SG2DLabelCanvas,
 	Sprite: SG2DSprite,
+	pixi: null,
+	matter: null,
 	version: typeof __SG2D_VERSION__ !== 'undefined' ? __SG2D_VERSION__ : '*'
 };
 
-if (typeof window === "object") window.SG2D = SG2D;
-if (typeof self === "object") self.SG2D = SG2D;
-if (typeof global === "object") global.SG2D = SG2D;
-if (typeof _root === "object") _root.SG2D = SG2D;
+if (typeof window === 'object' && window.document) window["SG2D"] = SG2D;
 
 export default SG2D;

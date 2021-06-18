@@ -1,4 +1,5 @@
 import Deferred from "../libs/deferred.js";
+import { BlockStandard, BlockTriangle } from "./blocks.js";
 
 export default class GraphicsPreparer {
 	static promise = Deferred();
@@ -35,6 +36,9 @@ export default class GraphicsPreparer {
 			});
 			
 			SG2D.Utils.setBorderAlphaTextures({ textures: ["lands/concrete"], alpha: 0.5});
+			
+			BlockStandard.generateInBetweenTextures();
+			BlockTriangle.generateInBetweenTextures();
 
 			this.promise.resolve();
 		});

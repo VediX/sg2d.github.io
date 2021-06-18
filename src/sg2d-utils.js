@@ -12,6 +12,8 @@ import SG2DMath from './sg2d-math.js';
 var SG2DUtils = {
 	DEFAULT_WIDTH: 32,
 	DEFAULT_HEIGHT: 32,
+	
+	FLAG_ADD_BORDER_ALPHA: 0b00000001,
 
 	getTime: function() {
 		var sResult;
@@ -195,32 +197,38 @@ var SG2DUtils = {
 		var texture_dest = PIXI.Texture.from(canvas);
 		texture_dest.canvas = canvas;
 		texture_dest._isFinalTexture = texture_src._isFinalTexture;
+		texture_dest._qBorderAlpha = texture_src._qBorderAlpha;
 	},
 
 	/**
 	 * Adds a transparent border to a 1 pixel sprite so that PIXI smooths the edges of the sprite when rotated.
 	 * @param {object} options
 	 * @param {array}		[options.textures=void 0]
-	 * @param {boolean}	[options.all=false] If TRUE then a transparent border is added if the sprite has opaque pixels on the border.
+	 * @param {boolean}	[options.all=false] If TRUE then a transparent border is added if the sprite has opaque pixels on the border
+	 * @param {number}		[options.qborder=1] Maximum permissible transparent frame thickness
 	 */
 	addBorderAlphaTextures: function(options) {
 		options.textures = options.textures || [];
+		options.qborder = options.qborder || 1;
 		if (! options.textures.length) {
 			this._getFinalTextures(options.textures);
 		}
 		for (var i = 0; i < options.textures.length; i++) {
 			var texture = typeof options.textures[i] === "object" ? options.textures[i] : PIXI.utils.TextureCache[options.textures[i]];
 			if (texture) {
-				var srcCanvas = SG2DUtils.getTextureAsCanvas(texture);
-				var destCanvas = SG2DUtils.createCanvas(texture.width + 2, texture.height + 2);
-				var destCtx = destCanvas.getContext("2d");
-				destCtx.drawImage(srcCanvas, 1, 1);
-				destCanvas._pixiId = texture.textureCacheIds[0] || texture.canvas._pixiId;
-				PIXI.Texture.removeFromCache(destCanvas._pixiId);
-				PIXI.BaseTexture.removeFromCache(destCanvas._pixiId);
-				var textureDest = PIXI.Texture.from(destCanvas);
-				textureDest.canvas = destCanvas;
-				textureDest._isFinalTexture = texture._isFinalTexture;
+				if (options.qborder > this.ifUndefined(texture._qBorderAlpha, 0)) {
+					var srcCanvas = SG2DUtils.getTextureAsCanvas(texture);
+					var destCanvas = SG2DUtils.createCanvas(texture.width + 2, texture.height + 2);
+					var destCtx = destCanvas.getContext("2d");
+					destCtx.drawImage(srcCanvas, 1, 1);
+					destCanvas._pixiId = texture.textureCacheIds[0] || texture.canvas._pixiId;
+					PIXI.Texture.removeFromCache(destCanvas._pixiId);
+					PIXI.BaseTexture.removeFromCache(destCanvas._pixiId);
+					var textureDest = PIXI.Texture.from(destCanvas);
+					textureDest.canvas = destCanvas;
+					textureDest._isFinalTexture = texture._isFinalTexture;
+					textureDest._qBorderAlpha = texture._qBorderAlpha ? texture._qBorderAlpha + 1 : 1;
+				}
 			} else {
 				console.warn("Texture with name \"" + options.textures[i] + "\" not found!");
 			}
@@ -264,10 +272,11 @@ var SG2DUtils = {
 	 * @param {object} config
 	 */
 	createInBetweenTextures: function(config) {
-		config.start;
-		config.end;
+		if (! config.start) throw "Error 7020181!";
+		if (! config.end) throw "Error 7020182!";
 		config.count = Math.max(2, config.count || 2);
-		config.name;
+		if (! config.name) throw "Error 7020184!";
+		config.flags = config.flags || 0;
 
 		if (config.count <= 2) return;
 
@@ -291,6 +300,8 @@ var SG2DUtils = {
 		let qblocks = Math.ceil(wh / blocksize);
 		let dataPrev = null;
 
+		let texturesCreated = [];
+		
 		for (var j = 2; j < config.count; j++) {
 
 			var jc = (j-1)/(config.count-1);
@@ -341,13 +352,21 @@ var SG2DUtils = {
 			var canvas = this.createCanvas(w, h);
 			var ctx = canvas.getContext("2d");
 			ctx.putImageData(imageData, 0, 0);
-
+			
 			canvas._pixiId = config.name.replace("%", j);
 			var texture = PIXI.Texture.from(canvas);
 			texture.canvas = canvas;
 			texture._isFinalTexture = true;
+			
+			texturesCreated.push(texture);
 
 			dataPrev = data;
+		}
+		
+		if (config.flags & this.FLAG_ADD_BORDER_ALPHA) {
+			this.addBorderAlphaTextures({
+				textures: texturesCreated
+			});
 		}
 
 		var nameStart = config.name.replace("%", 1);

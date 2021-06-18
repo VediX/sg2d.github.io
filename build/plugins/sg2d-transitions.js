@@ -258,5 +258,3 @@ export default class SG2DTransitions extends SG2D.PluginBase {
 		return texture;
 	}
 }
-
-if (typeof window === "object") window.SG2DTransitions = SG2DTransitions;

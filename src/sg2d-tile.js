@@ -24,7 +24,7 @@ export default class SG2DTile extends SGModel {
 		
 		options = options || SGModel.OBJECT_EMPTY;
 		
-		this.bounds = (options.own_bounds ? new SG2DBounds(options.own_bounds) : new SG2DBounds());
+		this.bounds = (this.body && this.body.bounds ? new SG2DBounds(this.body.bounds) : new SG2DBounds());
 		this.boundsCXY = new SG2DBounds();
 		this.clusters = new Set();
 		this.centerCluster = null;
@@ -136,11 +136,6 @@ export default class SG2DTile extends SGModel {
 		return false;
 	}
 	
-	/** @private */ // TODO DEL?
-	/*_setChecker(name, value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
-		return (value === void 0 || this.set(name, value, options, flags | SGModel.FLAG_IGNORE_OWN_SETTER));
-	}*/
-	
 	/**
 	 * For moving sprites, checks if drawing is required when hitting the camera
 	 */
@@ -187,6 +182,7 @@ export default class SG2DTile extends SGModel {
 				}
 			}
 			if (sprite.pixiSprite) {
+				this.updateSpriteTexture(sprite, sprite.texture);
 				pixiSprite.position.x = ~~this.properties.position.x;
 				pixiSprite.position.y = ~~this.properties.position.y;
 				if (typeof sprite.anchor === "number") pixiSprite.anchor.set(sprite.anchor); else pixiSprite.anchor.set(sprite.anchor.x, sprite.anchor.y);

@@ -119,7 +119,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -127,21 +127,23 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-// ESM COMPAT FLAG
-__webpack_require__.r(__webpack_exports__);
-
-// CONCATENATED MODULE: ./src/libs/sg-model.js
+/* WEBPACK VAR INJECTION */(function(module) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SGModel; });
 /**
  * SGModel 1.0.2
  * A fast lightweight library (ES6) for structuring web applications using binding models and custom events. This is a faster and more simplified analogue of Backbone.js!
  * https://github.com/VediX/SGModel
- * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
+ * (c) 2019-2021 Kalashnikov Ilya
  * SGModel may be freely distributed under the MIT license
  */
 
 
 
 class SGModel {
+	
+	// overriden
+	defaults() {
+		return SGModel.clone(this.constructor.defaultProperties);
+	}
 	
 	/**
 	 * SGModel constructor
@@ -156,9 +158,8 @@ class SGModel {
 			this.constructor._instance = this;
 		}
 		
-		var properties = props || {};
-		
-		var defaults = (typeof this.defaults === "function" ? this.defaults() : SGModel.clone(this.constructor.defaultProperties));
+		let properties = props || {};
+		let defaults = this.defaults();
 		
 		// override defaults by localStorage data
 		if (this.constructor.localStorageKey) {
@@ -618,9 +619,11 @@ class SGModel {
 	}
 }
 
-if (typeof window === "object") window.SGModel = SGModel;
-if (typeof self === "object") self.SGModel = SGModel;
-if (typeof _root === "object") _root.SGModel = SGModel;
+if (typeof exports === 'object' && typeof module === 'object') module.exports = SGModel;
+else if (typeof define === 'function' && __webpack_require__(2)) define("SG2D", [], ()=>SGModel);
+else if (typeof exports === 'object') exports["SGModel"] = SGModel;
+else if (typeof window === 'object' && window.document) window["SGModel"] = SGModel;
+else undefined["SGModel"] = SGModel;
 
 // Property data types
 SGModel.typeProperties = {};
@@ -828,6 +831,58 @@ SGModel._prevValue = void 0;
 
 /** @private */
 SGModel._xy = {x: 0, y: 0};
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)(module)))
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
+module.exports = function(originalModule) {
+	if (!originalModule.webpackPolyfill) {
+		var module = Object.create(originalModule);
+		// module.parent = undefined by default
+		if (!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		Object.defineProperty(module, "exports", {
+			enumerable: true
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
+module.exports = __webpack_amd_options__;
+
+/* WEBPACK VAR INJECTION */}.call(this, {}))
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+// EXTERNAL MODULE: ./src/libs/sg-model.js
+var sg_model = __webpack_require__(0);
+
 // CONCATENATED MODULE: ./src/sg2d-consts.js
 /**
  * SG2DConsts
@@ -911,14 +966,18 @@ let SG2DMath = {};
 	SG2DMath.PI2 = Math.PI*2;
 	SG2DMath.rad90 = 90 * SG2DMath.PI180;
 
-	/*Math.toRad = function(a) {
-		return a * SG2DMath.PI180;
-	};*/
+	SG2DMath.toRad = function(a) {
+		return a * this.PI180;
+	};
+	
+	SG2DMath.toDeg = function(a) {
+		return a / this.PI180;
+	};
 	
 	SG2DMath.normalize_a = function(a, precision = 0) {
 		while (a >= 360) a = a - 360;
 		while (a < 0) a = a + 360;
-		if (precision) a = SG2DMath.roundTo(a, precision);
+		if (precision) a = this.roundTo(a, precision);
 		return a;
 	};
 
@@ -937,10 +996,20 @@ let SG2DMath = {};
 	}
 	
 	SG2DMath.sin = function(a, precision = 0) { // Accuracy to the tenth of a degree
-		return (precision === 0 ? _aSin[SG2DMath.normalize_a(a, precision)] : _aSin1[ Math.round(10 * SG2DMath.normalize_a(a, 1)) ]);
+		return (precision === 0 ? _aSin[this.normalize_a(a, precision)] : _aSin1[ Math.round(10 * this.normalize_a(a, 1)) ]);
 	};
 	SG2DMath.cos = function(a, precision = 0) {
-		return (precision === 0 ? _aCos[SG2DMath.normalize_a(a, precision)] : _aCos1[ Math.round(10 * SG2DMath.normalize_a(a, 1)) ]);
+		return (precision === 0 ? _aCos[this.normalize_a(a, precision)] : _aCos1[ Math.round(10 * this.normalize_a(a, 1)) ]);
+	};
+	
+	SG2DMath.sinrad = function() {
+		arguments[0] = arguments[0] / this.PI180;
+		return this.sin.apply(this, arguments);
+	};
+	
+	SG2DMath.cosrad = function() {
+		arguments[0] = arguments[0] / this.PI180;
+		return this.cos.apply(this, arguments);
 	};
 	
 	/*Math.angle_p1p2_rad = function(p1, p2) { //not used!
@@ -948,7 +1017,7 @@ let SG2DMath = {};
 	};*/
 	SG2DMath.angle_p1p2_deg = function(p1, p2, precision = 0) {
 		var angle_rad = Math.atan2(p2.y - p1.y, p2.x - p1.x);
-		var angle_deg = SG2DMath.normalize_a(angle_rad / SG2DMath.PI180, precision);
+		var angle_deg = this.normalize_a(angle_rad / this.PI180, precision);
 		return angle_deg;
 	};
 
@@ -969,8 +1038,8 @@ let SG2DMath = {};
 
 	// Direction of rotation (right / left) - which is faster
 	SG2DMath.nearestDirRotate = function(rotate_current, rotate_target) {
-		var a1 = SG2DMath.normalize_a(rotate_target - rotate_current);
-		var a2 = SG2DMath.normalize_a(rotate_current - rotate_target);
+		var a1 = this.normalize_a(rotate_target - rotate_current);
+		var a2 = this.normalize_a(rotate_current - rotate_target);
 		if (a1 === a2) return 0;
 		return a1 > a2 ? -1 : 1;
 	};
@@ -997,7 +1066,7 @@ let SG2DMath = {};
 	*/
 	SG2DMath.getLinePoints = function(oPointStart, oPointEnd, dest = void 0) {
 		
-		var fAddLinePoint = SG2DMath._addLinePoint;
+		var fAddLinePoint = this._addLinePoint;
 		if (typeof dest === "function") fAddLinePoint = dest;
 		else if (Array.isArray(dest)) fAddLinePoint = fAddLinePoint.bind(dest);
 		else (_linePoints.length = 0, fAddLinePoint = fAddLinePoint.bind(_linePoints));
@@ -1089,6 +1158,8 @@ let SG2DMath = {};
 var SG2DUtils = {
 	DEFAULT_WIDTH: 32,
 	DEFAULT_HEIGHT: 32,
+	
+	FLAG_ADD_BORDER_ALPHA: 0b00000001,
 
 	getTime: function() {
 		var sResult;
@@ -1272,32 +1343,38 @@ var SG2DUtils = {
 		var texture_dest = PIXI.Texture.from(canvas);
 		texture_dest.canvas = canvas;
 		texture_dest._isFinalTexture = texture_src._isFinalTexture;
+		texture_dest._qBorderAlpha = texture_src._qBorderAlpha;
 	},
 
 	/**
 	 * Adds a transparent border to a 1 pixel sprite so that PIXI smooths the edges of the sprite when rotated.
 	 * @param {object} options
 	 * @param {array}		[options.textures=void 0]
-	 * @param {boolean}	[options.all=false] If TRUE then a transparent border is added if the sprite has opaque pixels on the border.
+	 * @param {boolean}	[options.all=false] If TRUE then a transparent border is added if the sprite has opaque pixels on the border
+	 * @param {number}		[options.qborder=1] Maximum permissible transparent frame thickness
 	 */
 	addBorderAlphaTextures: function(options) {
 		options.textures = options.textures || [];
+		options.qborder = options.qborder || 1;
 		if (! options.textures.length) {
 			this._getFinalTextures(options.textures);
 		}
 		for (var i = 0; i < options.textures.length; i++) {
 			var texture = typeof options.textures[i] === "object" ? options.textures[i] : PIXI.utils.TextureCache[options.textures[i]];
 			if (texture) {
-				var srcCanvas = SG2DUtils.getTextureAsCanvas(texture);
-				var destCanvas = SG2DUtils.createCanvas(texture.width + 2, texture.height + 2);
-				var destCtx = destCanvas.getContext("2d");
-				destCtx.drawImage(srcCanvas, 1, 1);
-				destCanvas._pixiId = texture.textureCacheIds[0] || texture.canvas._pixiId;
-				PIXI.Texture.removeFromCache(destCanvas._pixiId);
-				PIXI.BaseTexture.removeFromCache(destCanvas._pixiId);
-				var textureDest = PIXI.Texture.from(destCanvas);
-				textureDest.canvas = destCanvas;
-				textureDest._isFinalTexture = texture._isFinalTexture;
+				if (options.qborder > this.ifUndefined(texture._qBorderAlpha, 0)) {
+					var srcCanvas = SG2DUtils.getTextureAsCanvas(texture);
+					var destCanvas = SG2DUtils.createCanvas(texture.width + 2, texture.height + 2);
+					var destCtx = destCanvas.getContext("2d");
+					destCtx.drawImage(srcCanvas, 1, 1);
+					destCanvas._pixiId = texture.textureCacheIds[0] || texture.canvas._pixiId;
+					PIXI.Texture.removeFromCache(destCanvas._pixiId);
+					PIXI.BaseTexture.removeFromCache(destCanvas._pixiId);
+					var textureDest = PIXI.Texture.from(destCanvas);
+					textureDest.canvas = destCanvas;
+					textureDest._isFinalTexture = texture._isFinalTexture;
+					textureDest._qBorderAlpha = texture._qBorderAlpha ? texture._qBorderAlpha + 1 : 1;
+				}
 			} else {
 				console.warn("Texture with name \"" + options.textures[i] + "\" not found!");
 			}
@@ -1341,10 +1418,11 @@ var SG2DUtils = {
 	 * @param {object} config
 	 */
 	createInBetweenTextures: function(config) {
-		config.start;
-		config.end;
+		if (! config.start) throw "Error 7020181!";
+		if (! config.end) throw "Error 7020182!";
 		config.count = Math.max(2, config.count || 2);
-		config.name;
+		if (! config.name) throw "Error 7020184!";
+		config.flags = config.flags || 0;
 
 		if (config.count <= 2) return;
 
@@ -1368,6 +1446,8 @@ var SG2DUtils = {
 		let qblocks = Math.ceil(wh / blocksize);
 		let dataPrev = null;
 
+		let texturesCreated = [];
+		
 		for (var j = 2; j < config.count; j++) {
 
 			var jc = (j-1)/(config.count-1);
@@ -1418,13 +1498,21 @@ var SG2DUtils = {
 			var canvas = this.createCanvas(w, h);
 			var ctx = canvas.getContext("2d");
 			ctx.putImageData(imageData, 0, 0);
-
+			
 			canvas._pixiId = config.name.replace("%", j);
 			var texture = PIXI.Texture.from(canvas);
 			texture.canvas = canvas;
 			texture._isFinalTexture = true;
+			
+			texturesCreated.push(texture);
 
 			dataPrev = data;
+		}
+		
+		if (config.flags & this.FLAG_ADD_BORDER_ALPHA) {
+			this.addBorderAlphaTextures({
+				textures: texturesCreated
+			});
 		}
 
 		var nameStart = config.name.replace("%", 1);
@@ -2155,14 +2243,16 @@ var SG2DDebugging = {
 				graphics.y = tile.body.position.y;
 				graphics.angle_init = tile.body.angle;
 				graphics.zIndex = 9998;
-				SG2D._instance.viewport.addChild(graphics);
+				let sg2d = sg2d_application_SG2DApplication.getInstance();
+				sg2d.viewport.addChild(graphics);
 			}
 		}
 	},
 	
 	undrawSG2DBodyLines: function(tile) {
 		if (tile && tile.body && this._bodiesDrawed.has(tile.body)) {
-			SG2D._instance.viewport.removeChild(tile.body._sg2dLines);
+			let sg2d = sg2d_application_SG2DApplication.getInstance();
+			sg2d.viewport.removeChild(tile.body._sg2dLines);
 			this._bodiesDrawed.delete(tile.body);
 		}
 	},
@@ -2170,8 +2260,9 @@ var SG2DDebugging = {
 	redrawSG2DBodiesLines: function() {
 		for (var body of this._bodiesDrawed) {
 			if (body.removed) {
-				SG2D._instance.viewport.removeChild(body._sg2dLines);
-				SG2D._bodiesDrawed.delete(body);
+				let sg2d = sg2d_application_SG2DApplication.getInstance();
+				sg2d.viewport.removeChild(body._sg2dLines);
+				this._bodiesDrawed.delete(body);
 				continue;
 			}
 			if (body.isStatic) continue;
@@ -2205,16 +2296,16 @@ var SG2DDebugging = {
 
 
 
-class sg2d_tile_SG2DTile extends SGModel {
+class sg2d_tile_SG2DTile extends sg_model["a" /* default */] {
 	
 	initialize(properties, thisProps, options) {
 		
 		// Crutch, since in JS there is no way to execute the code in the child class at the time of extends of the parent class
 		this.constructor._prepareStaticConfigSprites();
 		
-		options = options || SGModel.OBJECT_EMPTY;
+		options = options || sg_model["a" /* default */].OBJECT_EMPTY;
 		
-		this.bounds = (options.own_bounds ? new SG2DBounds(options.own_bounds) : new SG2DBounds());
+		this.bounds = (this.body && this.body.bounds ? new SG2DBounds(this.body.bounds) : new SG2DBounds());
 		this.boundsCXY = new SG2DBounds();
 		this.clusters = new Set();
 		this.centerCluster = null;
@@ -2224,7 +2315,7 @@ class sg2d_tile_SG2DTile extends SGModel {
 		
 		if (! this.constructor.sprites) throw "Error 82423704! this.constructor.sprites must be filled!";
 		
-		this.sprites = SGModel.clone(this.constructor.sprites);
+		this.sprites = sg_model["a" /* default */].clone(this.constructor.sprites);
 		if (this.sprites.main) this.sprite = this.sprites.main;
 		if (this.sprite) {
 			this.sprite.texture = this.properties.texture !== void 0 ? this.properties.texture : this.constructor.sprites.main.texture;
@@ -2255,21 +2346,21 @@ class sg2d_tile_SG2DTile extends SGModel {
 	}
 	
 	/** Own setter for texture property*/
-	setTexture(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
+	setTexture(value = void 0, options = sg_model["a" /* default */].OBJECT_EMPTY, flags = 0) {
 		if (sg2d_consts.ONLY_LOGIC) return;
 		this._setTileProperty("texture", value, options, flags);
 	}
 	
 	/** Own setter for position property*/
-	setPosition(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
-		if (this.set("position", value, options, flags | SGModel.FLAG_IGNORE_OWN_SETTER)) {
+	setPosition(value = void 0, options = sg_model["a" /* default */].OBJECT_EMPTY, flags = 0) {
+		if (this.set("position", value, options, flags | sg_model["a" /* default */].FLAG_IGNORE_OWN_SETTER)) {
 			this.onGeometric();
 			this.drawUndraw();
 		}
 	}
 	
 	/** Own setter for angle property*/
-	setAngle(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
+	setAngle(value = void 0, options = sg_model["a" /* default */].OBJECT_EMPTY, flags = 0) {
 		if (value !== void 0) value = sg2d_math.normalize_a(value, sg2d_utils.ifUndefined(options.precision, 1));
 		if (this._setTileProperty("angle", value, options, flags)) {
 			//this.onGeometric();
@@ -2277,32 +2368,32 @@ class sg2d_tile_SG2DTile extends SGModel {
 	}
 	
 	/** Own setter for angle property*/
-	setAnchor(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
+	setAnchor(value = void 0, options = sg_model["a" /* default */].OBJECT_EMPTY, flags = 0) {
 		this._setTileProperty("anchor", value, options, flags);
 	}
 	
 	/** Own setter for scale property*/
-	setScale(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
+	setScale(value = void 0, options = sg_model["a" /* default */].OBJECT_EMPTY, flags = 0) {
 		this._setTileProperty("scale", value, options, flags);
 	}
 	
 	/** Own setter for visible property*/
-	setAlpha(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
+	setAlpha(value = void 0, options = sg_model["a" /* default */].OBJECT_EMPTY, flags = 0) {
 		this._setTileProperty("alpha", value, options, flags);
 	}
 	
 	/** Own setter for visible property*/
-	setVisible(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
+	setVisible(value = void 0, options = sg_model["a" /* default */].OBJECT_EMPTY, flags = 0) {
 		this._setTileProperty("visible", value, options, flags);
 	}
 	
 	/** Own setter for visible property*/
-	setZindex(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
+	setZindex(value = void 0, options = sg_model["a" /* default */].OBJECT_EMPTY, flags = 0) {
 		this._setTileProperty("zindex", value, options, flags);
 	}
 	
 	/** @private */
-	_setTileProperty(name, value, options = SGModel.OBJECT_EMPTY, flags = 0) {
+	_setTileProperty(name, value, options = sg_model["a" /* default */].OBJECT_EMPTY, flags = 0) {
 		this._spritesFromOptions(options);
 		if (sg2d_tile_SG2DTile._spritesFromOptions.size) {
 			let changed = false;
@@ -2315,7 +2406,7 @@ class sg2d_tile_SG2DTile extends SGModel {
 			}
 			return changed;
 		} else {
-			if (this.set(name, value, options, flags | SGModel.FLAG_IGNORE_OWN_SETTER)) {
+			if (this.set(name, value, options, flags | sg_model["a" /* default */].FLAG_IGNORE_OWN_SETTER)) {
 				sg2d_utils.objectForEach(this.sprites, sprite=>{
 					if (sprite.setter_flag !== sg2d_tile_SG2DTile.FLAG_ONLY_OPTIONS_SPRITE) sprite[name] = value;
 				});
@@ -2325,11 +2416,6 @@ class sg2d_tile_SG2DTile extends SGModel {
 		}
 		return false;
 	}
-	
-	/** @private */ // TODO DEL?
-	/*_setChecker(name, value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
-		return (value === void 0 || this.set(name, value, options, flags | SGModel.FLAG_IGNORE_OWN_SETTER));
-	}*/
 	
 	/**
 	 * For moving sprites, checks if drawing is required when hitting the camera
@@ -2377,6 +2463,7 @@ class sg2d_tile_SG2DTile extends SGModel {
 				}
 			}
 			if (sprite.pixiSprite) {
+				this.updateSpriteTexture(sprite, sprite.texture);
 				pixiSprite.position.x = ~~this.properties.position.x;
 				pixiSprite.position.y = ~~this.properties.position.y;
 				if (typeof sprite.anchor === "number") pixiSprite.anchor.set(sprite.anchor); else pixiSprite.anchor.set(sprite.anchor.x, sprite.anchor.y);
@@ -2543,7 +2630,7 @@ class sg2d_tile_SG2DTile extends SGModel {
 	}
 	
 	/** @private */
-	_spritesFromOptions(options = SGModel.OBJECT_EMPTY) {
+	_spritesFromOptions(options = sg_model["a" /* default */].OBJECT_EMPTY) {
 		sg2d_tile_SG2DTile._spritesFromOptions.clear();
 		if (options.sprite) {
 			sg2d_tile_SG2DTile._spritesFromOptions.add(options.sprite);
@@ -2574,7 +2661,7 @@ class sg2d_tile_SG2DTile extends SGModel {
 		sg2d_tile_SG2DTile._point.y = sg2d_utils.PXtoCX(this.properties.position.y);
 		this.centerCluster = sg2d_clusters_SG2DClusters.getClusterCXY(sg2d_tile_SG2DTile._point); // before this.set("cxy", ...) !
 		
-		this.set("cxy", sg2d_tile_SG2DTile._point, void 0, SGModel.FLAG_PREV_VALUE_CLONE);
+		this.set("cxy", sg2d_tile_SG2DTile._point, void 0, sg_model["a" /* default */].FLAG_PREV_VALUE_CLONE);
 		
 		this.boundsCXY.set(
 			sg2d_utils.PXtoCX(this.bounds.min.x),
@@ -2625,15 +2712,15 @@ class sg2d_tile_SG2DTile extends SGModel {
 }
 
 sg2d_tile_SG2DTile.typeProperties = { // overriden with Object.assign(...)
-	texture: SGModel.TYPE_STRING,
-	position: SGModel.TYPE_OBJECT_NUMBERS,
-	angle: SGModel.TYPE_NUMBER,
-	anchor: SGModel.TYPE_NUMBER_OR_XY,
-	scale: SGModel.TYPE_NUMBER_OR_XY,
-	alpha: SGModel.TYPE_NUMBER,
-	visible: SGModel.TYPE_BOOLEAN,
-	zindex: SGModel.TYPE_NUMBER,
-	cxy: SGModel.TYPE_OBJECT_NUMBERS
+	texture: sg_model["a" /* default */].TYPE_STRING,
+	position: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
+	angle: sg_model["a" /* default */].TYPE_NUMBER,
+	anchor: sg_model["a" /* default */].TYPE_NUMBER_OR_XY,
+	scale: sg_model["a" /* default */].TYPE_NUMBER_OR_XY,
+	alpha: sg_model["a" /* default */].TYPE_NUMBER,
+	visible: sg_model["a" /* default */].TYPE_BOOLEAN,
+	zindex: sg_model["a" /* default */].TYPE_NUMBER,
+	cxy: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS
 };
 
 /**@type {(void 0|string)} */
@@ -2773,7 +2860,7 @@ sg2d_tile_SG2DTile._prepareStaticConfigSprites = function() {
 	if (this.sprites.main) this.sprite = this.sprites.main;
 	if (this.sprite) {
 		if (this.animation !== void 0) {
-			this.sprite.animation = SGModel.clone(this.animation);
+			this.sprite.animation = sg_model["a" /* default */].clone(this.animation);
 		}
 	}
 
@@ -2833,7 +2920,7 @@ sg2d_tile_SG2DTile._spritesFromOptions = new Set();
 
 
 
-class sg2d_camera_SG2DCamera extends SGModel {
+class sg2d_camera_SG2DCamera extends sg_model["a" /* default */] {
 		
 	defaults() {
 		return {
@@ -2969,10 +3056,10 @@ class sg2d_camera_SG2DCamera extends SGModel {
 	
 	/** Own setter for rotate property*/
 	setRotate(newRotate, options, flags = 0) {
-		if (! this.properties.rotation && ! (flags & SGModel.FLAG_FORCE_CALLBACKS)) return; //?
+		if (! this.properties.rotation && ! (flags & sg_model["a" /* default */].FLAG_FORCE_CALLBACKS)) return; //?
 		newRotate = sg2d_math.normalize_a(newRotate);
 		let prevRotate = this.properties.rotate;
-		if (this.set("rotate", newRotate, options, flags | SGModel.FLAG_IGNORE_OWN_SETTER)) {
+		if (this.set("rotate", newRotate, options, flags | sg_model["a" /* default */].FLAG_IGNORE_OWN_SETTER)) {
 			this.sg2d.viewport.angle = -this.properties.rotate + this.rotate_adjustment;
 			let da = sg2d_math.normalize_a(newRotate - prevRotate);
 			let dx = this.properties.offset.x;
@@ -2995,12 +3082,12 @@ class sg2d_camera_SG2DCamera extends SGModel {
 	}
 	
 	/** Own setter for position property*/
-	setPosition(value, options = SGModel.OBJECT_EMPTY, flags = 0) {
+	setPosition(value, options = sg_model["a" /* default */].OBJECT_EMPTY, flags = 0) {
 		value = value || this.positionPrev;
-		options = ! options ||  options === SGModel.OBJECT_EMPTY ? SGModel.OPTIONS_PRECISION_5 : options;
+		options = ! options ||  options === sg_model["a" /* default */].OBJECT_EMPTY ? sg_model["a" /* default */].OPTIONS_PRECISION_5 : options;
 		options.precision = options.precision || 5;
 		
-		if (! this.set("position", value, options, flags | SGModel.FLAG_IGNORE_OWN_SETTER)) return false;
+		if (! this.set("position", value, options, flags | sg_model["a" /* default */].FLAG_IGNORE_OWN_SETTER)) return false;
 		
 		this._calc();
 		
@@ -3229,16 +3316,16 @@ class sg2d_camera_SG2DCamera extends SGModel {
 	 */
 	moveTo() {
 		if (typeof arguments[0] === "object") {
-			this.set("target", arguments[0], SGModel.OPTIONS_PRECISION_5);
+			this.set("target", arguments[0], sg_model["a" /* default */].OPTIONS_PRECISION_5);
 			if (arguments[1] === true) {
-				this.set("position", arguments[0], SGModel.OPTIONS_PRECISION_5);
+				this.set("position", arguments[0], sg_model["a" /* default */].OPTIONS_PRECISION_5);
 			}
 		} else {
 			sg2d_camera_SG2DCamera._moveToTarget.x = arguments[0];
 			sg2d_camera_SG2DCamera._moveToTarget.y = arguments[1];
-			this.set("target", sg2d_camera_SG2DCamera._moveToTarget, SGModel.OPTIONS_PRECISION_5);
+			this.set("target", sg2d_camera_SG2DCamera._moveToTarget, sg_model["a" /* default */].OPTIONS_PRECISION_5);
 			if (arguments[2] === true) {
-				this.set("position", sg2d_camera_SG2DCamera._moveToTarget, SGModel.OPTIONS_PRECISION_5);
+				this.set("position", sg2d_camera_SG2DCamera._moveToTarget, sg_model["a" /* default */].OPTIONS_PRECISION_5);
 			}
 		}
 	}
@@ -3376,15 +3463,15 @@ sg2d_camera_SG2DCamera.STATE_MOVING = 2;
 sg2d_camera_SG2DCamera.SMOOTHNESS_FACTOR = 0.25;
 
 sg2d_camera_SG2DCamera.typeProperties = {
-	rotate: SGModel.TYPE_NUMBER,
-	rotation: SGModel.TYPE_BOOLEAN,
-	position: SGModel.TYPE_OBJECT_NUMBERS,
-	target: SGModel.TYPE_OBJECT_NUMBERS,
-	offset: SGModel.TYPE_OBJECT_NUMBERS,
-	wh: SGModel.TYPE_OBJECT_NUMBERS,
-	wh05: SGModel.TYPE_OBJECT_NUMBERS,
-	boundsPX: SGModel.TYPE_OBJECT_NUMBERS,
-	boundsCluster: SGModel.TYPE_OBJECT_NUMBERS
+	rotate: sg_model["a" /* default */].TYPE_NUMBER,
+	rotation: sg_model["a" /* default */].TYPE_BOOLEAN,
+	position: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
+	target: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
+	offset: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
+	wh: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
+	wh05: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
+	boundsPX: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
+	boundsCluster: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS
 };
 
 sg2d_camera_SG2DCamera.ownSetters = {
@@ -3429,7 +3516,7 @@ sg2d_camera_SG2DCamera._moveToTarget = {x: 0, y: 0};
 
 
 
-class sg2d_mouse_SG2DMouse extends SGModel {
+class sg2d_mouse_SG2DMouse extends sg_model["a" /* default */] {
 	
 	initialize(properties, thisProps, options) {
 		
@@ -3563,7 +3650,7 @@ class sg2d_mouse_SG2DMouse extends SGModel {
 				let rotate = this.camera.properties.rotate - this.camera.rotate_adjustment;
 				sg2d_mouse_SG2DMouse._position.x = sg2d_mouse_SG2DMouse._startPointPXY.x - dx * sg2d_math.cos(rotate, 1) + dy * sg2d_math.sin(rotate, 1);
 				sg2d_mouse_SG2DMouse._position.y = sg2d_mouse_SG2DMouse._startPointPXY.y - dy * sg2d_math.cos(rotate, 1) - dx * sg2d_math.sin(rotate, 1);
-				this.camera.set("offset", sg2d_mouse_SG2DMouse._position, SGModel.OPTIONS_PRECISION_5);
+				this.camera.set("offset", sg2d_mouse_SG2DMouse._position, sg_model["a" /* default */].OPTIONS_PRECISION_5);
 			}
 		}
 	}
@@ -3604,10 +3691,10 @@ class sg2d_mouse_SG2DMouse extends SGModel {
 }
 
 sg2d_mouse_SG2DMouse.typeProperties = {
-	global: SGModel.TYPE_OBJECT_NUMBERS,
-	camera: SGModel.TYPE_OBJECT_NUMBERS,
-	pxy: SGModel.TYPE_OBJECT_NUMBERS,
-	cxy: SGModel.TYPE_OBJECT_NUMBERS
+	global: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
+	camera: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
+	pxy: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
+	cxy: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS
 };
 
 sg2d_mouse_SG2DMouse.POINTER_LEFT = 0;
@@ -3914,6 +4001,7 @@ class sg2d_application_SG2DApplication {
 	 * @param {boolean}		[config.pixi.autoStart=true]
 	 * @param {number}			[config.pixi.width=100]
 	 * @param {number}			[config.pixi.height=100]
+	 * @param {object}		[config.matter = void 0] - Config for Matter.Engine constructor
 	 * @param {array}		[plugins=void 0] Array of string, example: ["sg2d-transitions", ...]
 	 */
 	constructor(config) {
@@ -3944,7 +4032,21 @@ class sg2d_application_SG2DApplication {
 		this.canvas.oncontextmenu = function() { return false; };
 		this.canvas.onselectstart = function() { return false; };
 		
-		this.pixi = new PIXI.Application(pixi);
+		SG2D.pixi = this.pixi = new PIXI.Application(pixi);
+		
+		if (config.matter) {
+			SG2D.matter = this.matter = Matter.Engine.create(config.matter);
+			
+			Matter.Events.on(this.matter, "collisionStart", function(event) {
+				for (var i = 0; i < event.pairs.length; i++) {
+					var pair = event.pairs[i];
+					if (pair.bodyA.parent.tile && pair.bodyB.parent.tile) {
+						pair.bodyA.parent.tile.collision && pair.bodyA.parent.tile.collision(pair.bodyB.parent.tile, pair, event.pairs);
+						pair.bodyB.parent.tile.collision && pair.bodyB.parent.tile.collision(pair.bodyA.parent.tile, pair, event.pairs);
+					}
+				}
+			});
+		}
 
 		this.frame_index = 0;
 		
@@ -4059,6 +4161,10 @@ class sg2d_application_SG2DApplication {
 
 		this.frame_index++;
 		
+		if (this.matter) {
+			this.matterIterate();
+		}
+		
 		this.camera._iterate();
 		if (sg2d_consts.DRAW_BODY_LINES) sg2d_debugging.redrawSG2DBodiesLines();
 		
@@ -4081,6 +4187,47 @@ class sg2d_application_SG2DApplication {
 		this.tUsed0 = t - tStart; // How long did the iteration calculation take without taking into account the rendering time of the web page along with the canvases
 		this.tRequestAnimationFrame = (this.tPrevious ? t - this.tPrevious : 1); // Frame duration
 		this.tPrevious = t;
+	}
+	
+	matterIterate() {
+		
+		Matter.Engine.update(this.matter);
+		
+		this.aBodies = Matter.Composite.allBodies(this.matter.world);
+		for (var i = 0; i < this.aBodies.length; i++) {
+			var body = this.aBodies[i];
+			if (body.isStatic) continue;
+			
+			var tile = body.tile;
+			if (! tile) continue; // global border
+			
+			// TODO ON
+			/*if (body.position.x < this.boundsDestroy.min.x || body.position.y < this.boundsDestroy.min.y || body.position.x > this.boundsDestroy.max.x || body.position.y > this.boundsDestroy.max.y) {
+				tile.destroy();
+				continue;
+			}*/
+			
+			if (body.angle >= sg2d_math.PI2) { Matter.Body.setAngle(body, body.angle - sg2d_math.PI2); body.anglePrev = body.angle; }
+			if (body.angle < 0) { Matter.Body.setAngle(body, body.angle + sg2d_math.PI2); body.anglePrev = body.angle; }
+			
+			// use SGModel-setter to detect changes
+			tile.set("position", body.position, sg_model["a" /* default */].OPTIONS_PRECISION_5);
+			tile.set("angle", body.angle / sg2d_math.PI180, sg_model["a" /* default */].OPTIONS_PRECISION_5);
+			tile.set("velocity", body.velocity, sg_model["a" /* default */].OPTIONS_PRECISION_5);
+			tile.set("angularVelocity", body.angularVelocity, sg_model["a" /* default */].OPTIONS_PRECISION_5);
+			if (tile.changed) {
+				tile.bounds.set(body.bounds);
+				if (body.velocity) { // при движении тел bounds вытягивается в сторону движения!
+					if (body.velocity.x > 0) tile.bounds.max.x -= body.velocity.x; else tile.bounds.min.x -= body.velocity.x;
+					if (body.velocity.y > 0) tile.bounds.max.y -= body.velocity.y; else tile.bounds.min.y -= body.velocity.y;
+				}
+			} else {
+				Matter.Body.setAngularVelocity(body, 0);
+				Matter.Body.setVelocity(body, {x: 0, y:0});
+				Matter.Body.setPosition(body, tile.properties.position);
+				Matter.Body.setAngle(body, tile.properties.angle * sg2d_math.PI180);
+			}
+		}
 	}
 
 	pause() {
@@ -4109,7 +4256,14 @@ class sg2d_application_SG2DApplication {
 		setTimeout(()=>{
 			this.pixi.destroy(void 0, {children: true});
 			this.pixi = null;
+			SG2D.pixi = null;
 		}, 500);
+		
+		if (SG2D.matter) {
+			Matter.World.clear(this.matter.world); // ?
+			Matter.Engine.clear(this.matter);
+			SG2D.matter = null;
+		}
 		
 		sg2d_application_SG2DApplication.drawSprite = null
 		sg2d_application_SG2DApplication.removeSprite = null
@@ -4165,7 +4319,7 @@ sg2d_application_SG2DApplication._initialized = false;
 /** @private */
 sg2d_application_SG2DApplication._initialize = function() {
 	sg2d_application_SG2DApplication.plugins = SG2DPlugins;
-	SG2DPluginBase.SGModel = SGModel;
+	SG2DPluginBase.SGModel = sg_model["a" /* default */];
 	SG2DPluginBase.SG2DConsts = sg2d_consts;
 	SG2DPluginBase.SG2DUtils = sg2d_utils;
 	SG2DPluginBase.SG2DClusters = sg2d_clusters_SG2DClusters;
@@ -4212,6 +4366,100 @@ sg2d_application_SG2DApplication.setCellSizePix = function(v) {
 	sg2d_consts.CELLSIZEPIX05 = (+v)>>1;
 	sg2d_consts.CELLSIZELOG2 = Math.ceil(Math.log2(sg2d_consts.CELLSIZEPIX));
 }
+// CONCATENATED MODULE: ./src/sg2d-tilebody.js
+/**
+ * SG2DBody
+ * https://github.com/VediX/sg2d.github.io
+ * (c) 2019-2021 Kalashnikov Ilya
+ */
+
+
+
+
+
+
+
+
+class sg2d_tilebody_SG2DTileBody extends sg2d_tile_SG2DTile {
+	initialize(properties, thisProps, options) {
+		
+		this.body = this.bodyCreate(properties.position, properties.angle);
+		if (this.body) {
+			this.body.tile = this;
+		}
+		
+		super.initialize.apply(this, arguments);
+		
+		if (this.body) {
+			Matter.Composite.add(SG2D.matter.world, this.body);
+		}
+		
+		SG2D.Clusters.bodies.add(this);
+	}
+	
+	// default creator
+	bodyCreate(position = { x: 0, y: 0 }, angle = 0) {
+		
+		this.body = Matter.Bodies.rectangle(position.x, position.y, SG2D.Consts.CELLSIZEPIX - 1, SG2D.Consts.CELLSIZEPIX - 1, {
+			isStatic: true,
+			frictionStatic: this.constructor.MATTER.FRICTIONSTATIC,
+			restitution: this.constructor.MATTER.RESTITUTION,
+			slop: this.constructor.MATTER.SLOP
+		});
+		
+		if (this.properties.angle) {
+			Matter.Body.setAngle(this.body, angle * SG2D.Math.PI180);
+		}
+		
+		return this.body;
+	}
+	
+	// overrided
+	onGeometric() {
+		/*this.calcBoundsPX(); => bounds формируется MatterJS*/
+		this.calcCXY();
+		this.calcClustersBody();
+	}
+	
+	getBodiesAround(pxy, cells_indent = 1, bodies = []) {
+		bodies.length = 0;
+		var cluster;
+		var cx = sg2d_utils.PXtoCX(pxy.x), cy = sg2d_utils.PXtoCX(pxy.y);
+		for (var x = cx - cells_indent; x <= cx + cells_indent; x++) {
+			for (var y = cy - cells_indent; y <= cy + cells_indent; y++) {
+				if (cluster = sg2d_clusters_SG2DClusters.getCluster(x, y)) {
+					for (var tile of cluster.bodies) {
+						if (tile !== this && tile.body && bodies.indexOf(tile.body) === -1) {
+							bodies.push(tile.body);
+						}
+					}
+				}
+			}
+		}
+		return bodies;
+	}
+	
+	destroy() {
+		if (this.body) {
+			Matter.Composite.remove(SG2D.matter.world, this.body);
+		}
+		SG2D.Clusters.bodies.delete(this);
+		this.body = null;
+		super.destroy();
+	}
+}
+
+sg2d_tilebody_SG2DTileBody.isBody = true;
+
+/** default MatterJS parameters */
+sg2d_tilebody_SG2DTileBody.MATTER = {
+	DENSITY: 1,
+	FRICTION: 0,
+	FRICTIONAIR: 0.1,
+	FRICTIONSTATIC: 1,
+	RESTITUTION: 0,
+	SLOP: 0.05
+};
 // CONCATENATED MODULE: ./src/sg2d-fonts.js
 /**
  * SG2DFonts
@@ -4424,8 +4672,9 @@ sg2d_sprite_SG2DSprite._options = {};
 
 
 
+
 var sg2d_SG2D = {
-	Model: SGModel,
+	Model: sg_model["a" /* default */],
 	Consts: sg2d_consts,
 	Math: sg2d_math,
 	Utils: sg2d_utils,
@@ -4433,6 +4682,7 @@ var sg2d_SG2D = {
 	Clusters: sg2d_clusters_SG2DClusters,
 	Camera: sg2d_camera_SG2DCamera,
 	Tile: sg2d_tile_SG2DTile,
+	TileBody: sg2d_tilebody_SG2DTileBody,
 	Mouse: sg2d_mouse_SG2DMouse,
 	Effects: sg2d_effects_SG2DEffects,
 	Plugins: SG2DPlugins,
@@ -4444,13 +4694,12 @@ var sg2d_SG2D = {
 	Label: sg2d_fonts_SG2DLabel,
 	LabelCanvas: sg2d_fonts_SG2DLabelCanvas,
 	Sprite: sg2d_sprite_SG2DSprite,
+	pixi: null,
+	matter: null,
 	version:  true ? "1.0.0" : undefined
 };
 
-if (typeof window === "object") window.SG2D = sg2d_SG2D;
-if (typeof self === "object") self.SG2D = sg2d_SG2D;
-if (typeof global === "object") global.SG2D = sg2d_SG2D;
-if (typeof _root === "object") _root.SG2D = sg2d_SG2D;
+if (typeof window === 'object' && window.document) window["SG2D"] = sg2d_SG2D;
 
 /* harmony default export */ var src_sg2d = __webpack_exports__["default"] = (sg2d_SG2D);
 

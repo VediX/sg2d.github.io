@@ -26,6 +26,9 @@ class Application {
 	}
 	
 	createScene() {
+		
+		//SG2D.Consts.DRAW_BODY_LINES = 1;
+		
 		//PIXI.settings.ROUND_PIXELS = true; // If true, PixiJS will use Math.floor () x / y values when rendering, stopping pixel interpolation
 		//PIXI.settings.ANISOTROPIC_LEVEL = 16; // Default anisotropic filtering level for textures. Typically 0 to 16
 		//PIXI.settings.CAN_UPLOAD_SAME_BUFFER = true; // Can we load the same buffer in one frame?
@@ -40,6 +43,10 @@ class Application {
 			pixi: { // config passed to PIXI.Application constructor
 				antialias: true,
 				autoStart: false
+			},
+			matter: {
+				gravity: { x: 0, y: 0 },
+				broadphase: { bucketWidth: 64, bucketHeight: 64 }
 			},
 			camera: {
 				rotation: true,

@@ -1,4 +1,4 @@
-export default class ObjectBaseLifeBand extends SG2D.Tile {
+export default class ObjectBaseLifeBand extends SG2D.TileBody {
 	
 	static layer = "bodies";
 	

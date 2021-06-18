@@ -1,4 +1,5 @@
-import {Water, Grass, Sand, BlockStandard, BlockSteel, BlockTriangle, Medikit, Tree, Bush} from "./tiles.js";
+import {Water, Grass, Sand, Medikit, Tree, Bush} from "./tiles.js";
+import {BlockSteel, BlockStandard, BlockTriangle} from "./blocks.js";
 import Utils from "./utils.js";
 
 export default class Area {

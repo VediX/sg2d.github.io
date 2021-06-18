@@ -48,6 +48,7 @@ export default class SG2DApplication {
 	 * @param {boolean}		[config.pixi.autoStart=true]
 	 * @param {number}			[config.pixi.width=100]
 	 * @param {number}			[config.pixi.height=100]
+	 * @param {object}		[config.matter = void 0] - Config for Matter.Engine constructor
 	 * @param {array}		[plugins=void 0] Array of string, example: ["sg2d-transitions", ...]
 	 */
 	constructor(config) {
@@ -78,7 +79,21 @@ export default class SG2DApplication {
 		this.canvas.oncontextmenu = function() { return false; };
 		this.canvas.onselectstart = function() { return false; };
 		
-		this.pixi = new PIXI.Application(pixi);
+		SG2D.pixi = this.pixi = new PIXI.Application(pixi);
+		
+		if (config.matter) {
+			SG2D.matter = this.matter = Matter.Engine.create(config.matter);
+			
+			Matter.Events.on(this.matter, "collisionStart", function(event) {
+				for (var i = 0; i < event.pairs.length; i++) {
+					var pair = event.pairs[i];
+					if (pair.bodyA.parent.tile && pair.bodyB.parent.tile) {
+						pair.bodyA.parent.tile.collision && pair.bodyA.parent.tile.collision(pair.bodyB.parent.tile, pair, event.pairs);
+						pair.bodyB.parent.tile.collision && pair.bodyB.parent.tile.collision(pair.bodyA.parent.tile, pair, event.pairs);
+					}
+				}
+			});
+		}
 
 		this.frame_index = 0;
 		
@@ -193,6 +208,10 @@ export default class SG2DApplication {
 
 		this.frame_index++;
 		
+		if (this.matter) {
+			this.matterIterate();
+		}
+		
 		this.camera._iterate();
 		if (SG2DConsts.DRAW_BODY_LINES) SG2DDebugging.redrawSG2DBodiesLines();
 		
@@ -215,6 +234,47 @@ export default class SG2DApplication {
 		this.tUsed0 = t - tStart; // How long did the iteration calculation take without taking into account the rendering time of the web page along with the canvases
 		this.tRequestAnimationFrame = (this.tPrevious ? t - this.tPrevious : 1); // Frame duration
 		this.tPrevious = t;
+	}
+	
+	matterIterate() {
+		
+		Matter.Engine.update(this.matter);
+		
+		this.aBodies = Matter.Composite.allBodies(this.matter.world);
+		for (var i = 0; i < this.aBodies.length; i++) {
+			var body = this.aBodies[i];
+			if (body.isStatic) continue;
+			
+			var tile = body.tile;
+			if (! tile) continue; // global border
+			
+			// TODO ON
+			/*if (body.position.x < this.boundsDestroy.min.x || body.position.y < this.boundsDestroy.min.y || body.position.x > this.boundsDestroy.max.x || body.position.y > this.boundsDestroy.max.y) {
+				tile.destroy();
+				continue;
+			}*/
+			
+			if (body.angle >= SG2DMath.PI2) { Matter.Body.setAngle(body, body.angle - SG2DMath.PI2); body.anglePrev = body.angle; }
+			if (body.angle < 0) { Matter.Body.setAngle(body, body.angle + SG2DMath.PI2); body.anglePrev = body.angle; }
+			
+			// use SGModel-setter to detect changes
+			tile.set("position", body.position, SGModel.OPTIONS_PRECISION_5);
+			tile.set("angle", body.angle / SG2DMath.PI180, SGModel.OPTIONS_PRECISION_5);
+			tile.set("velocity", body.velocity, SGModel.OPTIONS_PRECISION_5);
+			tile.set("angularVelocity", body.angularVelocity, SGModel.OPTIONS_PRECISION_5);
+			if (tile.changed) {
+				tile.bounds.set(body.bounds);
+				if (body.velocity) { // при движении тел bounds вытягивается в сторону движения!
+					if (body.velocity.x > 0) tile.bounds.max.x -= body.velocity.x; else tile.bounds.min.x -= body.velocity.x;
+					if (body.velocity.y > 0) tile.bounds.max.y -= body.velocity.y; else tile.bounds.min.y -= body.velocity.y;
+				}
+			} else {
+				Matter.Body.setAngularVelocity(body, 0);
+				Matter.Body.setVelocity(body, {x: 0, y:0});
+				Matter.Body.setPosition(body, tile.properties.position);
+				Matter.Body.setAngle(body, tile.properties.angle * SG2DMath.PI180);
+			}
+		}
 	}
 
 	pause() {
@@ -243,7 +303,14 @@ export default class SG2DApplication {
 		setTimeout(()=>{
 			this.pixi.destroy(void 0, {children: true});
 			this.pixi = null;
+			SG2D.pixi = null;
 		}, 500);
+		
+		if (SG2D.matter) {
+			Matter.World.clear(this.matter.world); // ?
+			Matter.Engine.clear(this.matter);
+			SG2D.matter = null;
+		}
 		
 		SG2DApplication.drawSprite = null
 		SG2DApplication.removeSprite = null

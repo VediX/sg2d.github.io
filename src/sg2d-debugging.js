@@ -244,14 +244,16 @@ var SG2DDebugging = {
 				graphics.y = tile.body.position.y;
 				graphics.angle_init = tile.body.angle;
 				graphics.zIndex = 9998;
-				SG2D._instance.viewport.addChild(graphics);
+				let sg2d = SG2DApplication.getInstance();
+				sg2d.viewport.addChild(graphics);
 			}
 		}
 	},
 	
 	undrawSG2DBodyLines: function(tile) {
 		if (tile && tile.body && this._bodiesDrawed.has(tile.body)) {
-			SG2D._instance.viewport.removeChild(tile.body._sg2dLines);
+			let sg2d = SG2DApplication.getInstance();
+			sg2d.viewport.removeChild(tile.body._sg2dLines);
 			this._bodiesDrawed.delete(tile.body);
 		}
 	},
@@ -259,8 +261,9 @@ var SG2DDebugging = {
 	redrawSG2DBodiesLines: function() {
 		for (var body of this._bodiesDrawed) {
 			if (body.removed) {
-				SG2D._instance.viewport.removeChild(body._sg2dLines);
-				SG2D._bodiesDrawed.delete(body);
+				let sg2d = SG2DApplication.getInstance();
+				sg2d.viewport.removeChild(body._sg2dLines);
+				this._bodiesDrawed.delete(body);
 				continue;
 			}
 			if (body.isStatic) continue;

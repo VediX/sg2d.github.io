@@ -2,13 +2,18 @@
  * SGModel 1.0.2
  * A fast lightweight library (ES6) for structuring web applications using binding models and custom events. This is a faster and more simplified analogue of Backbone.js!
  * https://github.com/VediX/SGModel
- * (c) 2019-2021 Kalashnikov Ilya and VediX Systems
+ * (c) 2019-2021 Kalashnikov Ilya
  * SGModel may be freely distributed under the MIT license
  */
 
 "use strict";
 
 export default class SGModel {
+	
+	// overriden
+	defaults() {
+		return SGModel.clone(this.constructor.defaultProperties);
+	}
 	
 	/**
 	 * SGModel constructor
@@ -23,9 +28,8 @@ export default class SGModel {
 			this.constructor._instance = this;
 		}
 		
-		var properties = props || {};
-		
-		var defaults = (typeof this.defaults === "function" ? this.defaults() : SGModel.clone(this.constructor.defaultProperties));
+		let properties = props || {};
+		let defaults = this.defaults();
 		
 		// override defaults by localStorage data
 		if (this.constructor.localStorageKey) {
@@ -485,9 +489,11 @@ export default class SGModel {
 	}
 }
 
-if (typeof window === "object") window.SGModel = SGModel;
-if (typeof self === "object") self.SGModel = SGModel;
-if (typeof _root === "object") _root.SGModel = SGModel;
+if (typeof exports === 'object' && typeof module === 'object') module.exports = SGModel;
+else if (typeof define === 'function' && define.amd) define("SG2D", [], ()=>SGModel);
+else if (typeof exports === 'object') exports["SGModel"] = SGModel;
+else if (typeof window === 'object' && window.document) window["SGModel"] = SGModel;
+else this["SGModel"] = SGModel;
 
 // Property data types
 SGModel.typeProperties = {};

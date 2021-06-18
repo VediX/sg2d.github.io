@@ -1,5 +1,5 @@
 import ObjectBaseLifeBand from "./object-base-life-band.js";
-import {Whizbang} from "./tiles.js";
+import {Whizbang} from "./whizbang.js";
 
 export default class Player extends ObjectBaseLifeBand {
 	
@@ -75,14 +75,16 @@ export default class Player extends ObjectBaseLifeBand {
 	
 	static isPlayer = 1;
 	
-	static STATE_MOVE_FORWARD = 0b00000001;
-	static STATE_MOVE_BACKWARD = 0b00000010;
-	static STATE_ROTATE_LEFT = 0b00000100;
-	static STATE_ROTATE_RIGHT = 0b00001000;
-	static STATE_ACCELERATOR = 0b00010000;
-	//static STATE_DEBUG = 0b10000000; // TODO DEL DEBUG
+	static STATE_MOVE_FORWARD =	0b00000001;
+	static STATE_MOVE_BACKWARD =	0b00000010;
+	static STATE_ROTATE_LEFT =		0b00000100;
+	static STATE_ROTATE_RIGHT =		0b00001000;
+	static STATE_ACCELERATOR =		0b00010000;
+	//static STATE_DEBUG =			0b10000000; // TODO DEL DEBUG
 	
-	static STATES_TRACKS_MOVING = 0b00001111;
+	static STATES_MOVING =			0b00000011;
+	static STATES_ROTATING =		0b00001100;
+	static STATES_TRACKS_MOVING =	0b00001111;
 
 	static POWER_MOVE = 2;
 	static POWER_ROTATE_PLATFORM = 1;
@@ -163,22 +165,58 @@ export default class Player extends ObjectBaseLifeBand {
 	}
 	
 	iterate() {	
+		
 		let state = this.properties.state;
-		let dx = 0;
-		let dy = 0;
-		let angle = this.properties.angle;
-		let accelerator = (state & Player.STATE_ACCELERATOR ? 2 : 1);
-		if (this.centerCluster._f && ! this.centerCluster._r) accelerator *= 0.5;
-		if (state & Player.STATE_MOVE_FORWARD) {
-			dx += Player.POWER_MOVE * accelerator * SG2D.Math.cos(this.properties.angle, 1);
-			dy += Player.POWER_MOVE * accelerator * SG2D.Math.sin(this.properties.angle, 1);
+		let accelerator = (state & Player.STATE_ACCELERATOR ? 2 : 1) * (this.centerCluster._f && ! this.centerCluster._r ? 0.5 : 1);
+		
+		if (state & Player.STATES_MOVING) {
+			
+			let power = 5 * accelerator;
+			let powerback = -2.5;
+			let force = Matter.Vector.create(0, 0);
+			
+			if (state & Player.STATE_MOVE_FORWARD) {
+				Matter.Vector.add(
+					force,
+					Matter.Vector.create(power * Math.cos(this.body.angle), power * Math.sin(this.body.angle)),
+					force
+				);
+			}
+			if (state & Player.STATE_MOVE_BACKWARD) {
+				Matter.Vector.add(
+					force,
+					Matter.Vector.create(powerback * Math.cos(this.body.angle), powerback * Math.sin(this.body.angle)),
+					force
+				);
+			}
+			
+			Matter.Body.applyForce( this.body, this.body.position, force);
 		}
-		if (state & Player.STATE_MOVE_BACKWARD) {
-			dx -= Player.POWER_MOVE * SG2D.Math.cos(this.properties.angle, 1);
-			dy -= Player.POWER_MOVE * SG2D.Math.sin(this.properties.angle, 1);
+		
+		if (state & Player.STATES_ROTATING) {
+			
+			let powerrotate = 5;
+			let d = 10;
+			let vector_base = Matter.Vector.create(this.body.position.x, this.body.position.y);
+			let vector_delta = Matter.Vector.create( d * Math.cos(this.body.angle), d *  Math.sin(this.body.angle) );
+			let vector_forward = Matter.Vector.add(vector_base, vector_delta);
+			let vector_backward = Matter.Vector.sub(vector_base, vector_delta);
+
+			let force = Matter.Vector.create(0, 0);
+			let force_neg;
+			if (state & Player.STATE_ROTATE_LEFT) {
+				force.x = powerrotate * Math.cos(this.body.angle - Math.PI / 2);
+				force.y = powerrotate * Math.sin(this.body.angle - Math.PI / 2);
+				force_neg = Matter.Vector.neg(force);
+			} else if (state & Player.STATE_ROTATE_RIGHT) {
+				force.x = powerrotate * Math.cos(this.body.angle + Math.PI / 2);
+				force.y = powerrotate * Math.sin(this.body.angle + Math.PI / 2);
+				force_neg = Matter.Vector.neg(force);
+			}
+			
+			Matter.Body.applyForce( this.body, vector_forward, force);
+			Matter.Body.applyForce( this.body, vector_backward, force_neg);
 		}
-		if (state & Player.STATE_ROTATE_LEFT) angle -= Player.POWER_ROTATE_PLATFORM;
-		if (state & Player.STATE_ROTATE_RIGHT) angle += Player.POWER_ROTATE_PLATFORM;
 		
 		// TODO DEL DEBUG
 		/*if (state & Player.STATE_DEBUG) {
@@ -189,9 +227,6 @@ export default class Player extends ObjectBaseLifeBand {
 				angle += Player.POWER_ROTATE_PLATFORM * 15;
 			}
 		}*/
-		
-		this.set("position", {x: this.properties.position.x + dx, y: this.properties.position.y + dy});
-		this.set("angle", angle);
 		
 		this.camera.set("rotate", this.properties.angle);
 		
@@ -231,6 +266,31 @@ export default class Player extends ObjectBaseLifeBand {
 			this.stopAnimation(this.sprites.track_left);
 			this.stopAnimation(this.sprites.track_right);
 		}
+	}
+	
+	bodyCreate(position = { x: 0, y: 0 }, angle = 0) { // override
+		
+		this.body = Matter.Body.create(Object.assign(
+			{
+				parts: [
+					Matter.Bodies.trapezoid(0, -28, 100, 12, 0.1, {}),
+					Matter.Bodies.rectangle(0, 0, 70, 42, {}),
+					Matter.Bodies.trapezoid(0, 28, 100, 12, 0.1, { angle: 3.1415 })
+				]
+			},
+			{
+				friction: this.constructor.MATTER.FRICTION,
+				frictionAir: this.constructor.MATTER.FRICTIONAIR,
+				restitution: this.constructor.MATTER.RESTITUTION,
+				slop: this.constructor.MATTER.SLOP
+			}
+		));
+
+		Matter.Body.setMass(this.body, 10000);
+		Matter.Body.setPosition(this.body, position);
+		Matter.Body.setAngle(this.body, angle * SG2D.Math.PI180);
+		
+		return this.body;
 	}
 	
 	destroy() {

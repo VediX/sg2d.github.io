@@ -40,14 +40,18 @@ export default SG2DMath;
 	SG2DMath.PI2 = Math.PI*2;
 	SG2DMath.rad90 = 90 * SG2DMath.PI180;
 
-	/*Math.toRad = function(a) {
-		return a * SG2DMath.PI180;
-	};*/
+	SG2DMath.toRad = function(a) {
+		return a * this.PI180;
+	};
+	
+	SG2DMath.toDeg = function(a) {
+		return a / this.PI180;
+	};
 	
 	SG2DMath.normalize_a = function(a, precision = 0) {
 		while (a >= 360) a = a - 360;
 		while (a < 0) a = a + 360;
-		if (precision) a = SG2DMath.roundTo(a, precision);
+		if (precision) a = this.roundTo(a, precision);
 		return a;
 	};
 
@@ -66,10 +70,20 @@ export default SG2DMath;
 	}
 	
 	SG2DMath.sin = function(a, precision = 0) { // Accuracy to the tenth of a degree
-		return (precision === 0 ? _aSin[SG2DMath.normalize_a(a, precision)] : _aSin1[ Math.round(10 * SG2DMath.normalize_a(a, 1)) ]);
+		return (precision === 0 ? _aSin[this.normalize_a(a, precision)] : _aSin1[ Math.round(10 * this.normalize_a(a, 1)) ]);
 	};
 	SG2DMath.cos = function(a, precision = 0) {
-		return (precision === 0 ? _aCos[SG2DMath.normalize_a(a, precision)] : _aCos1[ Math.round(10 * SG2DMath.normalize_a(a, 1)) ]);
+		return (precision === 0 ? _aCos[this.normalize_a(a, precision)] : _aCos1[ Math.round(10 * this.normalize_a(a, 1)) ]);
+	};
+	
+	SG2DMath.sinrad = function() {
+		arguments[0] = arguments[0] / this.PI180;
+		return this.sin.apply(this, arguments);
+	};
+	
+	SG2DMath.cosrad = function() {
+		arguments[0] = arguments[0] / this.PI180;
+		return this.cos.apply(this, arguments);
 	};
 	
 	/*Math.angle_p1p2_rad = function(p1, p2) { //not used!
@@ -77,7 +91,7 @@ export default SG2DMath;
 	};*/
 	SG2DMath.angle_p1p2_deg = function(p1, p2, precision = 0) {
 		var angle_rad = Math.atan2(p2.y - p1.y, p2.x - p1.x);
-		var angle_deg = SG2DMath.normalize_a(angle_rad / SG2DMath.PI180, precision);
+		var angle_deg = this.normalize_a(angle_rad / this.PI180, precision);
 		return angle_deg;
 	};
 
@@ -98,8 +112,8 @@ export default SG2DMath;
 
 	// Direction of rotation (right / left) - which is faster
 	SG2DMath.nearestDirRotate = function(rotate_current, rotate_target) {
-		var a1 = SG2DMath.normalize_a(rotate_target - rotate_current);
-		var a2 = SG2DMath.normalize_a(rotate_current - rotate_target);
+		var a1 = this.normalize_a(rotate_target - rotate_current);
+		var a2 = this.normalize_a(rotate_current - rotate_target);
 		if (a1 === a2) return 0;
 		return a1 > a2 ? -1 : 1;
 	};
@@ -126,7 +140,7 @@ export default SG2DMath;
 	*/
 	SG2DMath.getLinePoints = function(oPointStart, oPointEnd, dest = void 0) {
 		
-		var fAddLinePoint = SG2DMath._addLinePoint;
+		var fAddLinePoint = this._addLinePoint;
 		if (typeof dest === "function") fAddLinePoint = dest;
 		else if (Array.isArray(dest)) fAddLinePoint = fAddLinePoint.bind(dest);
 		else (_linePoints.length = 0, fAddLinePoint = fAddLinePoint.bind(_linePoints));

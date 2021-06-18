@@ -26,32 +26,6 @@ export class Water extends SG2D.Tile {
 	static noDraw = true;
 }
 
-export class BlockSteel extends SG2D.Tile {
-	static texture = "elements/block-steel";
-	static layer = "bodies";
-	static zindex = 20;
-	static blockage = true;
-}
-
-export class BlockStandard extends SG2D.Tile {
-	static texture = "elements/block-standard";
-	static layer = "bodies";
-	static zindex = 20;
-	static blockage = true;
-}
-
-export class BlockTriangle extends SG2D.Tile {
-	static baseTexture = "elements/block-corner-";
-	static texture = "elements/block-corner-45";
-	static layer = "bodies";
-	static zindex = 20;
-	static blockage = true;
-	initialize(...args) {
-		super.initialize(...args);
-		this.set("texture", BlockTriangle.baseTexture + this.properties.type);
-	}
-}
-
 export class Tree extends SG2D.Tile {
 	static texture = "elements/trees/tree_";
 	static layer = "trees";
@@ -105,63 +79,5 @@ export class Medikit extends SG2D.Tile {
 		}
 		
 		super.iterateAnimations(...args);
-	}
-}
-
-export class Whizbang extends SG2D.Tile {
-	static texture = "objects/whizbang";
-	static layer = "animations";
-	static animation = {
-		count: 6,
-		sleep: 3,
-		running: false,
-		basetexture: "animations/explosionA_",
-		loop: false,
-		onComplete: function() {
-			this.destroy();
-		}
-	};
-	
-	static STATE_FLY = 1;
-	static STATE_EXPLODE = 2;
-	
-	defaults() {
-		return SG2D.Model.defaults({
-			state: Whizbang.STATE_FLY
-		}, SG2D.Tile.defaultProperties);
-	}
-	
-	iterate() {
-		if (! this.clusters.size) {
-			this.destroy();
-		} else {
-			switch (this.properties.state) {
-				case Whizbang.STATE_FLY: {
-					
-					// TODO: SG2DBody collision detector
-					for (var cluster of this.clusters) {
-						for (var tile of cluster.tiles) {
-							if (tile.constructor.blockage) {
-								this.set("state", Whizbang.STATE_EXPLODE);
-								return;
-							}
-						}
-					}
-
-					this.set("position", {
-						x: this.properties.position.x + 10 * SG2D.Math.cos(this.properties.angle, 1),
-						y: this.properties.position.y + 10 * SG2D.Math.sin(this.properties.angle, 1)
-					});
-					
-					break;
-				}
-				case Whizbang.STATE_EXPLODE: {
-					if (! this.sprite.animation.running) {
-						this.startAnimation();
-					}
-					break;
-				}
-			}
-		}
 	}
 }
