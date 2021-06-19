@@ -29,7 +29,7 @@ export default class SG2DCamera extends SGModel {
 			scale_wheel: true, // scale with scrolling
 			scale_min: SG2DCamera.SCALE_MIN,
 			scale_max: SG2DCamera.SCALE_MAX,
-			mouse_over_canvas: true,
+			pointer_over_canvas: true,
 			movement_by_pointer: 0,
 			movement_state: 0
 		};
@@ -107,8 +107,8 @@ export default class SG2DCamera extends SGModel {
 		
 		this._addLinePoint = this._addLinePoint.bind(this);
 		
-		this.onMouseEnter = this.onMouseEnter.bind(this);
-		this.onMouseLeave = this.onMouseLeave.bind(this);
+		this.onPointerEnter = this.onPointerEnter.bind(this);
+		this.onPointerLeave = this.onPointerLeave.bind(this);
 		
 		this.onWheelScale = this.onWheelScale.bind(this);
 		if (this.properties.scale_wheel) {
@@ -137,8 +137,8 @@ export default class SG2DCamera extends SGModel {
 	_sg2dconnect(sg2d) {
 		this.sg2d = sg2d;
 		this.onResize();
-		this.sg2d.pixi.view.addEventListener("mouseenter", this.onMouseEnter);
-		this.sg2d.pixi.view.addEventListener("mouseleave", this.onMouseLeave);
+		this.sg2d.pixi.view.addEventListener("pointerenter", this.onPointerEnter);
+		this.sg2d.pixi.view.addEventListener("pointerleave", this.onPointerLeave);
 		this.set("rotate", this.properties.rotate);
 		this.sg2d.viewport.angle = -this.properties.rotate + this.rotate_adjustment;
 		this.startPosition(this.properties.position || null);
@@ -459,16 +459,16 @@ export default class SG2DCamera extends SGModel {
 		}
 	}
 	
-	onMouseEnter(e) {
-		this.set("mouse_over_canvas", true);
+	onPointerEnter(e) {
+		this.set("pointer_over_canvas", true);
 	}
 	
-	onMouseLeave(e) {
-		this.set("mouse_over_canvas", false);
+	onPointerLeave(e) {
+		this.set("pointer_over_canvas", false);
 	}
 	
 	onWheelScale(e) {
-		if (! this.properties.mouse_over_canvas) return;
+		if (! this.properties.pointer_over_canvas) return;
 		var delta = e.deltaY || e.detail || e.wheelDelta;
 		this.zoomInc(delta < 0 ? 1 : -1);
 	}
@@ -523,8 +523,8 @@ export default class SG2DCamera extends SGModel {
 	}
 	
 	destroy() {
-		this.sg2d.pixi.view.removeEventListener("mouseenter", this.onMouseEnter);
-		this.sg2d.pixi.view.removeEventListener("mouseleave", this.onMouseLeave);
+		this.sg2d.pixi.view.removeEventListener("pointerenter", this.onPointerEnter);
+		this.sg2d.pixi.view.removeEventListener("pointerleave", this.onPointerLeave);
 		this._offwheel(this.onWheelScale);
 		super.destroy();
 	}

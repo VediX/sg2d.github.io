@@ -118,10 +118,10 @@ export default class Player extends ObjectBaseLifeBand {
 		super.initialize(...args);
 		
 		this.keyProcess = this.keyProcess.bind(this);
-		this.mouse.pointerclick = this.pointerClick.bind(this);
+		this.pointer.pointerclick = this.pointerClick.bind(this);
 		this.calcTurretAngleTarget = this.calcTurretAngleTarget.bind(this);
 		
-		this.mouse.on("pxy", this.calcTurretAngleTarget);
+		this.pointer.on("pxy", this.calcTurretAngleTarget);
 		document.addEventListener("keydown", this.keyProcess);
 		document.addEventListener("keyup", this.keyProcess);
 		
@@ -143,6 +143,10 @@ export default class Player extends ObjectBaseLifeBand {
 		this.set("state", state);
 	}
 	
+	pointerProcess() {
+		
+	}
+	
 	calcTurretAngleTarget(pxy) {
 		if (SG2D.Math.distance_p(pxy, this.properties.position) > 64) {
 			this.set("turret_angle_target", SG2D.Math.angle_p1p2_deg(this.properties.position, pxy, 1));
@@ -151,7 +155,7 @@ export default class Player extends ObjectBaseLifeBand {
 	
 	// shot
 	pointerClick(target, options) {
-		if (options.button === SG2D.Mouse.POINTER_LEFT && this.properties.load_whizbang <= 0) {
+		if (options.button === SG2D.Pointer.POINTER_LEFT && this.properties.load_whizbang <= 0) {
 			this.set("load_whizbang", Player.LOAD_WHIZBANG_FRAMES);
 			this.startAnimation(this.sprites.smoke_shot);
 			let whizbang = new Whizbang({

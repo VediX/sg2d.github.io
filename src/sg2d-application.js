@@ -11,7 +11,7 @@ import SG2DConsts from './sg2d-consts.js';
 import SG2DClusters from './sg2d-clusters.js';
 import SG2DTile from './sg2d-tile.js';
 import SG2DCamera from './sg2d-camera.js';
-import SG2DMouse from './sg2d-mouse.js';
+import SG2DPointer from './sg2d-pointer.js';
 import SG2DMath from './sg2d-math.js';
 import SG2DUtils from './sg2d-utils.js';
 import SG2DEffects from './sg2d-effects.js';
@@ -36,7 +36,7 @@ export default class SG2DApplication {
 	 * @param {number}			[config.camera.rotate_adjustment=0
 	 * @param {object}		[config.clusters] - Config or instanceof SG2DClusters
 	 * @param {number}			[config.clusters.areasize=128]
-	 * @param {object}		[config.mouse] - Config or instanceof SG2DMouse
+	 * @param {object}		[config.pointer] - Config or instanceof SG2DPointer
 	 * @param {function}	[config.iterate]
 	 * @param {function}	[config.resize]
 	 * @param {boolean}	[config.layers_enabled=true]
@@ -162,8 +162,8 @@ export default class SG2DApplication {
 		this.camera = config.camera instanceof SG2DCamera ? config.camera : new SG2DCamera(config.camera);
 		this.camera._sg2dconnect && this.camera._sg2dconnect(this);
 		
-		this.mouse = config.mouse instanceof SG2DMouse ? config.mouse : new SG2DMouse(config.mouse);
-		this.mouse._sg2dconnect && this.mouse._sg2dconnect(this);
+		this.pointer = config.pointer instanceof SG2DPointer ? config.pointer : new SG2DPointer(config.pointer);
+		this.pointer._sg2dconnect && this.pointer._sg2dconnect(this);
 		
 		this.resize = SG2DUtils.debounce(this.resize, 100).bind(this);
 		addEventListener("resize", this.resize);
@@ -215,7 +215,7 @@ export default class SG2DApplication {
 		this.camera._iterate();
 		if (SG2DConsts.DRAW_BODY_LINES) SG2DDebugging.redrawSG2DBodiesLines();
 		
-		this.mouse.iterate();
+		this.pointer.iterate();
 		
 		for (var cluster of this.camera.clustersInCamera) {
 			for (var tile of cluster.tiles) {
@@ -287,8 +287,8 @@ export default class SG2DApplication {
 		this.state = SG2DApplication.STATE_DESTROY;
 		
 		removeEventListener("resize", this.resize);
-		this.mouse.destroy();
-		this.mouse = null;
+		this.pointer.destroy();
+		this.pointer = null;
 		this.camera.destroy();
 		this.camera = null;
 		this.clusters.destroy();
@@ -322,15 +322,6 @@ export default class SG2DApplication {
 		this.camera.onResize();
 		this.resize_out();
 	}
-	
-	/*static drawCircle(x, y, r, c) {
-		var graphics = new PIXI.Graphics();
-		graphics.beginFill(c || 0xff2222);
-		graphics.drawCircle(x || 0, y || 0, r || 3);
-		graphics.endFill();
-		graphics.zIndex = 99999;
-		SG2DApplication.drawSprite(graphics);
-	}*/
 }
 
 /** @private */

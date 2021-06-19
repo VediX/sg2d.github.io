@@ -117,6 +117,7 @@ export default class SG2DTile extends SGModel {
 		if (SG2DTile._spritesFromOptions.size) {
 			let changed = false;
 			for (var sprite of SG2DTile._spritesFromOptions) {
+				if (! sprite) continue;
 				if (sprite[name] !== value) {
 					sprite[name] = value;
 					changed = true;
@@ -182,7 +183,9 @@ export default class SG2DTile extends SGModel {
 				}
 			}
 			if (sprite.pixiSprite) {
-				this.updateSpriteTexture(sprite, sprite.texture);
+				if (! sprite.animation || sprite.animation && ! sprite.animation.running) {
+					this.updateSpriteTexture(sprite, sprite.texture);
+				}
 				pixiSprite.position.x = ~~this.properties.position.x;
 				pixiSprite.position.y = ~~this.properties.position.y;
 				if (typeof sprite.anchor === "number") pixiSprite.anchor.set(sprite.anchor); else pixiSprite.anchor.set(sprite.anchor.x, sprite.anchor.y);

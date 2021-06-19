@@ -1622,6 +1622,15 @@ var SG2DUtils = {
 			return new OffscreenCanvas(width || SG2DUtils.DEFAULT_WIDTH, height || SG2DUtils.DEFAULT_HEIGHT);
 		}
 	},
+	
+	drawCircle: function(x, y, r, c) {
+		var graphics = new PIXI.Graphics();
+		graphics.beginFill(c || 0xff2222);
+		graphics.drawCircle(x || 0, y || 0, r || 3);
+		graphics.endFill();
+		graphics.zIndex = 99999;
+		SG2DApplication.drawSprite(graphics);
+	},
 
 	/** @public */
 	PXtoCX: function(x_or_y) {
@@ -2398,6 +2407,7 @@ class sg2d_tile_SG2DTile extends sg_model["a" /* default */] {
 		if (sg2d_tile_SG2DTile._spritesFromOptions.size) {
 			let changed = false;
 			for (var sprite of sg2d_tile_SG2DTile._spritesFromOptions) {
+				if (! sprite) continue;
 				if (sprite[name] !== value) {
 					sprite[name] = value;
 					changed = true;
@@ -2463,7 +2473,9 @@ class sg2d_tile_SG2DTile extends sg_model["a" /* default */] {
 				}
 			}
 			if (sprite.pixiSprite) {
-				this.updateSpriteTexture(sprite, sprite.texture);
+				if (! sprite.animation || sprite.animation && ! sprite.animation.running) {
+					this.updateSpriteTexture(sprite, sprite.texture);
+				}
 				pixiSprite.position.x = ~~this.properties.position.x;
 				pixiSprite.position.y = ~~this.properties.position.y;
 				if (typeof sprite.anchor === "number") pixiSprite.anchor.set(sprite.anchor); else pixiSprite.anchor.set(sprite.anchor.x, sprite.anchor.y);
@@ -2938,7 +2950,7 @@ class sg2d_camera_SG2DCamera extends sg_model["a" /* default */] {
 			scale_wheel: true, // scale with scrolling
 			scale_min: sg2d_camera_SG2DCamera.SCALE_MIN,
 			scale_max: sg2d_camera_SG2DCamera.SCALE_MAX,
-			mouse_over_canvas: true,
+			pointer_over_canvas: true,
 			movement_by_pointer: 0,
 			movement_state: 0
 		};
@@ -3016,8 +3028,8 @@ class sg2d_camera_SG2DCamera extends sg_model["a" /* default */] {
 		
 		this._addLinePoint = this._addLinePoint.bind(this);
 		
-		this.onMouseEnter = this.onMouseEnter.bind(this);
-		this.onMouseLeave = this.onMouseLeave.bind(this);
+		this.onPointerEnter = this.onPointerEnter.bind(this);
+		this.onPointerLeave = this.onPointerLeave.bind(this);
 		
 		this.onWheelScale = this.onWheelScale.bind(this);
 		if (this.properties.scale_wheel) {
@@ -3046,8 +3058,8 @@ class sg2d_camera_SG2DCamera extends sg_model["a" /* default */] {
 	_sg2dconnect(sg2d) {
 		this.sg2d = sg2d;
 		this.onResize();
-		this.sg2d.pixi.view.addEventListener("mouseenter", this.onMouseEnter);
-		this.sg2d.pixi.view.addEventListener("mouseleave", this.onMouseLeave);
+		this.sg2d.pixi.view.addEventListener("pointerenter", this.onPointerEnter);
+		this.sg2d.pixi.view.addEventListener("pointerleave", this.onPointerLeave);
 		this.set("rotate", this.properties.rotate);
 		this.sg2d.viewport.angle = -this.properties.rotate + this.rotate_adjustment;
 		this.startPosition(this.properties.position || null);
@@ -3368,16 +3380,16 @@ class sg2d_camera_SG2DCamera extends sg_model["a" /* default */] {
 		}
 	}
 	
-	onMouseEnter(e) {
-		this.set("mouse_over_canvas", true);
+	onPointerEnter(e) {
+		this.set("pointer_over_canvas", true);
 	}
 	
-	onMouseLeave(e) {
-		this.set("mouse_over_canvas", false);
+	onPointerLeave(e) {
+		this.set("pointer_over_canvas", false);
 	}
 	
 	onWheelScale(e) {
-		if (! this.properties.mouse_over_canvas) return;
+		if (! this.properties.pointer_over_canvas) return;
 		var delta = e.deltaY || e.detail || e.wheelDelta;
 		this.zoomInc(delta < 0 ? 1 : -1);
 	}
@@ -3432,8 +3444,8 @@ class sg2d_camera_SG2DCamera extends sg_model["a" /* default */] {
 	}
 	
 	destroy() {
-		this.sg2d.pixi.view.removeEventListener("mouseenter", this.onMouseEnter);
-		this.sg2d.pixi.view.removeEventListener("mouseleave", this.onMouseLeave);
+		this.sg2d.pixi.view.removeEventListener("pointerenter", this.onPointerEnter);
+		this.sg2d.pixi.view.removeEventListener("pointerleave", this.onPointerLeave);
 		this._offwheel(this.onWheelScale);
 		super.destroy();
 	}
@@ -3501,9 +3513,9 @@ sg2d_camera_SG2DCamera._boundsCluster = {};
 
 /** @private */
 sg2d_camera_SG2DCamera._moveToTarget = {x: 0, y: 0};
-// CONCATENATED MODULE: ./src/sg2d-mouse.js
+// CONCATENATED MODULE: ./src/sg2d-pointer.js
 /**
- * SG2DMouse
+ * SG2DPointer
  * https://github.com/VediX/sg2d.github.io
  * (c) 2019-2021 Kalashnikov Ilya
  */
@@ -3516,7 +3528,7 @@ sg2d_camera_SG2DCamera._moveToTarget = {x: 0, y: 0};
 
 
 
-class sg2d_mouse_SG2DMouse extends sg_model["a" /* default */] {
+class sg2d_pointer_SG2DPointer extends sg_model["a" /* default */] {
 	
 	initialize(properties, thisProps, options) {
 		
@@ -3524,18 +3536,22 @@ class sg2d_mouse_SG2DMouse extends sg_model["a" /* default */] {
 		
 		//this.camera = this.sg2d.camera;
 		
-		if (! sg2d_mouse_SG2DMouse._newPosition) sg2d_mouse_SG2DMouse._newPosition = new PIXI.Point();
+		if (! sg2d_pointer_SG2DPointer._newPosition) sg2d_pointer_SG2DPointer._newPosition = new PIXI.Point();
 		
-		this.target = this.constructor.target;
-		this.options = this.constructor.options;
+		//this.target = this.constructor.target;
+		//this.options = this.constructor.options;
+		
+		this.identifiers = [];
+		for (var i = 0; i < sg2d_pointer_SG2DPointer.maxIdentifiers; i++) {
+			this.identifiers[i] = {
+				target: { cluster: void 0, tile: void 0, sprite: void 0, pxy: this.properties.pxy, cxy: this.properties.cxy, pxy_local: {x: void 0, y: void 0} },
+				options: { type: void 0, button: void 0 }
+			}
+		}
 		
 		this.on("pxy", ()=>{
 			this.set("cxy", [Math.floor( 1 + this.properties.pxy.x / sg2d_consts.CELLSIZEPIX ), Math.floor( 1 + this.properties.pxy.y / sg2d_consts.CELLSIZEPIX )]);
 		});
-		
-		this.target.pxy = this.properties.pxy;
-		this.target.cxy = this.properties.cxy;
-		this.target.pxy_local = {x: void 0, y: void 0};
 	}
 	
 	/** @private */
@@ -3550,9 +3566,9 @@ class sg2d_mouse_SG2DMouse extends sg_model["a" /* default */] {
 		
 		this.sg2d.viewport.on("pointerdown", this.pointerdown.bind(this));
 		this.sg2d.viewport.on("pointerup", this.pointerup.bind(this));
-		this.sg2d.viewport.on("mousemove", this.pointermove.bind(this));
-		//this.sg2d.viewport.on("mouseover", this.mouseover.bind(this));
-		//this.sg2d.canvas.addEventListener("mouseup", (e)=>{ debugger; });
+		this.sg2d.viewport.on("pointermove", this.pointermove.bind(this));
+		//this.sg2d.viewport.on("pointerover", this.pointerover.bind(this));
+		//this.sg2d.canvas.addEventListener("pointerup", (e)=>{ debugger; });
 		
 		// Css style for icons
 		for (var p in this.properties.cursors) {
@@ -3564,42 +3580,41 @@ class sg2d_mouse_SG2DMouse extends sg_model["a" /* default */] {
 	}
 	
 	/*getTileByPXY(pxy, bClick) {
-		SG2DMouse._target.cluster = this.sg2d.clusters.getCluster(pxy.x, pxy.y);
-		SG2DMouse._target.tile = null;
-		SG2DMouse._target.sprite = null;
-		SG2DMouse._target.pxy_local.x = void 0;
-		SG2DMouse._target.pxy_local.y = void 0;
-		for (var tile of SG2DMouse._target.cluster.bodies) {
+		SG2DPointer._target.cluster = this.sg2d.clusters.getCluster(pxy.x, pxy.y);
+		SG2DPointer._target.tile = null;
+		SG2DPointer._target.sprite = null;
+		SG2DPointer._target.pxy_local.x = void 0;
+		SG2DPointer._target.pxy_local.y = void 0;
+		for (var tile of SG2DPointer._target.cluster.bodies) {
 			if (bClick && ! tile.click) continue;
 			for (var sprite of tile.sprites) {
 				//var mousePos = e.data.getLocalPosition(sprite);
 				var mousePos = this.sg2d.pixi.renderer.plugins.interaction.mouse.getLocalPosition(sprite);
 				if (sprite.getLocalBounds().contains(mousePos.x, mousePos.y)) {
-					if (! SG2DMouse._target.sprite || SG2DMouse._target.sprite.zIndex > sprite.zIndex) {
-						SG2DMouse._target.sprite = sprite;
-						SG2DMouse._target.tile = tile;
+					if (! SG2DPointer._target.sprite || SG2DPointer._target.sprite.zIndex > sprite.zIndex) {
+						SG2DPointer._target.sprite = sprite;
+						SG2DPointer._target.tile = tile;
 					}
 				}
 			}
 		}
-		return SG2DMouse._target;
+		return SG2DPointer._target;
 	}*/
 	
-	pointerdown(e) {
+	pointerdown(event) {
 		
 		if (! this.sg2d.clusters) return;
+		if (event.data.identifier >= sg2d_pointer_SG2DPointer.maxIdentifiers) return;
 		
-		let target = this.target;
-		let options = this.options;
+		let target = this.identifiers[event.data.identifier].target;
+		let options = this.identifiers[event.data.identifier].options;
 		
-		options.button = e.data.button;
-		options.type = e.type;
+		options.button = event.data.button;
+		options.type = event.type;
 		
 		target.cluster = this.sg2d.clusters.getCluster(this.properties.cxy.x, this.properties.cxy.y);
 		target.tile = null;
 		target.sprite = null;
-		//target.pxy_local.x = void 0;
-		//target.pxy_local.y = void 0;
 		
 		if (target.cluster) {
 			for (var tile of target.cluster.bodies) {
@@ -3623,8 +3638,8 @@ class sg2d_mouse_SG2DMouse extends sg_model["a" /* default */] {
 					(options.button === 2 && (this.camera.properties.movement_by_pointer & sg2d_camera_SG2DCamera.MOVEMENT_BY_POINTER_RIGHT)) ||
 					(options.button === 1 && (this.camera.properties.movement_by_pointer & sg2d_camera_SG2DCamera.MOVEMENT_BY_POINTER_MIDDLE))
 				) {
-					sg2d_mouse_SG2DMouse._startPointMouse.x = sg2d_mouse_SG2DMouse._newPosition.x;
-					sg2d_mouse_SG2DMouse._startPointMouse.y = sg2d_mouse_SG2DMouse._newPosition.y;
+					sg2d_pointer_SG2DPointer._startPoint.x = sg2d_pointer_SG2DPointer._newPosition.x;
+					sg2d_pointer_SG2DPointer._startPoint.y = sg2d_pointer_SG2DPointer._newPosition.y;
 					this.camera.set("movement_state", sg2d_camera_SG2DCamera.STATE_MOVEMENT_WAITING_SHIFT);
 				}
 			}
@@ -3635,32 +3650,33 @@ class sg2d_mouse_SG2DMouse extends sg_model["a" /* default */] {
 		if (this.camera.properties.movement_by_pointer) {
 			if (this.camera.properties.movement_state === sg2d_camera_SG2DCamera.STATE_MOVEMENT_WAITING_SHIFT) {
 				this.sg2d.viewport.cursor = "move";
-				let d = sg2d_math.distance_p(sg2d_mouse_SG2DMouse._startPointMouse, sg2d_mouse_SG2DMouse._newPosition);
-				if (d >= sg2d_mouse_SG2DMouse.CAMERA_MOVEMENT_SHIFT) {
-					sg2d_mouse_SG2DMouse._startPointMouse.x =  this.properties.global.x;
-					sg2d_mouse_SG2DMouse._startPointMouse.y =  this.properties.global.y;
-					sg2d_mouse_SG2DMouse._startPointPXY.x = this.camera.properties.offset.x;
-					sg2d_mouse_SG2DMouse._startPointPXY.y = this.camera.properties.offset.y;
+				let d = sg2d_math.distance_p(sg2d_pointer_SG2DPointer._startPoint, sg2d_pointer_SG2DPointer._newPosition);
+				if (d >= sg2d_pointer_SG2DPointer.CAMERA_MOVEMENT_SHIFT) {
+					sg2d_pointer_SG2DPointer._startPoint.x =  this.properties.global.x;
+					sg2d_pointer_SG2DPointer._startPoint.y =  this.properties.global.y;
+					sg2d_pointer_SG2DPointer._startPointPXY.x = this.camera.properties.offset.x;
+					sg2d_pointer_SG2DPointer._startPointPXY.y = this.camera.properties.offset.y;
 					this.camera.set("movement_state", sg2d_camera_SG2DCamera.STATE_MOVING);
 				}
 			} else if (this.camera.properties.movement_state === sg2d_camera_SG2DCamera.STATE_MOVING) {
 				let k = this.camera.scales_k[this.camera.properties.scale];
-				let dx = (this.properties.global.x - sg2d_mouse_SG2DMouse._startPointMouse.x) / k;
-				let dy = (this.properties.global.y - sg2d_mouse_SG2DMouse._startPointMouse.y) / k;
+				let dx = (this.properties.global.x - sg2d_pointer_SG2DPointer._startPoint.x) / k;
+				let dy = (this.properties.global.y - sg2d_pointer_SG2DPointer._startPoint.y) / k;
 				let rotate = this.camera.properties.rotate - this.camera.rotate_adjustment;
-				sg2d_mouse_SG2DMouse._position.x = sg2d_mouse_SG2DMouse._startPointPXY.x - dx * sg2d_math.cos(rotate, 1) + dy * sg2d_math.sin(rotate, 1);
-				sg2d_mouse_SG2DMouse._position.y = sg2d_mouse_SG2DMouse._startPointPXY.y - dy * sg2d_math.cos(rotate, 1) - dx * sg2d_math.sin(rotate, 1);
-				this.camera.set("offset", sg2d_mouse_SG2DMouse._position, sg_model["a" /* default */].OPTIONS_PRECISION_5);
+				sg2d_pointer_SG2DPointer._position.x = sg2d_pointer_SG2DPointer._startPointPXY.x - dx * sg2d_math.cos(rotate, 1) + dy * sg2d_math.sin(rotate, 1);
+				sg2d_pointer_SG2DPointer._position.y = sg2d_pointer_SG2DPointer._startPointPXY.y - dy * sg2d_math.cos(rotate, 1) - dx * sg2d_math.sin(rotate, 1);
+				this.camera.set("offset", sg2d_pointer_SG2DPointer._position, sg_model["a" /* default */].OPTIONS_PRECISION_5);
 			}
 		}
 	}
 	
-	pointerup(e) {
+	pointerup(event) {
 		
 		if (! this.sg2d.clusters) return;
+		if (event.data.identifier >= sg2d_pointer_SG2DPointer.maxIdentifiers) return;
 		
-		let target = this.target;
-		let options = this.options;
+		let target = this.identifiers[event.data.identifier].target;
+		let options = this.identifiers[event.data.identifier].options;
 		
 		if (target.tile) {
 			if (target.tile.constructor.click) target.tile.constructor.click(target, options);
@@ -3671,8 +3687,8 @@ class sg2d_mouse_SG2DMouse extends sg_model["a" /* default */] {
 			if (this.camera.properties.movement_state) {
 				this.sg2d.viewport.cursor = "default";
 				let k = this.camera.scales_k[this.camera.properties.scale];
-				let dx = (this.properties.global.x - sg2d_mouse_SG2DMouse._startPointMouse.x) / k;
-				let dy = (this.properties.global.y - sg2d_mouse_SG2DMouse._startPointMouse.y) / k;
+				let dx = (this.properties.global.x - sg2d_pointer_SG2DPointer._startPoint.x) / k;
+				let dy = (this.properties.global.y - sg2d_pointer_SG2DPointer._startPoint.y) / k;
 				this.camera.set("movement_state", sg2d_camera_SG2DCamera.STATE_NO_MOVEMENT);
 			}
 		}
@@ -3683,33 +3699,35 @@ class sg2d_mouse_SG2DMouse extends sg_model["a" /* default */] {
 	pointerclick(e) {} // override
 	
 	iterate() {
-		this.sg2d.pixi.renderer.plugins.interaction.mouse.getLocalPosition(this.sg2d.viewport, sg2d_mouse_SG2DMouse._newPosition);
-		sg2d_mouse_SG2DMouse._newPosition.x = ~~sg2d_mouse_SG2DMouse._newPosition.x;
-		sg2d_mouse_SG2DMouse._newPosition.y = ~~sg2d_mouse_SG2DMouse._newPosition.y;
-		this.set("pxy", [sg2d_mouse_SG2DMouse._newPosition.x, sg2d_mouse_SG2DMouse._newPosition.y]);
+		this.sg2d.pixi.renderer.plugins.interaction.mouse.getLocalPosition(this.sg2d.viewport, sg2d_pointer_SG2DPointer._newPosition);
+		sg2d_pointer_SG2DPointer._newPosition.x = ~~sg2d_pointer_SG2DPointer._newPosition.x;
+		sg2d_pointer_SG2DPointer._newPosition.y = ~~sg2d_pointer_SG2DPointer._newPosition.y;
+		this.set("pxy", [sg2d_pointer_SG2DPointer._newPosition.x, sg2d_pointer_SG2DPointer._newPosition.y]);
 	}
 }
 
-sg2d_mouse_SG2DMouse.typeProperties = {
+sg2d_pointer_SG2DPointer.typeProperties = {
 	global: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
 	camera: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
 	pxy: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
 	cxy: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS
 };
 
-sg2d_mouse_SG2DMouse.POINTER_LEFT = 0;
-sg2d_mouse_SG2DMouse.POINTER_MIDDLE = 1;
-sg2d_mouse_SG2DMouse.POINTER_RIGHT = 2;
+sg2d_pointer_SG2DPointer.POINTER_LEFT = 0;
+sg2d_pointer_SG2DPointer.POINTER_MIDDLE = 1;
+sg2d_pointer_SG2DPointer.POINTER_RIGHT = 2;
 
-sg2d_mouse_SG2DMouse.CAMERA_MOVEMENT_SHIFT = 10; // pixels
+sg2d_pointer_SG2DPointer.CAMERA_MOVEMENT_SHIFT = 10; // pixels
 
 /** @private */
-sg2d_mouse_SG2DMouse._newPosition= void 0;
+sg2d_pointer_SG2DPointer._newPosition= void 0;
 
-sg2d_mouse_SG2DMouse.target = { cluster: void 0, tile: void 0, sprite: void 0, pxy: void 0, cxy: void 0 }; //, pxy_local: void 0 };
-sg2d_mouse_SG2DMouse.options = { type: void 0, button: void 0 };
+// TODO DEL
+//SG2DPointer.target = { cluster: void 0, tile: void 0, sprite: void 0, pxy: void 0, cxy: void 0 }; //, pxy_local: void 0 };
+//SG2DPointer.options = { type: void 0, button: void 0 };
+sg2d_pointer_SG2DPointer.maxIdentifiers = 10;
 
-sg2d_mouse_SG2DMouse.defaultProperties = {
+sg2d_pointer_SG2DPointer.defaultProperties = {
 	global: void 0, // relative to the screen
 	pxy: { x: 0, y: 0 }, // in the coordinates of the game world: PX
 	cxy: { x: 0, y: 0 }, // in the coordinates of the game world: Cluster
@@ -3717,13 +3735,13 @@ sg2d_mouse_SG2DMouse.defaultProperties = {
 }
 
 /** @private */
-sg2d_mouse_SG2DMouse._position = {x: 0, y: 0};
+sg2d_pointer_SG2DPointer._position = {x: 0, y: 0};
 
 /** @private */
-sg2d_mouse_SG2DMouse._startPointMouse = { x: 0, y: 0 };
+sg2d_pointer_SG2DPointer._startPoint = { x: 0, y: 0 };
 
 /** @private */
-sg2d_mouse_SG2DMouse._startPointPXY = { x: 0, y: 0 };
+sg2d_pointer_SG2DPointer._startPointPXY = { x: 0, y: 0 };
 // CONCATENATED MODULE: ./src/sg2d-effects.js
 /**
  * SG2DEffects
@@ -3989,7 +4007,7 @@ class sg2d_application_SG2DApplication {
 	 * @param {number}			[config.camera.rotate_adjustment=0
 	 * @param {object}		[config.clusters] - Config or instanceof SG2DClusters
 	 * @param {number}			[config.clusters.areasize=128]
-	 * @param {object}		[config.mouse] - Config or instanceof SG2DMouse
+	 * @param {object}		[config.pointer] - Config or instanceof SG2DPointer
 	 * @param {function}	[config.iterate]
 	 * @param {function}	[config.resize]
 	 * @param {boolean}	[config.layers_enabled=true]
@@ -4115,8 +4133,8 @@ class sg2d_application_SG2DApplication {
 		this.camera = config.camera instanceof sg2d_camera_SG2DCamera ? config.camera : new sg2d_camera_SG2DCamera(config.camera);
 		this.camera._sg2dconnect && this.camera._sg2dconnect(this);
 		
-		this.mouse = config.mouse instanceof sg2d_mouse_SG2DMouse ? config.mouse : new sg2d_mouse_SG2DMouse(config.mouse);
-		this.mouse._sg2dconnect && this.mouse._sg2dconnect(this);
+		this.pointer = config.pointer instanceof sg2d_pointer_SG2DPointer ? config.pointer : new sg2d_pointer_SG2DPointer(config.pointer);
+		this.pointer._sg2dconnect && this.pointer._sg2dconnect(this);
 		
 		this.resize = sg2d_utils.debounce(this.resize, 100).bind(this);
 		addEventListener("resize", this.resize);
@@ -4168,7 +4186,7 @@ class sg2d_application_SG2DApplication {
 		this.camera._iterate();
 		if (sg2d_consts.DRAW_BODY_LINES) sg2d_debugging.redrawSG2DBodiesLines();
 		
-		this.mouse.iterate();
+		this.pointer.iterate();
 		
 		for (var cluster of this.camera.clustersInCamera) {
 			for (var tile of cluster.tiles) {
@@ -4240,8 +4258,8 @@ class sg2d_application_SG2DApplication {
 		this.state = sg2d_application_SG2DApplication.STATE_DESTROY;
 		
 		removeEventListener("resize", this.resize);
-		this.mouse.destroy();
-		this.mouse = null;
+		this.pointer.destroy();
+		this.pointer = null;
 		this.camera.destroy();
 		this.camera = null;
 		this.clusters.destroy();
@@ -4275,15 +4293,6 @@ class sg2d_application_SG2DApplication {
 		this.camera.onResize();
 		this.resize_out();
 	}
-	
-	/*static drawCircle(x, y, r, c) {
-		var graphics = new PIXI.Graphics();
-		graphics.beginFill(c || 0xff2222);
-		graphics.drawCircle(x || 0, y || 0, r || 3);
-		graphics.endFill();
-		graphics.zIndex = 99999;
-		SG2DApplication.drawSprite(graphics);
-	}*/
 }
 
 /** @private */
@@ -4683,7 +4692,7 @@ var sg2d_SG2D = {
 	Camera: sg2d_camera_SG2DCamera,
 	Tile: sg2d_tile_SG2DTile,
 	TileBody: sg2d_tilebody_SG2DTileBody,
-	Mouse: sg2d_mouse_SG2DMouse,
+	Pointer: sg2d_pointer_SG2DPointer,
 	Effects: sg2d_effects_SG2DEffects,
 	Plugins: SG2DPlugins,
 	PluginBase: SG2DPluginBase,

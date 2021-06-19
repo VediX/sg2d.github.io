@@ -476,6 +476,15 @@ var SG2DUtils = {
 			return new OffscreenCanvas(width || SG2DUtils.DEFAULT_WIDTH, height || SG2DUtils.DEFAULT_HEIGHT);
 		}
 	},
+	
+	drawCircle: function(x, y, r, c) {
+		var graphics = new PIXI.Graphics();
+		graphics.beginFill(c || 0xff2222);
+		graphics.drawCircle(x || 0, y || 0, r || 3);
+		graphics.endFill();
+		graphics.zIndex = 99999;
+		SG2DApplication.drawSprite(graphics);
+	},
 
 	/** @public */
 	PXtoCX: function(x_or_y) {

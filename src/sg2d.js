@@ -19,7 +19,7 @@ import SG2DCluster from './sg2d-cluster.js';
 import SG2DTile from './sg2d-tile.js';
 import SG2DTileBody from './sg2d-tilebody.js';
 import SG2DCamera from './sg2d-camera.js';
-import SG2DMouse from './sg2d-mouse.js';
+import SG2DPointer from './sg2d-pointer.js';
 import SG2DEffects from './sg2d-effects.js';
 import SG2DPlugins from './sg2d-plugins.js';
 import SG2DPluginBase from './sg2d-plugin-base.js';
@@ -38,7 +38,7 @@ var SG2D = {
 	Camera: SG2DCamera,
 	Tile: SG2DTile,
 	TileBody: SG2DTileBody,
-	Mouse: SG2DMouse,
+	Pointer: SG2DPointer,
 	Effects: SG2DEffects,
 	Plugins: SG2DPlugins,
 	PluginBase: SG2DPluginBase,

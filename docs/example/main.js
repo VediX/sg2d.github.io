@@ -60,7 +60,7 @@ class Application {
 			clusters: {
 				areasize: 64
 			},
-			mouse: {
+			pointer: {
 				cursors: {
 					default: GraphicsPreparer.cursors.default,
 					hover: GraphicsPreparer.cursors.target,
@@ -96,7 +96,7 @@ class Application {
 		// Graphic effects
 		this.sceneEffect = SceneEffects.toApply(this.scene);
 		
-		this.player = new Player({ position: this.scene.clusters.getCluster(5,5).position, angle: 45 }, { mouse: this.scene.mouse, camera: camera });
+		this.player = new Player({ position: this.scene.clusters.getCluster(5,5).position, angle: 45 }, { pointer: this.scene.pointer, camera: camera });
 		
 		/**
 		* The camera can move smoothly behind the player.
@@ -117,7 +117,8 @@ class Application {
 		}
 		
 		if (this.scene.frame_index % 30 === 0) {
-			document.querySelector("#info > span").innerText = (1 / this.scene.tRequestAnimationFrame).toFixed(0); // FPS info
+			document.querySelector("#info > span:nth-child(1)").innerText = (1 / this.scene.tRequestAnimationFrame).toFixed(0); // FPS
+			document.querySelector("#info > span:nth-child(2)").innerText =SG2D.Application.spritesCount; // Sprites count
 		}
 	}
 	
