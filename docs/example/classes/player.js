@@ -157,7 +157,10 @@ export default class Player extends ObjectBaseLifeBand {
 	pointerClick(target, options) {
 		if (options.button === SG2D.Pointer.POINTER_LEFT && this.properties.load_whizbang <= 0) {
 			this.set("load_whizbang", Player.LOAD_WHIZBANG_FRAMES);
+			
+			this.set("angle", this.sprites.turret.angle, { sprite: this.sprites.smoke_shot });
 			this.startAnimation(this.sprites.smoke_shot);
+			
 			let whizbang = new Whizbang({
 				angle: this.sprites.turret.angle,
 				position: {

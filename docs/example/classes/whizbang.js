@@ -8,10 +8,7 @@ export class Whizbang extends SG2D.TileBody {
 		sleep: 3,
 		running: false,
 		basetexture: "animations/explosionA_",
-		loop: false,
-		onComplete: function() {
-			this.destroy();
-		}
+		loop: false
 	};
 	
 	static STATE_FLY = 1;
@@ -26,9 +23,16 @@ export class Whizbang extends SG2D.TileBody {
 		DAMAGE_DEVIATION: 0.10
 	};
 	
+	static ownSetters = Object.assign({
+		state: true
+	}, SG2D.TileBody.ownSetters);
+	
+	static isWhizbang = true;
+	
 	defaults() {
 		return SG2D.Model.defaults({
-			state: Whizbang.STATE_FLY
+			state: Whizbang.STATE_FLY,
+			state_index: 0
 		}, SG2D.Tile.defaultProperties);
 	}
 	
@@ -44,6 +48,17 @@ export class Whizbang extends SG2D.TileBody {
 		}
 	}
 	
+	setState(state = void 0, options = SG2D.Model.OBJECT_EMPTY, flags = 0) {
+		if (this.set("state", state, options, flags | SG2D.Model.FLAG_IGNORE_OWN_SETTER)) {
+			switch (state) {
+				case Whizbang.STATE_EXPLODE: {
+					this.set("state_index", Whizbang.animation.count * Whizbang.animation.sleep);
+					break;
+				}
+			}
+		}
+	}
+	
 	iterate() {
 		if (! this.clusters.size) {
 			this.destroy();
@@ -56,16 +71,20 @@ export class Whizbang extends SG2D.TileBody {
 						power * SG2D.Math.sinrad(this.body.angle, 1)
 					);
 					Matter.Body.applyForce( this.body, this.body.position, force);
-
-					//this.set("state", Whizbang.STATE_EXPLODE);
 					break;
 				}
 				case Whizbang.STATE_EXPLODE: {
-					if (! this.sprite.animation.running) {
-						this.startAnimation();
-					}
 					
-					this.makeDamage();
+					this.set("state_index", Math.max(0, this.properties.state_index - 1));
+					if (this.properties.state_index === 0) {
+						this.destroy();
+						return;
+					} else {
+						if (! this.sprite.animation.running) {
+							this.startAnimation();
+						}
+						this.makeDamage();
+					}
 					
 					break;
 				}

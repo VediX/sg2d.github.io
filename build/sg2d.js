@@ -2432,24 +2432,31 @@ class sg2d_tile_SG2DTile extends sg_model["a" /* default */] {
 	 */
 	drawUndraw(sprite = void 0) {
 		if (! sg2d_consts.ONLY_LOGIC && sg2d_application_SG2DApplication._initialized) {
-			if (! this.clusters) debugger; // TODO DEL DEBUG
-			for (var cluster of this.clusters) {
-				if (cluster.drawed) {
-					if (sprite) {
-						this._pixiSprite(sprite);
-					} else {
-						for (var name in this.sprites) {
-							this._pixiSprite(this.sprites[name]);
-						}
-						this.set("drawed", true);
+			if (this.isInCamera()) {
+				if (sprite) {
+					this._pixiSprite(sprite);
+				} else {
+					for (var name in this.sprites) {
+						this._pixiSprite(this.sprites[name]);
 					}
-					return true;
+					this.set("drawed", true);
 				}
+				return true;
+			} else {
+				this.removeSprites();
+				return false;
 			}
-			this.removeSprites();
-			return false;
 		}
 		return void 0;
+	}
+	
+	/** @public */
+	isInCamera() {
+		if (! this.clusters) debugger; // TODO DEL DEBUG
+		for (var cluster of this.clusters) {
+			if (cluster.drawed) return true;
+		}
+		return false;
 	}
 	
 	// To handle a click on a tile instance, set this method
@@ -2516,7 +2523,9 @@ class sg2d_tile_SG2DTile extends sg_model["a" /* default */] {
 			sprite.visible = true;
 			sprite.animation._count = 1;
 			sprite.animation._sleep = 1;
-			this._pixiSprite(sprite);
+			if (this.isInCamera()) {
+				this._pixiSprite(sprite);
+			}
 			this.updateSpriteTexture(sprite, this.getAnimationTexture(sprite));
 		}
 	}
@@ -2529,7 +2538,9 @@ class sg2d_tile_SG2DTile extends sg_model["a" /* default */] {
 			sprite.animation._count = 1;
 			sprite.animation._sleep = 1;
 			this.updateSpriteTexture(sprite, sprite.texture || sprite._texture);
-			this._pixiSprite(sprite);
+			if (this.isInCamera()) {
+				this._pixiSprite(sprite);
+			}
 		}
 	}
 	
@@ -3538,11 +3549,8 @@ class sg2d_pointer_SG2DPointer extends sg_model["a" /* default */] {
 		
 		if (! sg2d_pointer_SG2DPointer._newPosition) sg2d_pointer_SG2DPointer._newPosition = new PIXI.Point();
 		
-		//this.target = this.constructor.target;
-		//this.options = this.constructor.options;
-		
 		this.identifiers = [];
-		for (var i = 0; i < sg2d_pointer_SG2DPointer.maxIdentifiers; i++) {
+		for (var i = 0; i < sg2d_pointer_SG2DPointer._maxIdentifiers; i++) {
 			this.identifiers[i] = {
 				target: { cluster: void 0, tile: void 0, sprite: void 0, pxy: this.properties.pxy, cxy: this.properties.cxy, pxy_local: {x: void 0, y: void 0} },
 				options: { type: void 0, button: void 0 }
@@ -3604,7 +3612,7 @@ class sg2d_pointer_SG2DPointer extends sg_model["a" /* default */] {
 	pointerdown(event) {
 		
 		if (! this.sg2d.clusters) return;
-		if (event.data.identifier >= sg2d_pointer_SG2DPointer.maxIdentifiers) return;
+		if (event.data.identifier >= sg2d_pointer_SG2DPointer._maxIdentifiers) return;
 		
 		let target = this.identifiers[event.data.identifier].target;
 		let options = this.identifiers[event.data.identifier].options;
@@ -3673,7 +3681,7 @@ class sg2d_pointer_SG2DPointer extends sg_model["a" /* default */] {
 	pointerup(event) {
 		
 		if (! this.sg2d.clusters) return;
-		if (event.data.identifier >= sg2d_pointer_SG2DPointer.maxIdentifiers) return;
+		if (event.data.identifier >= sg2d_pointer_SG2DPointer._maxIdentifiers) return;
 		
 		let target = this.identifiers[event.data.identifier].target;
 		let options = this.identifiers[event.data.identifier].options;
@@ -3722,10 +3730,8 @@ sg2d_pointer_SG2DPointer.CAMERA_MOVEMENT_SHIFT = 10; // pixels
 /** @private */
 sg2d_pointer_SG2DPointer._newPosition= void 0;
 
-// TODO DEL
-//SG2DPointer.target = { cluster: void 0, tile: void 0, sprite: void 0, pxy: void 0, cxy: void 0 }; //, pxy_local: void 0 };
-//SG2DPointer.options = { type: void 0, button: void 0 };
-sg2d_pointer_SG2DPointer.maxIdentifiers = 10;
+/** @private */
+sg2d_pointer_SG2DPointer._maxIdentifiers = 10;
 
 sg2d_pointer_SG2DPointer.defaultProperties = {
 	global: void 0, // relative to the screen

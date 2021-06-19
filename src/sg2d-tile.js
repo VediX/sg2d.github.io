@@ -142,24 +142,31 @@ export default class SG2DTile extends SGModel {
 	 */
 	drawUndraw(sprite = void 0) {
 		if (! SG2DConsts.ONLY_LOGIC && SG2DApplication._initialized) {
-			if (! this.clusters) debugger; // TODO DEL DEBUG
-			for (var cluster of this.clusters) {
-				if (cluster.drawed) {
-					if (sprite) {
-						this._pixiSprite(sprite);
-					} else {
-						for (var name in this.sprites) {
-							this._pixiSprite(this.sprites[name]);
-						}
-						this.set("drawed", true);
+			if (this.isInCamera()) {
+				if (sprite) {
+					this._pixiSprite(sprite);
+				} else {
+					for (var name in this.sprites) {
+						this._pixiSprite(this.sprites[name]);
 					}
-					return true;
+					this.set("drawed", true);
 				}
+				return true;
+			} else {
+				this.removeSprites();
+				return false;
 			}
-			this.removeSprites();
-			return false;
 		}
 		return void 0;
+	}
+	
+	/** @public */
+	isInCamera() {
+		if (! this.clusters) debugger; // TODO DEL DEBUG
+		for (var cluster of this.clusters) {
+			if (cluster.drawed) return true;
+		}
+		return false;
 	}
 	
 	// To handle a click on a tile instance, set this method
@@ -226,7 +233,9 @@ export default class SG2DTile extends SGModel {
 			sprite.visible = true;
 			sprite.animation._count = 1;
 			sprite.animation._sleep = 1;
-			this._pixiSprite(sprite);
+			if (this.isInCamera()) {
+				this._pixiSprite(sprite);
+			}
 			this.updateSpriteTexture(sprite, this.getAnimationTexture(sprite));
 		}
 	}
@@ -239,7 +248,9 @@ export default class SG2DTile extends SGModel {
 			sprite.animation._count = 1;
 			sprite.animation._sleep = 1;
 			this.updateSpriteTexture(sprite, sprite.texture || sprite._texture);
-			this._pixiSprite(sprite);
+			if (this.isInCamera()) {
+				this._pixiSprite(sprite);
+			}
 		}
 	}
 	
