@@ -42,6 +42,8 @@ import SG2DTransitions from "./sg2d/plugins/sg2d-transitions.js";
 
 Example of realizing game on the engine SG2D and SG2DTransitions plugin: [https://sg2d.ru/example/](https://sg2d.ru/example/)
 
+Controls: W and S - movement, A and D - turn, Shift + W - forward acceleration, left mouse button - shot, right mouse button - move around the map, scrolling - map zoom
+
 ![SG2D Example 2D game](https://sg2d.ru/example.png "SG2D Example 2D game")
 
 ## License

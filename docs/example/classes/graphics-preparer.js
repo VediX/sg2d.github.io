@@ -8,7 +8,8 @@ export default class GraphicsPreparer {
 		let loader = PIXI.Loader.shared;
 		loader.add([
 			{ name: "assets", url: "res/assets.json" },
-			{ name: "displacement_animation", url: "res/displacement_animation.jpg" }
+			{ name: "displacement_static", url: "res/displacement_static.jpg" },
+			{ name: "displacement_animation", url: "res/displacement_animation.png" }
 		]).load(async(loader, resources)=>{
 
 			// Parsing composite images, for example, "explosion_64x64.png" will be decomposed into several images

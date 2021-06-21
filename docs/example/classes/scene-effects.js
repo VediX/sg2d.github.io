@@ -68,14 +68,16 @@ export default class SceneEffects {
 		});
 		
 		// Trees animation
+		let trees_a = 0;
 		scene.effects.addDisplacementToLayer({
 			layer: "trees",
-			scale: 0.5,
+			scale: 1,
 			texture: "displacement_animation",
-			animationStep: 0.4,
+			animationStep: 0.25,
 			iterate: function() {
-				this.sprite.x += Math.random() * this.options.animationStep;
-				this.sprite.y += Math.random() * this.options.animationStep;
+				trees_a++; if (trees_a > 360) trees_a = 0;
+				this.sprite.x += this.options.animationStep * SG2D.Math.cos(trees_a);
+				this.sprite.y += this.options.animationStep * SG2D.Math.sin(trees_a);
 			}
 		});
 		
@@ -88,7 +90,7 @@ export default class SceneEffects {
 		scene.effects.addDisplacementToLayer({
 			layer: "grounds",
 			scale: 0.1,
-			texture: "displacement_animation"
+			texture: "displacement_static"
 		});
 		
 		return this;
