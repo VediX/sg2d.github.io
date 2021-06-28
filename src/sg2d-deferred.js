@@ -1,6 +1,12 @@
+/**
+ * SG2DDeferred
+ * https://github.com/VediX/sg2d.github.io
+ * (c) Kalashnikov Ilya
+ */
+
 "use strict";
 
-function Deferred() {
+function SG2DDeferred() {
 	let thens = [];
 	let catches = [];
 
@@ -41,4 +47,4 @@ function Deferred() {
 	}
 }
 
-export default Deferred;
+export default SG2DDeferred;

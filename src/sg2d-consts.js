@@ -14,9 +14,9 @@ let SG2DConsts = {
 	AREASQUARE: 128*128,
 	DRAW_BODY_LINES: false, // draw body borders (SG2DBody-> body.verticles)
 	ONLY_LOGIC: false, // If true - the graphic part is disabled, i.e. the engine can only be used for calculations, for example, in the server side
-	DEBUGGING: {
-		CAMERA: {
-			WIDTH_HEIGHT_K: 1.01,
+	CAMERA: {
+		WIDTH_HEIGHT_K: 1.01,
+		DEBUGGING: {
 			SHOW: {
 				GRID: false,
 				BOUNDS_PXY: false,

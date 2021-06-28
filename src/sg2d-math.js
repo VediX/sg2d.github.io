@@ -1,9 +1,8 @@
 /**
  * SG2DMath
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
-
 
 "use strict";
 
@@ -17,6 +16,13 @@ export default SG2DMath;
 	SG2DMath.uid = function() {
 		return (++_uid);
 	};
+	
+	// Functions for working with bitmasks
+	SG2DMath.addFlag = (value, flag)=>(value | flag);
+	SG2DMath.removeFlag = (value, flag)=>(value & ~flag);
+	SG2DMath.setFlag = (value, flag, state = true)=>(state ? SG2DMath.addFlag(value, flag) : SG2DMath.removeFlag(value, flag));
+	SG2DMath.hasFlag = (value, flag)=>(value & flag);
+	SG2DMath.noFlag = (value, flag)=>(! (value & flag));
 	
 	let _ap = [];
 	for (var dec = 0; dec <= 10; dec++) _ap[dec] = 10 ** dec;
@@ -51,8 +57,7 @@ export default SG2DMath;
 	SG2DMath.normalize_a = function(a, precision = 0) {
 		while (a >= 360) a = a - 360;
 		while (a < 0) a = a + 360;
-		if (precision) a = this.roundTo(a, precision);
-		return a;
+		return this.roundTo(a, precision);
 	};
 
 	let _aSin = [];

@@ -15,6 +15,7 @@ export class Whizbang extends SG2D.TileBody {
 	static STATE_EXPLODE = 2;
 	
 	static CONFIG = {
+		FLY_POWER: 0.002,
 		DAMAGE: 2,
 		DISTANCE: Infinity,
 		EXPLODE_RADIUS: 35,
@@ -53,6 +54,7 @@ export class Whizbang extends SG2D.TileBody {
 			switch (state) {
 				case Whizbang.STATE_EXPLODE: {
 					this.set("state_index", Whizbang.animation.count * Whizbang.animation.sleep);
+					this.sound("tank_whizbang_explosion");
 					break;
 				}
 			}
@@ -65,10 +67,9 @@ export class Whizbang extends SG2D.TileBody {
 		} else {
 			switch (this.properties.state) {
 				case Whizbang.STATE_FLY: {
-					let power = 0.001;
 					let force = Matter.Vector.create(
-						power * SG2D.Math.cosrad(this.body.angle, 1),
-						power * SG2D.Math.sinrad(this.body.angle, 1)
+						this.constructor.CONFIG.FLY_POWER * SG2D.Math.cosrad(this.body.angle, 1),
+						this.constructor.CONFIG.FLY_POWER * SG2D.Math.sinrad(this.body.angle, 1)
 					);
 					Matter.Body.applyForce( this.body, this.body.position, force);
 					break;

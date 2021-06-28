@@ -81,7 +81,7 @@ export default class SceneEffects {
 			}
 		});
 		
-		// Smooth transitions between different soil types (use plugin)
+		// Smooth transitions between different land types (use plugin)
 		SG2DTransitions.ready(()=>{
 			SG2DTransitions.run(scene.clusters);
 		});

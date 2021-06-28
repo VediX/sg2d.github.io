@@ -1,7 +1,7 @@
 /**
  * SG2DDebugging
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 "use strict";
@@ -18,7 +18,7 @@ var SG2DDebugging = {
 		let camera = sg2d.camera;
 		
 		// Grid
-		if (SG2DConsts.DEBUGGING.CAMERA.SHOW.GRID) {
+		if (SG2DConsts.CAMERA.DEBUGGING.SHOW.GRID) {
 			if (! this._temp116) {
 				this._temp116 = [];
 				for (var x = 0; x <= clusters.width; x++) {
@@ -46,7 +46,7 @@ var SG2DDebugging = {
 		}
 		
 		// bounds cluster line
-		if (SG2DConsts.DEBUGGING.CAMERA.SHOW.BOUNDS_PXY) {
+		if (SG2DConsts.CAMERA.DEBUGGING.SHOW.BOUNDS_PXY) {
 			if (this._temp110) sg2d.viewport.removeChild(this._temp110);
 			var graphics = this._temp110 = new PIXI.Graphics();
 			var bpx = camera.boundsPXTops;
@@ -70,7 +70,7 @@ var SG2DDebugging = {
 		}
 		
 		// bounds cluster top points
-		if (SG2DConsts.DEBUGGING.CAMERA.SHOW.BOUNDS_TOP_CLUSTERS) {
+		if (SG2DConsts.CAMERA.DEBUGGING.SHOW.BOUNDS_TOP_CLUSTERS) {
 			if (! this._temp111) this._temp111 = {};
 			var i = 0; var colors = [0xFF0000, 0x00FF00, 0x0000FF, 0xAA00AA];
 			for (var p in camera.boundsClusterTops) {
@@ -99,7 +99,7 @@ var SG2DDebugging = {
 		}
 		
 		// bounds cluster line points
-		if (SG2DConsts.DEBUGGING.CAMERA.SHOW.CLUSTER_LINE_BOUNDS) {
+		if (SG2DConsts.CAMERA.DEBUGGING.SHOW.CLUSTER_LINE_BOUNDS) {
 			if (! this._temp112) this._temp112 = [];
 			for (var i = 0; i < this._temp112.length; i++) sg2d.viewport.removeChild(this._temp112[i]);
 			this._temp112.length = 0;
@@ -128,7 +128,7 @@ var SG2DDebugging = {
 
 		// Static coordinate labels along the axes
 		// TODO: сделать динамический перерасчет position существующих Text-объектов, что бы координаты всегда были на виду по краям камеры?
-		if (SG2DConsts.DEBUGGING.CAMERA.SHOW.AXIS_LABELS) {
+		if (SG2DConsts.CAMERA.DEBUGGING.SHOW.AXIS_LABELS) {
 			if (! this._temp115) {
 				this._temp115 = [];
 				for (var x = 1; x <= clusters.width; x++) {
@@ -174,7 +174,7 @@ var SG2DDebugging = {
 		let sg2d = SG2DApplication.getInstance();
 		let camera = sg2d.camera;
 		
-		if (SG2DConsts.DEBUGGING.CAMERA.SHOW.CLUSTERS_IN_OUT) {
+		if (SG2DConsts.CAMERA.DEBUGGING.SHOW.CLUSTERS_IN_OUT) {
 			if (! this._temp113) this._temp113 = [];
 			for (var i = 0; i < this._temp113.length; i++) sg2d.viewport.removeChild(this._temp113[i]);
 			this._temp113.length = 0;

@@ -1,13 +1,13 @@
 ## Documentation
 
-2D graphics engine based on PixiJS and MatterJS, optimized for large maps through matrix clustering of tiles. Written in modern ES6. Supported by the latest versions of Chrome, Opera, Mozilla and Yandex browsers.
+2D game engine based on PixiJS (WebGL) and MatterJS (physics engine), optimized for large maps through matrix clustering of tiles. Written in modern ES6. Supported by the latest versions of Chrome, Opera, Mozilla and Yandex browsers.
 
 [See Wiki for API documentation](https://github.com/VediX/sg2d.github.io/wiki/SG2D-API)
 
 ## Ready installation
 
-* [sg2d.js (160KB)](https://raw.githubusercontent.com/VediX/sg2d.github.io/main/build/sg2d.js)
-* [sg2d.min.js (80KB)](https://raw.githubusercontent.com/VediX/sg2d.github.io/main/build/sg2d.min.js)
+* [sg2d.js (187KB)](https://raw.githubusercontent.com/VediX/sg2d.github.io/main/build/sg2d.js)
+* [sg2d.min.js (94KB)](https://raw.githubusercontent.com/VediX/sg2d.github.io/main/build/sg2d.min.js)
 
 ## Plugins
 
@@ -26,7 +26,7 @@ Library connection (for example index.html):
 Plugin registration in SG2D application:
 
 ```js
-let myApp =  new SG2D.Application({
+let sg2dApp =  new SG2D.Application({
 	...
 	plugins: ["sg2d-transitions", ...]
 });
@@ -36,6 +36,12 @@ To use the functionality of plugin, you can connect it in your scripts using ES6
 
 ```js
 import SG2DTransitions from "./sg2d/plugins/sg2d-transitions.js";
+...
+// Smooth transitions between different land types (use plugin)
+SG2DTransitions.ready(()=>{
+	SG2DTransitions.run(sg2dApp.clusters);
+});
+...
 ```
 
 ## Examples

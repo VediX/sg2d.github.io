@@ -1,0 +1,65 @@
+.screen-loader {
+  color: white;
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  text-align: center;
+}
+.screen-loader .message {
+  display: inline-block;
+  vertical-align: middle;
+}
+.screen-loader .button-start {
+  display: inline-block;
+  vertical-align: middle;
+}
+.screen-loader .button-start img.button-play {
+  cursor: pointer;
+  opacity: 0.7;
+}
+.screen-loader .button-start img.button-play:hover {
+  opacity: 1;
+  transition-duration: 0.5s;
+}
+.screen-loader .button-start img.button-play[data-state="loading"] {
+  opacity: 1;
+  filter: grayscale(100%);
+  cursor: default;
+  transition-duration: 0.5s;
+}
+.screen-loader .button-start img.button-play[data-state="join"] {
+  opacity: 1;
+  filter: grayscale(100%);
+  cursor: default;
+}
+.screen-loader:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+}
+.screen-game {
+  background: #333;
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+}
+.screen-game #info {
+  position: fixed;
+  left: 0px;
+  bottom: 0px;
+  color: white;
+}
+.screen-game #title {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  text-align: center;
+  padding: 5px;
+  z-index: 10;
+}

@@ -1,8 +1,8 @@
 /**
- * SG2DPluginBase 1.0.0
+ * SG2DPluginBase
  * Base class for the plugin
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 "use strict";

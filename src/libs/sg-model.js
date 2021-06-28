@@ -21,14 +21,13 @@ export default class SGModel {
 	 * @param {object} thisProps Properties and methods passed to the "this" context of the created instance
 	 * @param {object} options Custom settings
 	 */
-	constructor(props, thisProps, options = void 0) {
+	constructor(properties = {}, thisProps = void 0, options = void 0) {
 		
 		if (this.constructor.singleInstance) {
 			if (this.constructor._instance) throw "Error! this.constructor._instance not is empty!";
 			this.constructor._instance = this;
 		}
 		
-		let properties = props || {};
 		let defaults = this.defaults();
 		
 		// override defaults by localStorage data
@@ -38,6 +37,8 @@ export default class SGModel {
 			if (data) lsData = JSON.parse(data);
 			if (lsData) SGModel.initObjectByObject(defaults, lsData);
 		}
+		
+		if (typeof properties !== "object") properties = {};
 		
 		for (var p in properties) {
 			var value = properties[p];
@@ -121,7 +122,7 @@ export default class SGModel {
 		
 		this.changed = false; // reset manually!
 		
-		this.initialize.call(this, props, thisProps, options);
+		this.initialize.call(this, properties, thisProps, options);
 	}
 	
 	// Called when an instance is created. Override in your classes.
@@ -131,10 +132,10 @@ export default class SGModel {
 	* Set property value
 	* @param {string} name
 	* @param {mixed} val
-	* @param {object} [options]
-	* @param {number} flags	- Valid flags: FLAG_OFF_MAY_BE | FLAG_PREV_VALUE_CLONE | FLAG_NO_CALLBACKS | FLAG_FORCE_CALLBACKS | FLAG_IGNORE_OWN_SETTER
+	* @param {object}	[options=void 0]
 	* @param {number}		[options.precision] - Rounding precision
 	* @param {mixed}		[options.previous_value] - Use this value as the previous value
+	* @param {number} flags	- Valid flags: FLAG_OFF_MAY_BE | FLAG_PREV_VALUE_CLONE | FLAG_NO_CALLBACKS | FLAG_FORCE_CALLBACKS | FLAG_IGNORE_OWN_SETTER
 	* @return {boolean} If the value was changed will return true
 	*/
 	set(name, value, options = void 0, flags = 0) {
@@ -489,12 +490,6 @@ export default class SGModel {
 	}
 }
 
-if (typeof exports === 'object' && typeof module === 'object') module.exports = SGModel;
-else if (typeof define === 'function' && define.amd) define("SG2D", [], ()=>SGModel);
-else if (typeof exports === 'object') exports["SGModel"] = SGModel;
-else if (typeof window === 'object' && window.document) window["SGModel"] = SGModel;
-else this["SGModel"] = SGModel;
-
 // Property data types
 SGModel.typeProperties = {};
 	
@@ -701,3 +696,9 @@ SGModel._prevValue = void 0;
 
 /** @private */
 SGModel._xy = {x: 0, y: 0};
+
+if (typeof exports === 'object' && typeof module === 'object') module.exports = SGModel;
+else if (typeof define === 'function' && define.amd) define("SG2D", [], ()=>SGModel);
+else if (typeof exports === 'object') exports["SGModel"] = SGModel;
+else if (typeof window === 'object' && window.document) window["SGModel"] = SGModel;
+else this["SGModel"] = SGModel;

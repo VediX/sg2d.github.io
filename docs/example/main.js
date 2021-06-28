@@ -19,27 +19,45 @@ class Application {
 		
 		window.app = this;
 		
-		Promise.all([
-			GraphicsPreparer.load(),
-			Menu.load()
-		]).then(this.createScene.bind(this));
+		let btnPlay = document.querySelector("#btnPlay");
+		btnPlay.dataset.state = "ready";
+		
+		btnPlay.addEventListener("click", ()=>{
+			
+			btnPlay.dataset.state = "loading";
+			
+			Promise.all([
+				GraphicsPreparer.load(),
+				SG2D.Sound.load({
+					music_dir: "./res/music/",
+					sounds_dir: "./res/sounds/",
+					config: "./res/sound.json"
+				}, {
+					sounds: true,
+					music: true,
+					musicVolume: 10,
+					volumeDecreaseDistance: 10, // units changes in clusters
+					environment2D: true,
+					view: "scene" // You can start the melodies in this way or in another way, see below
+				}),
+				Menu.load()
+			]).then(()=>{
+				document.querySelector("#loader_screen").style.display = "none";
+				document.querySelector("#game_screen").style.display = "block";
+				this.createScene();
+				//SG2D.Sound.musicPlay("scene"); // The second way to play the melody in a circle for the specified view
+			});
+		});
 	}
 	
 	createScene() {
 		
-		//SG2D.Consts.DRAW_BODY_LINES = 1;
-		
-		//PIXI.settings.ROUND_PIXELS = true; // If true, PixiJS will use Math.floor () x / y values when rendering, stopping pixel interpolation
-		//PIXI.settings.ANISOTROPIC_LEVEL = 16; // Default anisotropic filtering level for textures. Typically 0 to 16
-		//PIXI.settings.CAN_UPLOAD_SAME_BUFFER = true; // Can we load the same buffer in one frame?
-		//PIXI.settings.FILTER_RESOLUTION = 1;
-		//PIXI.settings.MIPMAP_TEXTURES = PIXI.MIPMAP_MODES.POW2; // If set to true, WebGL will try to make textures anti-aliased by default (PIXI.MIPMAP_MODES.POW2 | PIXI.MIPMAP_MODES.ON | PIXI.MIPMAP_MODES.OFF)
-		//PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.LINEAR; // LINEAR (smooth) | NEAREST (pixel)
-		//PIXI.settings.WRAP_MODE = PIXI.WRAP_MODES.CLAMP; // CLAMP | REPEAT | MIRRORED_REPEAT
-		//PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.MEDIUM;
 		this.scene =  new SG2D.Application({
 			canvasId: "canvas",
 			cellsizepix: 64,
+			clusters: {
+				areasize: 64
+			},
 			pixi: { // config passed to PIXI.Application constructor
 				antialias: true,
 				autoStart: false
@@ -57,9 +75,6 @@ class Application {
 				movement_by_pointer: SG2D.Camera.MOVEMENT_BY_POINTER_RIGHT,
 				rotate_adjustment: -90 // Base offset of the camera angle in degrees. Default 0
 			},
-			clusters: {
-				areasize: 64
-			},
 			pointer: {
 				cursors: {
 					default: GraphicsPreparer.cursors.default,
@@ -69,7 +84,6 @@ class Application {
 			},
 			iterate: this.iterate.bind(this),
 			resize: this.resize.bind(this),
-			layers_enabled: true,
 			layers: {
 				bottom: {},
 				fluids: {},
@@ -78,44 +92,49 @@ class Application {
 				bodies: {},
 				trees: {},
 				animations: {},
-				interface: { position: SG2D.Application.LAYER_POSITION_FIXED, zindex: 10 }
+				interface: { position: SG2D.LAYER_POSITION_FIXED, zIndex: 10 }
 			},
-			plugins: ["sg2d-transitions"]
+			plugins: ["sg2d-transitions"],
+			sound: true // or for example: { sounds_dir: "./res/sounds/level1/", config: "./res/sounds_for_level1.json" }
 		});
 		
 		let camera = this.scene.camera;
 
 		// Print information to the console about the current scaling
-		/*camera.on("scale", (scale)=>{
-			console.log("New camera scale: " + camera.getScale().percent + "%");
-		}, void 0, void 0, true);*/
+		camera.on("scale", (scale)=>{
+			SG2D.MessageToast.show({ text: "Scale: " + camera.getScale().percent + "%" });
+		}, void 0, void 0, true);
 
 		// Generate the map
-		Area.build(this.scene.clusters);
+		this.area = Area.build(this.scene.clusters);
 
 		// Graphic effects
 		this.sceneEffect = SceneEffects.toApply(this.scene);
 		
-		this.player = new Player({ position: this.scene.clusters.getCluster(5,5).position, angle: 45 }, { pointer: this.scene.pointer, camera: camera });
-		
-		/**
-		* The camera can move smoothly behind the player.
-		* The camera can be moved anywhere on the map, after which it will also move in parallel with the player.
-		* The camera is rotated either relative to the center of the screen, or relative to the player (TODO).
-		* The camera is zoomed relative to the cursor position (TODO).
-		*/
-		camera.followTo(this.player);
+		this.player = new Player({
+			position: this.scene.clusters.getCluster(5,5).position,
+			angle: 45
+		}, {
+			pointer: this.scene.pointer,
+			camera: camera
+		});
 		
 		this.sceneUI = SceneUI.toApply(this.scene, this.player);
 		
 		this.scene.run();
+		
+		camera.followTo(this.player);
+		/* TODO:
+		camera.setRelativity({
+			follow: this.player, // The camera can move smoothly behind player. Also, camera can be moved to any on map, after which it will also move in parallel with player
+			scaling: this.player, //TODO: The camera is zoomed relative to cursor position, or relative to tile
+			rotation: this.player //TODO: The camera is rotated either relative to center of the screen, or relative to player
+		});*/
+		
+		return this.scene;
 	}
 	
 	iterate() {
-		for (var tile of this.scene.clusters.tilesset) {
-			tile.iterate && tile.iterate();
-		}
-		
 		if (this.scene.frame_index % 30 === 0) {
 			document.querySelector("#info > span:nth-child(1)").innerText = (1 / this.scene.tRequestAnimationFrame).toFixed(0); // FPS
 			document.querySelector("#info > span:nth-child(2)").innerText =SG2D.Application.spritesCount; // Sprites count

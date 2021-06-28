@@ -1,5 +1,5 @@
 /*!
- * SG2D 1.0.0 by @ilyak
+ * SG2D 1.0.0 by @ Kalashnikov Ilya
  * https://sg2d.ru
  * License MIT
  * 
@@ -151,14 +151,13 @@ class SGModel {
 	 * @param {object} thisProps Properties and methods passed to the "this" context of the created instance
 	 * @param {object} options Custom settings
 	 */
-	constructor(props, thisProps, options = void 0) {
+	constructor(properties = {}, thisProps = void 0, options = void 0) {
 		
 		if (this.constructor.singleInstance) {
 			if (this.constructor._instance) throw "Error! this.constructor._instance not is empty!";
 			this.constructor._instance = this;
 		}
 		
-		let properties = props || {};
 		let defaults = this.defaults();
 		
 		// override defaults by localStorage data
@@ -168,6 +167,8 @@ class SGModel {
 			if (data) lsData = JSON.parse(data);
 			if (lsData) SGModel.initObjectByObject(defaults, lsData);
 		}
+		
+		if (typeof properties !== "object") properties = {};
 		
 		for (var p in properties) {
 			var value = properties[p];
@@ -251,7 +252,7 @@ class SGModel {
 		
 		this.changed = false; // reset manually!
 		
-		this.initialize.call(this, props, thisProps, options);
+		this.initialize.call(this, properties, thisProps, options);
 	}
 	
 	// Called when an instance is created. Override in your classes.
@@ -261,10 +262,10 @@ class SGModel {
 	* Set property value
 	* @param {string} name
 	* @param {mixed} val
-	* @param {object} [options]
-	* @param {number} flags	- Valid flags: FLAG_OFF_MAY_BE | FLAG_PREV_VALUE_CLONE | FLAG_NO_CALLBACKS | FLAG_FORCE_CALLBACKS | FLAG_IGNORE_OWN_SETTER
+	* @param {object}	[options=void 0]
 	* @param {number}		[options.precision] - Rounding precision
 	* @param {mixed}		[options.previous_value] - Use this value as the previous value
+	* @param {number} flags	- Valid flags: FLAG_OFF_MAY_BE | FLAG_PREV_VALUE_CLONE | FLAG_NO_CALLBACKS | FLAG_FORCE_CALLBACKS | FLAG_IGNORE_OWN_SETTER
 	* @return {boolean} If the value was changed will return true
 	*/
 	set(name, value, options = void 0, flags = 0) {
@@ -619,12 +620,6 @@ class SGModel {
 	}
 }
 
-if (typeof exports === 'object' && typeof module === 'object') module.exports = SGModel;
-else if (typeof define === 'function' && __webpack_require__(2)) define("SG2D", [], ()=>SGModel);
-else if (typeof exports === 'object') exports["SGModel"] = SGModel;
-else if (typeof window === 'object' && window.document) window["SGModel"] = SGModel;
-else undefined["SGModel"] = SGModel;
-
 // Property data types
 SGModel.typeProperties = {};
 	
@@ -831,6 +826,12 @@ SGModel._prevValue = void 0;
 
 /** @private */
 SGModel._xy = {x: 0, y: 0};
+
+if (typeof exports === 'object' && typeof module === 'object') module.exports = SGModel;
+else if (typeof define === 'function' && __webpack_require__(2)) define("SG2D", [], ()=>SGModel);
+else if (typeof exports === 'object') exports["SGModel"] = SGModel;
+else if (typeof window === 'object' && window.document) window["SGModel"] = SGModel;
+else undefined["SGModel"] = SGModel;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)(module)))
 
 /***/ }),
@@ -883,6 +884,57 @@ __webpack_require__.r(__webpack_exports__);
 // EXTERNAL MODULE: ./src/libs/sg-model.js
 var sg_model = __webpack_require__(0);
 
+// CONCATENATED MODULE: ./src/sg2d-deferred.js
+/**
+ * SG2DDeferred
+ * https://github.com/VediX/sg2d.github.io
+ * (c) Kalashnikov Ilya
+ */
+
+
+
+function SG2DDeferred() {
+	let thens = [];
+	let catches = [];
+
+	let status;
+	let resolvedValue;
+	let rejectedError;
+
+	return {
+		isCompleted: ()=>{
+			return status === 'resolved';
+		},
+		resolve: value => {
+			status = 'resolved';
+			resolvedValue = value;
+			thens.forEach(t => t(value));
+			thens.length = 0; // Avoid memleaks.
+		},
+		reject: error => {
+			status = 'rejected';
+			rejectedError = error;
+			catches.forEach(c => c(error));
+			catches.length = 0; // Avoid memleaks.
+		},
+		then: cb => {
+			if (status === 'resolved') {
+				cb(resolvedValue);
+			} else {
+				thens.unshift(cb);
+			}
+		},
+		catch: cb => {
+			if (status === 'rejected') {
+				cb(rejectedError);
+			} else {
+				catches.unshift(cb);
+			}
+		}
+	}
+}
+
+/* harmony default export */ var sg2d_deferred = (SG2DDeferred);
 // CONCATENATED MODULE: ./src/sg2d-consts.js
 /**
  * SG2DConsts
@@ -900,9 +952,9 @@ let SG2DConsts = {
 	AREASQUARE: 128*128,
 	DRAW_BODY_LINES: false, // draw body borders (SG2DBody-> body.verticles)
 	ONLY_LOGIC: false, // If true - the graphic part is disabled, i.e. the engine can only be used for calculations, for example, in the server side
-	DEBUGGING: {
-		CAMERA: {
-			WIDTH_HEIGHT_K: 1.01,
+	CAMERA: {
+		WIDTH_HEIGHT_K: 1.01,
+		DEBUGGING: {
 			SHOW: {
 				GRID: false,
 				BOUNDS_PXY: false,
@@ -927,9 +979,8 @@ let SG2DConsts = {
 /**
  * SG2DMath
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
-
 
 
 
@@ -943,6 +994,13 @@ let SG2DMath = {};
 	SG2DMath.uid = function() {
 		return (++_uid);
 	};
+	
+	// Functions for working with bitmasks
+	SG2DMath.addFlag = (value, flag)=>(value | flag);
+	SG2DMath.removeFlag = (value, flag)=>(value & ~flag);
+	SG2DMath.setFlag = (value, flag, state = true)=>(state ? SG2DMath.addFlag(value, flag) : SG2DMath.removeFlag(value, flag));
+	SG2DMath.hasFlag = (value, flag)=>(value & flag);
+	SG2DMath.noFlag = (value, flag)=>(! (value & flag));
 	
 	let _ap = [];
 	for (var dec = 0; dec <= 10; dec++) _ap[dec] = 10 ** dec;
@@ -977,8 +1035,7 @@ let SG2DMath = {};
 	SG2DMath.normalize_a = function(a, precision = 0) {
 		while (a >= 360) a = a - 360;
 		while (a < 0) a = a + 360;
-		if (precision) a = this.roundTo(a, precision);
-		return a;
+		return this.roundTo(a, precision);
 	};
 
 	let _aSin = [];
@@ -1147,7 +1204,7 @@ let SG2DMath = {};
 /**
  * SG2D Utilities
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 
@@ -1173,6 +1230,19 @@ var SG2DUtils = {
 			sResult = (d.getTime()/1000).toFixed(3);
 		}
 		return +sResult;
+	},
+	
+	loadJS: function(src, onload = void 0) {
+		return new Promise((resolve, reject)=>{
+			var script = document.createElement('script');
+			script.onload = (event)=>{
+				onload && onload(event);
+				resolve();
+			};
+			script.onerror = reject;
+			script.src = src;
+			document.head.append(script);
+		});
 	},
 
 	getTextureAsCanvas: function(mTexture) {
@@ -1629,7 +1699,7 @@ var SG2DUtils = {
 		graphics.drawCircle(x || 0, y || 0, r || 3);
 		graphics.endFill();
 		graphics.zIndex = 99999;
-		SG2DApplication.drawSprite(graphics);
+		SG2D.Application.drawSprite(graphics);
 	},
 
 	/** @public */
@@ -1685,6 +1755,13 @@ var SG2DUtils = {
 			if (f.call(c, o[name])===false) break;
 		}
 	},
+	
+	/** @public */
+	propertiesCount: function(o) {
+		let q = 0;
+		for (var p in o) q++;
+		return q;
+	},
 
 	/** @public */
 	ifUndefined: function(value, valueIfUndefined) {
@@ -1697,7 +1774,7 @@ var SG2DUtils = {
 /**
  * SG2DBounds
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 
@@ -1756,7 +1833,7 @@ class SG2DBounds {
 /**
  * SG2DCluster
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 
@@ -1843,7 +1920,7 @@ sg2d_cluster_SG2DCluster._tiles = [];
 /**
  * SG2DClusters
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 
@@ -1854,10 +1931,6 @@ sg2d_cluster_SG2DCluster._tiles = [];
 
 class sg2d_clusters_SG2DClusters {
 	
-	/**
-	 * Config parameters and default values:
-	 *	areasize=128 Size of area. The default is 128
-	 */
 	constructor(config, clusterClass = sg2d_cluster_SG2DCluster) {
 	
 		if (sg2d_clusters_SG2DClusters._instance) { debugger; throw "SG2DClusters Error! There is an instance of the class! You must execute .destroy() on the previous instance!"; }
@@ -2009,7 +2082,7 @@ sg2d_clusters_SG2DClusters.nearestClusters45 = function(cluster, checker) { retu
 /**
  * SG2DDebugging
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 
@@ -2026,7 +2099,7 @@ var SG2DDebugging = {
 		let camera = sg2d.camera;
 		
 		// Grid
-		if (sg2d_consts.DEBUGGING.CAMERA.SHOW.GRID) {
+		if (sg2d_consts.CAMERA.DEBUGGING.SHOW.GRID) {
 			if (! this._temp116) {
 				this._temp116 = [];
 				for (var x = 0; x <= clusters.width; x++) {
@@ -2054,7 +2127,7 @@ var SG2DDebugging = {
 		}
 		
 		// bounds cluster line
-		if (sg2d_consts.DEBUGGING.CAMERA.SHOW.BOUNDS_PXY) {
+		if (sg2d_consts.CAMERA.DEBUGGING.SHOW.BOUNDS_PXY) {
 			if (this._temp110) sg2d.viewport.removeChild(this._temp110);
 			var graphics = this._temp110 = new PIXI.Graphics();
 			var bpx = camera.boundsPXTops;
@@ -2078,7 +2151,7 @@ var SG2DDebugging = {
 		}
 		
 		// bounds cluster top points
-		if (sg2d_consts.DEBUGGING.CAMERA.SHOW.BOUNDS_TOP_CLUSTERS) {
+		if (sg2d_consts.CAMERA.DEBUGGING.SHOW.BOUNDS_TOP_CLUSTERS) {
 			if (! this._temp111) this._temp111 = {};
 			var i = 0; var colors = [0xFF0000, 0x00FF00, 0x0000FF, 0xAA00AA];
 			for (var p in camera.boundsClusterTops) {
@@ -2107,7 +2180,7 @@ var SG2DDebugging = {
 		}
 		
 		// bounds cluster line points
-		if (sg2d_consts.DEBUGGING.CAMERA.SHOW.CLUSTER_LINE_BOUNDS) {
+		if (sg2d_consts.CAMERA.DEBUGGING.SHOW.CLUSTER_LINE_BOUNDS) {
 			if (! this._temp112) this._temp112 = [];
 			for (var i = 0; i < this._temp112.length; i++) sg2d.viewport.removeChild(this._temp112[i]);
 			this._temp112.length = 0;
@@ -2136,7 +2209,7 @@ var SG2DDebugging = {
 
 		// Static coordinate labels along the axes
 		// TODO: сделать динамический перерасчет position существующих Text-объектов, что бы координаты всегда были на виду по краям камеры?
-		if (sg2d_consts.DEBUGGING.CAMERA.SHOW.AXIS_LABELS) {
+		if (sg2d_consts.CAMERA.DEBUGGING.SHOW.AXIS_LABELS) {
 			if (! this._temp115) {
 				this._temp115 = [];
 				for (var x = 1; x <= clusters.width; x++) {
@@ -2182,7 +2255,7 @@ var SG2DDebugging = {
 		let sg2d = sg2d_application_SG2DApplication.getInstance();
 		let camera = sg2d.camera;
 		
-		if (sg2d_consts.DEBUGGING.CAMERA.SHOW.CLUSTERS_IN_OUT) {
+		if (sg2d_consts.CAMERA.DEBUGGING.SHOW.CLUSTERS_IN_OUT) {
 			if (! this._temp113) this._temp113 = [];
 			for (var i = 0; i < this._temp113.length; i++) sg2d.viewport.removeChild(this._temp113[i]);
 			this._temp113.length = 0;
@@ -2287,12 +2360,1067 @@ var SG2DDebugging = {
 };
 
 /* harmony default export */ var sg2d_debugging = (SG2DDebugging);
+// CONCATENATED MODULE: ./src/sg2d-camera.js
+/**
+ * SG2DCamera
+ * https://github.com/VediX/sg2d.github.io
+ * (c) Kalashnikov Ilya
+ */
+
+
+
+
+
+
+
+
+class sg2d_camera_SG2DCamera extends sg_model["a" /* default */] {
+		
+	defaults() {
+		return {
+			scale: sg2d_camera_SG2DCamera.SCALE_NORMAL, // Scaling, for example: 16 -> 128px (200%), ..., 9 -> 72px (112%),  8 -> 64px (100%), 7 -> 56px, 6 -> 48px, 5 -> 40px, 4 -> 32px, 3 -> 24px, 2 -> 16px, 1-> 8px (12.5%)
+			rotation: false,
+			rotate: 0, // grad
+			position: {x: 0, y: 0}, // current camera position
+			target: {x: 0, y: 0}, // camera movement target
+			offset: {x: 0, y: 0},
+			wh: {w: 0, h: 0},
+			wh05: {w: 0, h: 0},
+			boundsPX: { left: 0, top: 0, right: 0, bottom: 0 },
+			boundsCluster: { left: 0, top: 0, right: 0, bottom: 0 },
+			frameCVC: 0, // frameChangeVisibleClusters - Changing this property means that some new clusters have appeared in the camera view, or some have disappeared
+			scale_wheel: true, // scale with scrolling
+			scale_min: sg2d_camera_SG2DCamera.SCALE_MIN,
+			scale_max: sg2d_camera_SG2DCamera.SCALE_MAX,
+			pointer_over_canvas: true,
+			movement_by_pointer: 0,
+			movement_state: 0
+		};
+	}
+	
+	/**
+	 * Config parameters and default values:
+	 * @param {object} properties
+	 * @param {boolean}	[properties.scale_wheel=true] Allow camera zoom
+	 * @param {number}		[scale=8] Start scale
+	 * @param {boolean}	[rotation=true] Allow camera rotation
+	 * @param {number}		[rotate=0] Start camera rotation
+	 * @param {object}		[start_position={ x: 0, y: 0}] Start position
+	 * @param {number}		[rotate_adjustment=0] Basic offset of the camera angle in degrees
+	 * @param {boolean}	[movement_by_pointer=0] Allow free movement of the camera with the right mouse button
+	 */
+	initialize(properties) {
+		
+		let config = properties || {};
+		config.scale_wheel = typeof config.scale_wheel !== "undefined" ? config.scale_wheel : true;
+		config.scale = +config.scale || sg2d_camera_SG2DCamera.SCALE_NORMAL;
+		config.rotation = !!config.rotation || false;
+		config.rotate = +config.rotate || 0;
+		config.position = config.position || null;
+		config.rotate_adjustment = +config.rotate_adjustment || sg2d_camera_SG2DCamera.ROTATE_ADJUSTMENT;
+		config.movement_by_pointer = +config.movement_by_pointer;
+		
+		this.rotate_adjustment = config.rotate_adjustment;
+		this.browser_scale_start = window.devicePixelRatio ? window.devicePixelRatio : window.outerWidth/window.innerWidth;
+		this.set("scale_min", +config.scale_min || sg2d_camera_SG2DCamera.SCALE_MIN);
+		this.set("scale_max", +config.scale_max || sg2d_camera_SG2DCamera.SCALE_MAX);
+		
+		this.scales_k = [];
+		this.scales_per = [];
+		var k = 1, p = 100, k_step = 1.00;
+		for (var i = sg2d_camera_SG2DCamera.SCALE_NORMAL; i <= this.properties.scale_max; i++) {
+			this.scales_k[i] = k;
+			this.scales_per[i] = ~~p;
+			k += 0.125 * k_step;
+			p += 12.5 * k_step;
+		}
+		var k = 1, p = 100;
+		for (var i = sg2d_camera_SG2DCamera.SCALE_NORMAL; i >= this.properties.scale_min; i--) {
+			this.scales_k[i] = k;
+			this.scales_per[i] = ~~p;
+			k -= 0.125 * k_step;
+			p -= 12.5 * k_step;
+		}
+		
+		this.positionPrev = {
+			x: this.properties.position.x,
+			y: this.properties.position.y
+		};
+		this.frame_lighting = 1;
+		this.boundsClusterPrev = null;
+		this.clustersInCamera = new Set();
+		
+		// Visible part of the area in PX units
+		this.boundsPXTops = { // The vertices of the rectangle are calculated with camera rotation and scaling
+			leftTop: {x:0,y:0},
+			rightTop: {x:0,y:0},
+			rightBottom: {x:0,y:0},
+			leftBottom: {x:0,y:0}
+		};
+		// Visible part of the area in Cells units
+		this.boundsClusterTops = { // The vertices of the rectangle are calculated with camera rotation and scaling
+			leftTop: {x:0,y:0},
+			rightTop: {x:0,y:0},
+			rightBottom: {x:0,y:0},
+			leftBottom: {x:0,y:0}
+		};
+		
+		this.clustersOut = []; // Clusters that disappeared from the camera view
+		this.clustersIn = []; // Clusters that appeared in the camera view
+		
+		this._addLinePoint = this._addLinePoint.bind(this);
+		
+		this.onPointerEnter = this.onPointerEnter.bind(this);
+		this.onPointerLeave = this.onPointerLeave.bind(this);
+		
+		this.onWheelScale = this.onWheelScale.bind(this);
+		if (this.properties.scale_wheel) {
+			this._onwheel(this.onWheelScale);
+		}
+		
+		// Boundaries of the visible part in Cells units (all points of 4 solid lines formed by boundsCluster vertices)
+		this.boundsPoint = [];
+		this.on("wh", (wh)=>{
+			var q = ~~((wh.w + wh.h) / sg2d_consts.CELLSIZEPIX * 4);
+			for (var i = 0; i < q; i++) this.boundsPoint[i] = {x: 0, y: 0}; // so as not to spawn objects every time!
+		});
+		
+		this.set("scale_wheel", config.scale_wheel);
+		this.set("scale", config.scale);
+		this.set("rotation", config.rotation);
+		
+		this.on("frameCVC", sg2d_debugging.drawDebug2);
+		
+		this.set("movement_by_pointer", config.movement_by_pointer);
+		
+		this._followToTile = null;
+	}
+	
+	/** @private */
+	_sg2dconnect(sg2d) {
+		this.sg2d = sg2d;
+		this.onResize();
+		this.sg2d.pixi.view.addEventListener("pointerenter", this.onPointerEnter);
+		this.sg2d.pixi.view.addEventListener("pointerleave", this.onPointerLeave);
+		this.set("rotate", this.properties.rotate);
+		this.sg2d.viewport.angle = -this.properties.rotate + this.rotate_adjustment;
+		this.startPosition(this.properties.position || null);
+		this._calc();
+	}
+	
+	/** Own setter for rotate property*/
+	setRotate(newRotate, options, flags = 0) {
+		if (! this.properties.rotation && ! (flags & sg_model["a" /* default */].FLAG_FORCE_CALLBACKS)) return; //?
+		newRotate = sg2d_math.normalize_a(newRotate, 1);
+		let prevRotate = this.properties.rotate;
+		if (this.set("rotate", newRotate, options, flags | sg_model["a" /* default */].FLAG_IGNORE_OWN_SETTER)) {
+			this.sg2d.viewport.angle = -this.properties.rotate + this.rotate_adjustment;
+			let da = sg2d_math.normalize_a(newRotate - prevRotate);
+			let dx = this.properties.offset.x;
+			let dy = this.properties.offset.y;
+			sg2d_camera_SG2DCamera._point.x = dx * sg2d_math.cos(da, 1) - dy * sg2d_math.sin(da, 1);
+			sg2d_camera_SG2DCamera._point.y = dy * sg2d_math.cos(da, 1) + dx * sg2d_math.sin(da, 1);
+			this.set("offset", sg2d_camera_SG2DCamera._point);
+			this._calc();
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Set the starting position of the camera
+	 */
+	startPosition(position) {
+		this.moveTo(position, true);
+	}
+	
+	/** Own setter for position property*/
+	setPosition(value, options = sg_model["a" /* default */].OBJECT_EMPTY, flags = 0) {
+		value = value || this.positionPrev;
+		options = ! options ||  options === sg_model["a" /* default */].OBJECT_EMPTY ? sg_model["a" /* default */].OPTIONS_PRECISION_5 : options;
+		options.precision = options.precision || 5;
+		
+		if (! this.set("position", value, options, flags | sg_model["a" /* default */].FLAG_IGNORE_OWN_SETTER)) return false;
+		
+		this._calc();
+		
+		return true;
+	}
+	
+	/** @private */
+	_calc() {
+		
+		this.sg2d.viewport.x = (this.sg2d.pixi.screen.width  || 100) / 2;
+		this.sg2d.viewport.y = (this.sg2d.pixi.screen.height || 100) / 2;
+		this.sg2d.viewport.pivot.x = this.properties.position.x;
+		this.sg2d.viewport.pivot.y = this.properties.position.y;
+		
+		var x = this.properties.position.x
+		var y = this.properties.position.y
+		var acos = sg2d_math.cos(this.properties.rotate, 1), asin = sg2d_math.sin(this.properties.rotate, 1);
+		var w05 = this.properties.wh05.w * sg2d_consts.CAMERA.WIDTH_HEIGHT_K;
+		var h05 = this.properties.wh05.h * sg2d_consts.CAMERA.WIDTH_HEIGHT_K;
+		var bpx = this.boundsPXTops;
+		var bc = this.boundsClusterTops;
+		
+		// boundsPXTops calc
+		bpx.leftTop.x = Math.round(x - w05 * acos + h05 * asin);
+		bpx.leftTop.y = Math.round(y - w05 * asin - h05 * acos);
+		bpx.rightTop.x = Math.round(x + w05 * acos + h05 * asin);
+		bpx.rightTop.y = Math.round(y + w05 * asin - h05 * acos);
+		bpx.rightBottom.x = Math.round(x + w05 * acos - h05 * asin);
+		bpx.rightBottom.y = Math.round(y + w05 * asin + h05 * acos);
+		bpx.leftBottom.x = Math.round(x - w05 * acos - h05 * asin);
+		bpx.leftBottom.y = Math.round(y - w05 * asin + h05 * acos);
+		
+		// boundsPX calc
+		var boundsPX = sg2d_camera_SG2DCamera._boundsPX;
+		boundsPX.left = boundsPX.top = boundsPX.right = boundsPX.bottom = void 0;
+		for (var p in bpx) {
+			var o = bpx[p];
+			if (boundsPX.left === void 0) boundsPX.left = o.x; else if (boundsPX.left > o.x) boundsPX.left = o.x;
+			if (boundsPX.top === void 0) boundsPX.top = o.y; else if (boundsPX.top > o.y) boundsPX.top = o.y;
+			if (boundsPX.right === void 0) boundsPX.right = o.x; else if (boundsPX.right < o.x) boundsPX.right = o.x;
+			if (boundsPX.bottom === void 0) boundsPX.bottom = o.y; else if (boundsPX.bottom < o.y) boundsPX.bottom = o.y;
+		}
+		var bChangeBoundsPX = false;
+		for (var p in this.properties.boundsPX) {
+			if (boundsPX[p] !== this.properties.boundsPX[p]) bChangeBoundsPX = true;
+			this.properties.boundsPX[p] = boundsPX[p];
+		}
+		
+		// boundsCluster calc
+		var boundsCluster = sg2d_camera_SG2DCamera._boundsCluster;
+		boundsCluster.left = Math.floor( 1 + boundsPX.left / sg2d_consts.CELLSIZEPIX );
+		boundsCluster.top = Math.floor( 1 + boundsPX.top / sg2d_consts.CELLSIZEPIX );
+		boundsCluster.right = Math.floor( 1 + boundsPX.right / sg2d_consts.CELLSIZEPIX );
+		boundsCluster.bottom = Math.floor( 1 + boundsPX.bottom / sg2d_consts.CELLSIZEPIX );
+		var bChangeBoundsCluster = false;
+		for (var p in boundsCluster) {
+			if (boundsCluster[p] !== this.properties.boundsCluster[p]) bChangeBoundsCluster = true;
+			this.properties.boundsCluster[p] = boundsCluster[p];
+		}
+		
+		if (! this.boundsClusterPrev) {
+			this.boundsClusterPrev = {
+				left: this.properties.boundsCluster.left,
+				top: this.properties.boundsCluster.top,
+				right: this.properties.boundsCluster.right,
+				bottom: this.properties.boundsCluster.bottom
+			}
+		}
+		
+		// boundsClusterTops calc - step 1
+		bc.leftTop.x = 0.5 + bpx.leftTop.x / sg2d_consts.CELLSIZEPIX;
+		bc.leftTop.y = 0.5 + bpx.leftTop.y / sg2d_consts.CELLSIZEPIX;
+		bc.rightTop.x = 0.5 + bpx.rightTop.x / sg2d_consts.CELLSIZEPIX;
+		bc.rightTop.y = 0.5 + bpx.rightTop.y / sg2d_consts.CELLSIZEPIX;
+		bc.rightBottom.x = 0.5 + bpx.rightBottom.x / sg2d_consts.CELLSIZEPIX;
+		bc.rightBottom.y = 0.5 + bpx.rightBottom.y / sg2d_consts.CELLSIZEPIX;
+		bc.leftBottom.x = 0.5 + bpx.leftBottom.x / sg2d_consts.CELLSIZEPIX;
+		bc.leftBottom.y = 0.5 + bpx.leftBottom.y / sg2d_consts.CELLSIZEPIX;
+		
+		// Calc line points
+		this.boundsPoint._length = -1;
+		sg2d_math.getLinePoints(bc.leftTop, bc.rightTop, this._addLinePoint);
+		sg2d_math.getLinePoints(bc.rightTop, bc.rightBottom, this._addLinePoint);
+		sg2d_math.getLinePoints(bc.rightBottom, bc.leftBottom, this._addLinePoint);
+		sg2d_math.getLinePoints(bc.leftBottom, bc.leftTop, this._addLinePoint);
+		this.boundsPoint._length++;
+		
+		// calculate visible clusters
+		var cluster, x ,y, x1, x2, state;
+		var frame_lighting_prev = this.frame_lighting++;
+		var frame_lighting = this.frame_lighting;
+		this.clustersOut.length = 0;
+		this.clustersIn.length = 0;
+
+		for (var i = 0; i < this.boundsPoint._length; i++) {
+			var p = this.boundsPoint[i];
+			if (cluster = this.sg2d.clusters.getCluster(p.x, p.y)) {
+				if (cluster.lighting_frame === 0) {
+					this.clustersIn.push(cluster);
+					this.clustersInCamera.add(cluster);
+				}
+				cluster.lighting_frame = frame_lighting;
+			}
+		}
+		
+		var x_min = Math.min(this.boundsClusterPrev.left, this.properties.boundsCluster.left);
+		var y_min = Math.min(this.boundsClusterPrev.top, this.properties.boundsCluster.top);
+		var x_max = Math.max(this.boundsClusterPrev.right, this.properties.boundsCluster.right);
+		var y_max = Math.max(this.boundsClusterPrev.bottom, this.properties.boundsCluster.bottom);
+		
+		for (y = y_min; y <= y_max; y++) {
+			state = 0;
+			x1 = 0;
+			x2 = 0;
+			for (x = x_min; x <= x_max; x++) {
+				if (cluster = this.sg2d.clusters.getCluster(x, y)) {
+					switch (state) {
+						case 0: { // Finding the first cluster with frame_lighting
+							switch (cluster.lighting_frame) {
+								case 0: break;
+								case frame_lighting_prev: {
+									this.clustersOut.push(cluster);
+									this.clustersInCamera.delete(cluster);
+									cluster.lighting_frame = 0;
+									break;
+								}
+								case frame_lighting: {
+									state = 1;
+									x1 = x;
+									x2 = x1;
+									break;
+								}
+								default:
+									debugger; throw "Error!";
+							}
+							break;
+						}
+						case 1: { // Finding the last cluster with frame lighting
+							switch (cluster.lighting_frame) {
+								case 0: case frame_lighting_prev: {
+									break;
+								}
+								case frame_lighting: {
+									x2 = x;
+									break;
+								}
+								default: 
+									console.log("cluster.lighting_frame=" + cluster.lighting_frame);
+									debugger; throw "Error!";
+							}
+							break;
+						}
+					}
+				}
+			}
+			if (x1 && x2) {
+				for (var x = x1; x <= x2; x++) {
+					if (cluster = this.sg2d.clusters.getCluster(x, y)) {
+						if (cluster.lighting_frame === 0) {
+							this.clustersIn.push(cluster);
+							this.clustersInCamera.add(cluster);
+						}
+						cluster.lighting_frame = frame_lighting;
+					}
+				}
+				for (var x = x2 + 1; x <= x_max; x++) {
+					if (cluster = this.sg2d.clusters.getCluster(x, y)) {
+						if (cluster.lighting_frame === frame_lighting_prev) {
+							this.clustersOut.push(cluster);
+							this.clustersInCamera.delete(cluster);
+						} //else break; // if left, sometimes the error in state=1 => cluster.lighting_frame is older than it could be!
+						cluster.lighting_frame = 0;
+					}
+				}
+			}
+		}
+		if (this.clustersOut.length || this.clustersIn.length) {
+			this.set("frameCVC", this.properties.frameCVC+1);
+			for (var i = 0; i < this.clustersOut.length; i++) {
+				this.clustersOut[i].outCamera();
+			}
+			for (var i = 0; i < this.clustersIn.length; i++) {
+				this.clustersIn[i].inCamera();
+			}
+		}
+		
+		// boundsClusterTops calc - step 2
+		for (var p in bc) {
+			bc[p].x = Math.floor(0.5 + bc[p].x);
+			bc[p].y = Math.floor(0.5 + bc[p].y);
+		}
+		
+		sg2d_debugging.drawDebug();
+		
+		this.positionPrev.x = this.properties.position.x;
+		this.positionPrev.y = this.properties.position.y;
+		
+		this.boundsClusterPrev.left = this.properties.boundsCluster.left;
+		this.boundsClusterPrev.top = this.properties.boundsCluster.top;
+		this.boundsClusterPrev.right = this.properties.boundsCluster.right;
+		this.boundsClusterPrev.bottom = this.properties.boundsCluster.bottom;
+		
+		if (bChangeBoundsPX) this.trigger("boundsPX");
+		if (bChangeBoundsCluster) this.trigger("boundsCluster");
+	}
+	
+	/**
+	 * Tile that the camera will follow
+	 */
+	followTo(tile) {
+		this._followToTile = tile;
+	}
+	
+	stopFollow() {
+		this._followToTile = null;
+	}
+	
+	getFollow() {
+		return this._followToTile;
+	}
+	
+	/**
+	 * Smoothly move the camera to position
+	 * @param {object|number, number} point
+	 * @param {boolean} [flag=false] Move instantly (true) or smoothly (false)
+	 */
+	moveTo() {
+		if (typeof arguments[0] === "object") {
+			this.set("target", arguments[0], sg_model["a" /* default */].OPTIONS_PRECISION_5);
+			if (arguments[1] === true) {
+				this.set("position", arguments[0], sg_model["a" /* default */].OPTIONS_PRECISION_5);
+			}
+		} else {
+			sg2d_camera_SG2DCamera._moveToTarget.x = arguments[0];
+			sg2d_camera_SG2DCamera._moveToTarget.y = arguments[1];
+			this.set("target", sg2d_camera_SG2DCamera._moveToTarget, sg_model["a" /* default */].OPTIONS_PRECISION_5);
+			if (arguments[2] === true) {
+				this.set("position", sg2d_camera_SG2DCamera._moveToTarget, sg_model["a" /* default */].OPTIONS_PRECISION_5);
+			}
+		}
+	}
+											
+	moveOffset(step = sg2d_consts.CELLSIZEPIX, rotate = 0) {
+		let k = this.scales_k[this.properties.scale];
+		let d = step / k;
+		rotate = rotate - this.properties.rotate + this.rotate_adjustment;
+		sg2d_camera_SG2DCamera._point.x = this.properties.offset.x + d * sg2d_math.cos(rotate, 1);
+		sg2d_camera_SG2DCamera._point.y = this.properties.offset.y - d * sg2d_math.sin(rotate, 1);
+		this.set("offset", sg2d_camera_SG2DCamera._point);
+	}
+	
+	onResize() {
+		var browser_scale = window.devicePixelRatio ? window.devicePixelRatio : window.outerWidth/window.innerWidth; // ignoring browser scaling
+		var k = this.scales_k[this.properties.scale] * this.browser_scale_start / browser_scale;
+		this.sg2d.viewport.scale.set(k);
+		if (this.rotate_adjustment === 0 || this.rotate_adjustment === 180 || this.rotate_adjustment === -180) {
+			this.set("wh", {w: (this.sg2d.pixi.screen.width || 100) / k, h: (this.sg2d.pixi.screen.height || 100) / k});
+		} else {
+			this.set("wh", {w: (this.sg2d.pixi.screen.height || 100) / k, h: (this.sg2d.pixi.screen.width || 100) / k});
+		}
+		this.set("wh05", {w: this.properties.wh.w>>1, h: this.properties.wh.h>>1});
+		
+		this.set("position", void 0, void 0, sg2d_camera_SG2DCamera.FLAG_FORCE_CALLBACKS);
+	}
+	
+	/** @private */
+	_iterate() {
+		if (this._followToTile) {
+			sg2d_camera_SG2DCamera._point.x = this._followToTile.properties.position.x + this.properties.offset.x;
+			sg2d_camera_SG2DCamera._point.y = this._followToTile.properties.position.y + this.properties.offset.y;
+			this.set("target", sg2d_camera_SG2DCamera._point);
+		}	
+		if (this.properties.target.x !== this.properties.position.x || this.properties.target.y !== this.properties.position.y) {
+			sg2d_camera_SG2DCamera._point.x = this.properties.position.x + sg2d_camera_SG2DCamera.SMOOTHNESS_FACTOR * (this.properties.target.x - this.properties.position.x);
+			sg2d_camera_SG2DCamera._point.y = this.properties.position.y + sg2d_camera_SG2DCamera.SMOOTHNESS_FACTOR * (this.properties.target.y - this.properties.position.y);
+			//SG2DCamera._point.x = this.properties.target.x; SG2DCamera._point.y = this.properties.target.y; // TODO DEL DEBUG
+			this.set("position", sg2d_camera_SG2DCamera._point);
+		}
+	}
+	
+	onPointerEnter(e) {
+		this.set("pointer_over_canvas", true);
+	}
+	
+	onPointerLeave(e) {
+		this.set("pointer_over_canvas", false);
+	}
+	
+	onWheelScale(e) {
+		if (! this.properties.pointer_over_canvas) return;
+		var delta = e.deltaY || e.detail || e.wheelDelta;
+		this.zoomInc(delta < 0 ? 1 : -1);
+	}
+	
+	zoom(scale = sg2d_camera_SG2DCamera.SCALE_NORMAL) {
+		scale = Math.max(this.properties.scale_min, scale);
+		scale = Math.min(this.properties.scale_max, scale);
+		this.set("scale", scale);
+		this.onResize();
+	}
+	
+	zoomInc(scaleIncrement = 1) {
+		var scale_next = this.properties.scale + scaleIncrement;
+		scale_next = Math.max(this.properties.scale_min, scale_next);
+		scale_next = Math.min(this.properties.scale_max, scale_next);
+		this.set("scale", scale_next);
+		this.onResize();
+	}
+	
+	/** @public */
+	getScale() {
+		return {
+			value: this.properties.scale,
+			percent: this.scales_per[this.properties.scale],
+			k: this.scales_k[this.properties.scale]
+		};
+	}
+	
+	/** @private */
+	_addLinePoint(x, y) { // Used in Math.GetLinePoints (..) as a callback
+		var p = this.boundsPoint[++this.boundsPoint._length];
+		p.x = (x < 1 ? 1 : (x > sg2d_consts.AREASIZE ? sg2d_consts.AREASIZE : x));
+		p.y = (y < 1 ? 1 : (y > sg2d_consts.AREASIZE ? sg2d_consts.AREASIZE : y));
+	}
+	
+	_onwheel(fCallback, e) {
+		if (! e) e = window;
+		if ("onwheel" in document) {
+			e.addEventListener("wheel", fCallback); // IE9+, FF17+, Ch31+
+		} else if ("onmousewheel" in document) {
+			e.addEventListener("mousewheel", fCallback); // obsolete version of the event
+		} else {
+			e.addEventListener("MozMousePixelScroll", fCallback); // Firefox < 17
+		}
+	}
+	_offwheel(fCallback, e) {
+		if (! e) e = window;
+		e.removeEventListener("wheel", fCallback);
+		e.removeEventListener("onmousewheel", fCallback);
+		e.removeEventListener("mousewheel", fCallback);
+		e.removeEventListener("MozMousePixelScroll", fCallback);
+	}
+	
+	destroy() {
+		this.sg2d.pixi.view.removeEventListener("pointerenter", this.onPointerEnter);
+		this.sg2d.pixi.view.removeEventListener("pointerleave", this.onPointerLeave);
+		this._offwheel(this.onWheelScale);
+		super.destroy();
+	}
+}
+
+sg2d_camera_SG2DCamera.singleInstance = true;
+
+sg2d_camera_SG2DCamera.ROTATE_ADJUSTMENT = 0; // default
+
+sg2d_camera_SG2DCamera.SCALE_MIN = 2;
+sg2d_camera_SG2DCamera.SCALE_NORMAL = 8;
+sg2d_camera_SG2DCamera.SCALE_MAX = 10;
+
+sg2d_camera_SG2DCamera.MOVEMENT_BY_POINTER = 0b00000001;
+sg2d_camera_SG2DCamera.MOVEMENT_BY_POINTER_LEFT = 0b00000001;
+sg2d_camera_SG2DCamera.MOVEMENT_BY_POINTER_RIGHT = 0b00000010;
+sg2d_camera_SG2DCamera.MOVEMENT_BY_POINTER_MIDDLE = 0b00000100;
+
+sg2d_camera_SG2DCamera.STATE_NO_MOVEMENT = 0;
+sg2d_camera_SG2DCamera.STATE_MOVEMENT_WAITING_SHIFT = 1;
+sg2d_camera_SG2DCamera.STATE_MOVING = 2;
+
+/**
+ * Camera smoothness factor
+ * @public
+ */
+sg2d_camera_SG2DCamera.SMOOTHNESS_FACTOR = 0.25;
+
+sg2d_camera_SG2DCamera.typeProperties = {
+	rotate: sg_model["a" /* default */].TYPE_NUMBER,
+	rotation: sg_model["a" /* default */].TYPE_BOOLEAN,
+	position: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
+	target: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
+	offset: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
+	wh: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
+	wh05: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
+	boundsPX: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
+	boundsCluster: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS
+};
+
+sg2d_camera_SG2DCamera.ownSetters = {
+	rotate: true,
+	position: true
+};
+
+/** @public */
+sg2d_camera_SG2DCamera.moveTo = function(...args) {
+	sg2d_camera_SG2DCamera.getInstance().moveTo.apply(sg2d_camera_SG2DCamera.getInstance(), ...args);
+}
+
+sg2d_camera_SG2DCamera.scaling = function(params) {
+	if (sg2d_camera_SG2DCamera.getInstance().properties.scale_wheel) {
+		sg2d_camera_SG2DCamera.getInstance().onWheelScale({deltaY: params.action === "-" ? 1 : -1});
+	}
+}
+
+/** @private */
+sg2d_camera_SG2DCamera._point = {x: void 0, y: void 0};
+
+/** @private */
+sg2d_camera_SG2DCamera._boundsPX = {};
+
+/** @private */
+sg2d_camera_SG2DCamera._boundsCluster = {};
+
+/** @private */
+sg2d_camera_SG2DCamera._moveToTarget = {x: 0, y: 0};
+// CONCATENATED MODULE: ./src/sg2d-sound.js
+/**
+ * SG2DSound
+ * https://github.com/VediX/sg2d.github.io
+ * (c) Kalashnikov Ilya
+ */
+
+
+
+
+
+
+
+
+/** @private */
+function _SG2DSound() {
+	
+	Object.assign(this, new sg_model["a" /* default */]({
+		music: true,
+		musicVolume: 100, // from 0 to 100
+		sounds: true,
+		soundsVolume: 100, // from 0 to 100
+		bass: false,
+		muteOnLossFocus: true,
+		volumeDecreaseDistance: 10, // Units changes in clusters. Distance at which the sound can no longer be heard. If value is 0, sound does not subside with increasing distance
+		environment2D: true,
+		view: "", // Current view code
+		_focusLoss: false // global mute when focus loss browser
+	}));
+	
+	this.sounds = {};
+	this.musics = {}; // flat list of all music ([] * PIXI.sound.Sound)
+	this.music_views = {}; // Views and list music
+	this.music_view = null; // Current view object
+	
+	this.options = {
+		config: void 0,
+		music_dir:  void 0,
+		sounds_dir: void 0,
+		library_pathfile: void 0
+	};
+	
+	this.bass = void 0;
+	
+	/** @private */
+	this._resolveLibrary = void 0;
+	/** @private */
+	this._rejectLibrary = void 0;
+	/** @private */
+	this._promiseLibrary = new Promise((resolve, reject)=>{
+		this._resolveLibrary = resolve;
+		this._rejectLibrary = reject;
+	});
+	
+	/** @private */
+	this._initializationRunned = false;
+	
+	/** @private */
+	this._gestureDetected = false;
+	
+	/**
+	 * Sound library loader and parameter setter
+	 * @param {object}		[options={}]
+	 * @param {object|string}	[options.config="./res/sound.json"]
+	 * @param {string}			[options.music_dir="./res/music/"]
+	 * @param {string}			[options.sounds_dir="./res/sounds/"]
+	 * @param {string}			[options.library_pathfile="./libs/pixi/pixi-sound.js"]
+	 * @param {object}		[properties={}]
+	 * @param {boolean}		[properties.sounds=true]
+	 * @param {boolean}		[properties.music=true]
+	 * @param {number}			[properties.musicVolume=100]
+	 * @param {number}			[properties.soundsVolume=100]
+	 * @param {boolean}		[properties.muteOnLossFocus=true]
+	 * @param {number}			[properties.volumeDecreaseDistance=0]
+	 * @param {boolean}		[properties.environment2D=true]
+	 * @param {boolean}		[properties.bass=false]
+	 */
+	this.load = (options = {}, properties = {})=>{
+		
+		if (typeof window === "undefined" || window.document === void 0) {
+			console.error("Error in SG2D.Sound.load()! window.document is not set!");
+			return;
+		}
+		
+		if (this._initializationRunned) {
+			this.destroy();
+		}
+		
+		for (var p in properties) this.set(p, properties[p]);
+		
+		if (! this._initializationRunned) {
+			this._initializationRunned = true;
+			
+			if (options.config) this.options.config = options.config;
+			this.options.music_dir = options.music_dir || "./res/music/";
+			this.options.sounds_dir = options.sounds_dir || "./res/sounds/";
+			this.options.library_pathfile = options.library_pathfile || "./libs/pixi/pixi-sound.js";
+			
+			this.onEndMusic = this._onEndMusic.bind(this);
+			this.visibilityChange = this._visibilityChange.bind(this);
+			document.addEventListener("visibilitychange", this._visibilityChange);
+			
+			this.on("music", (music)=>{
+				if (music) {
+					this.musicResume();
+				} else {
+					this.musicPause();
+				}
+			});
+			
+			this.on("musicVolume", (musicVolume)=>{
+				if (this.music_view && this.music_view.instance) {
+					this.music_view.instance.volume = musicVolume / 100;
+				}
+			});
+			
+			if (this._gestureDetected) {
+				this._libraryLoad(options);
+			} else {
+				let t = setInterval(()=>{
+					if (this._gestureDetected) {
+						clearInterval(t);
+						this._libraryLoad(options);
+					}
+				}, 100);
+			}
+		}
+		
+		return this._promiseLibrary;
+	};
+	
+	/** @private */
+	this._libraryLoader = void 0;
+	
+	/** @private */
+	this._libraryLoad = (options = {})=>{
+		
+		if (! this._libraryLoader) {
+			
+			this._libraryLoader = sg2d_utils.loadJS(this.options.library_pathfile, (event)=>{
+				
+				this.visibilityChange();
+				
+				this.bass = [
+					new PIXI.sound.filters.ReverbFilter(1, 100),
+					new PIXI.sound.filters.EqualizerFilter(13, 15, 6, -1, 0, 0, 0, 0, 0, 0)
+				];
+				
+				if (options.config) {
+					this.loadConfig(options.config, this._resolveLibrary, this._rejectLibrary);
+				} else {
+					this._resolveLibrary();
+				}
+			});
+			
+			this._libraryLoader.catch(error=>{
+				this._rejectLibrary("Error in SG2D.Sound! See options.library_pathfile=\"" + this.options.library_pathfile + "\"!");
+			});
+		}
+		
+		return this._libraryLoader;
+	};
+	
+	/** @private */
+	this._sg2dconnect = (sg2d)=>{
+		this.sg2d = sg2d;
+	};
+	
+	this.loadConfig = (config, resolve, reject)=>{
+		if (typeof config === "object") {
+			this._parseConfig(config);
+			resolve();
+		} else if (typeof config === "string") {
+			fetch(config).then(response=>{
+				if (! response.ok) {
+					let sError = "Error in SG2D.Sound! response.status="+response.status+". See config=\"" + config + "\"!";
+					reject(sError);
+					throw new Error(sError);
+				} else {
+					return response.json();
+				}
+			}).then(json=>{
+				this._parseConfig.call(this, json);
+				resolve();
+			}).catch(error=>{
+				reject("Error in SG2D.Sound! See config=\"" + config + "\"!");
+				debugger; // TODO
+			});
+		}
+	};
+	
+	/** @private */
+	this._parseConfig = (json)=>{
+		var temp, sound;
+		if (json.sounds) {
+			for (var name in json.sounds) {
+				temp = json.sounds[name];
+				this.sounds[name] = sound = typeof temp === "object" ? temp : { file: temp };
+				sound.name = name;
+				sound.sound = PIXI.sound.add(name, {
+					autoPlay: false,
+					preload: true,
+					url: SG2DSound.options.sounds_dir+sound.file,
+					loaded: (err, sound)=>{
+						if (err) {
+							if (typeof sound !== "undefined") sound.isError = true;
+							console.warn(''+err);
+						}
+					}
+				});
+
+				if (this.properties.bass) {
+					sound.sound.filters = this.bass;
+				}
+			}
+		}
+		if (json.music) {
+			for (let viewcode in json.music) {
+				temp = json.music[viewcode];
+				let list = typeof temp === "string" ? [temp] : (Array.isArray(temp) ? temp : []);
+				let musics = [];
+				for (var i = 0; i < list.length; i++) {
+					musics[i] = this.musics[list[i]] = PIXI.sound.add(list[i], {
+						autoPlay: false,
+						preload: false,
+						singleInstance: true,
+						url: SG2DSound.options.music_dir+list[i],
+						loaded: (err, music)=>{
+							if (err) {
+								if (typeof music !== "undefined") music.isError = true;
+								console.warn(''+err);
+							} else {
+								if (this.properties.view && this.properties.view === viewcode && ! this.music_view) {
+									this.musicPlay(viewcode);
+								}
+							}
+						},
+						complete: (sound, b, c)=>{
+							debugger;
+						}
+					});
+				}
+				this.music_views[viewcode] = {
+					viewcode: viewcode, status: false,
+					list: musics, current_index: 0,
+					instance: null // Current music instance
+				}
+			}
+		}
+		
+		if (this.properties.view && (! this.music_view || this.music_view.viewcode !== this.properties.view)) {
+			this.musicPlay(this.properties.view);
+		}
+	};
+	
+	this._visibilityChange = ()=>{
+		if (document.visibilityState === "visible") {
+			this.set("_focusLoss", false);
+			if (PIXI.sound) PIXI.sound.unmuteAll();
+		} else {
+			this.set("_focusLoss", true);
+			if (PIXI.sound && this.properties.muteOnLossFocus) PIXI.sound.muteAll();
+		}
+	};
+	
+	/**
+	 * Play music
+	 * @param {string|bool}	[viewcode=true] - Page code or true value. If true, then the current music starts playing if it is not playing yet
+	 * @param {object}		[options={}] - Options passed to the play() method, for example, sound volume, playback speed, start and end times
+	 */
+	this.musicPlay = (viewcode = true, options = {})=>{
+		
+		if (viewcode === true) {
+			if (! this.music_view) return false;
+		} else {
+			if (this.music_view && this.music_view.viewcode === viewcode) {
+				// no code
+			} else {
+				if (this.music_view) {
+					this.music_view.instance && this.music_view.instance.destroy();
+					this.music_view.instance = null;
+					this.music_view.status = false;
+				}
+				this.music_view = this.music_views[viewcode];
+			}
+		}
+		
+		if (! this.music_view) {
+			console.error("SG2D.Sound Error! The music file may not have been loaded yet!");
+		}
+		
+		this.set("view", viewcode, void 0, sg_model["a" /* default */].FLAG_NO_CALLBACKS);
+		
+		this.music_view.status = true;
+		
+		if (! this.music_view.list.length) return false;
+		
+		if (this.properties.music && PIXI.sound) {
+			
+			options = sg_model["a" /* default */].defaults(options, {
+				volume: this.properties.musicVolume / 100
+			});
+			
+			if (this.music_view.instance) {
+				if (this.music_view.instance.paused) {
+					this.music_view.instance.paused = false;
+				}
+			} else {
+			
+				let music = this.music_view.list[this.music_view.current_index];
+				if (music.isError) return false;
+
+				if (this.properties.bass) music.filters = this.bass;
+
+				let music_view = this.music_view;
+				let result = music.play(options);
+				if (typeof result.then === "function") {
+					result.then((instance)=>{
+						music_view.instance = instance;
+						instance.on("end", this.onEndMusic);
+						if (! music_view.status) music_view.instance.paused = true;
+					});
+				} else {
+					music_view.instance = result;
+					music_view.instance.on("end", this.onEndMusic);
+				}
+			}
+		}
+		return true;
+	};
+	
+	/** @private */
+	this._onEndMusic = (instance)=>{
+		this.music_view.current_index++;
+		if (this.music_view.current_index >= this.music_view.list.length) this.music_view.current_index = 0;
+		this.music_view.instance = null;
+		this.musicPlay();
+	};
+	
+	this.musicPause = ()=>{
+		if (this.music_view) {
+			this.music_view.status = false;
+			if (this.music_view.instance) {
+				this.music_view.instance.paused = true;
+			}
+		}
+	};
+	
+	this.musicResume = ()=>{
+		this.musicPlay();
+	};
+	
+	/** @private */
+	this._sound = { file: "" };
+	/** @private */
+	this._config = {};
+	
+	/**
+	 * Play sound
+	 * @param {string|object} Sound name or base sound object from sounds.json
+	 * @param {object} config_or_tile Sound settings overriding basic sounds.json or Tile instance
+	 * @param {object} tile If a tile is specified, then position is taken from it to calculate the distance and sound volume
+	 */
+	this.play = (sound, config_or_tile = void 0, tile = void 0)=>{
+		
+		var instance = null;
+		
+		if (typeof sound === "string") {
+			let name = sound;
+			sound = this.sounds[name];
+			if (! sound) this.sounds[name] = sound = { name: name, file: name + ".mp3" };
+		}
+		
+		var config = SG2DSound._config;
+		if (typeof config_or_tile === "object") {
+			if (config_or_tile.constructor.isTile) {
+				tile = config_or_tile;
+			} else {
+				config = config_or_tile;
+			}
+		}
+		
+		if (this.properties.sounds && PIXI.sound) {
+			if (! sound.sound) return; // Sounds have not yet been loaded into loadLibAndSounds()
+			if (! sound.sound.isLoaded) return false;
+			
+			var options = {};
+			options.volume = (config.volume || sound.volume || 1) * this.properties.soundsVolume / 100;
+			
+			if (this.properties.volumeDecreaseDistance) {
+				let camera = sg2d_camera_SG2DCamera.getInstance(true);
+				if (tile && camera) {
+					let maxd = this.properties.volumeDecreaseDistance * 64;
+					let pp = camera.get("position");
+					let tp = tile.get("position");
+					let d = sg2d_math.distance_p(pp, tp);
+					options.volume *= Math.max(0, 1 - d / maxd);
+				}
+				if (sg2d_camera_SG2DCamera.getInstance(true)) {
+					options.volume = options.volume * sg2d_camera_SG2DCamera.get("scale") / sg2d_camera_SG2DCamera.SCALE_NORMAL;
+				}
+			}
+			
+			options.speed = config.speed || sound.speed || 1;
+			options.start = config.start || sound.start || 0;
+			if (config.end) options.end = config.end; else if (sound.end) options.end = sound.end;
+			
+			instance = sound.sound.play(options);
+			
+			if (tile) tile.sound_instance = instance;
+			
+			// 2D Environment
+			if (this.properties.environment2D) {
+				let camera = sg2d_camera_SG2DCamera.getInstance(true);
+				if (tile && camera) {
+					// TODO: PIXI.Sound does not currently support instance-level filters!
+					//tile.sound.filters[0].pan = Math.min(1, Math.max(-1, 3*(dx - ppx)/visd));
+					// START OF CRAWLER: // TODO are waiting for the official release, or you need to look at https://codepen.io/Rumyra/pen/qyMzqN/ or https://howlerjs.com/
+					let pan = sg2d_math.sin( sg2d_math.angle_p1p2_deg(camera.get("position"), tile.get("position"), 0) - sg2d_camera_SG2DCamera.get("rotate") );
+					//console.log("pan="+pan+", camera_rotate=" + ca +", pta="+pta);
+					let panner = new StereoPannerNode(instance._source.context, {pan: pan});
+					instance._source.connect(instance._gain).connect(panner).connect(instance._source.context.destination);
+					// /END OF CRAWLER
+				}
+			}
+		}
+		
+		return instance;
+	};
+	
+	this.destroy = ()=>{
+		document.removeEventListener("visibilitychange", this.visibilityChange);
+	};
+}
+
+var SG2DSound = { EMPTY: true };
+
+if (typeof window !== "undefined" && window.document) {
+	let fKeyDown = event=>{
+		if (event.keyCode === 20 || event.keyCode === 18 || event.keyCode === 17 || event.keyCode === 16) return; // CapsLock, Alt, Ctrl, Shift - these gesture keys are not read out and a warning arrives "WebAudioContext.ts:101 The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://goo.gl/7K7WLu"
+		document.removeEventListener("keydown", fKeyDown);
+		document.removeEventListener("pointerup", fPointerUp);
+		SG2DSound._gestureDetected = true;
+	};
+
+	let fPointerUp = event=>{
+		document.removeEventListener("keydown", fKeyDown);
+		document.removeEventListener("pointerup", fPointerUp);
+		SG2DSound._gestureDetected = true;
+	};
+
+	document.addEventListener("keydown", fKeyDown);
+	document.addEventListener("pointerup", fPointerUp);
+	
+	_SG2DSound.prototype = sg_model["a" /* default */].prototype;
+	SG2DSound = new _SG2DSound();
+}
+
+/* harmony default export */ var sg2d_sound = (SG2DSound);
 // CONCATENATED MODULE: ./src/sg2d-tile.js
 /**
  * SG2DTile
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
+
 
 
 
@@ -2715,6 +3843,10 @@ class sg2d_tile_SG2DTile extends sg_model["a" /* default */] {
 		}
 	}
 	
+	sound(code) {
+		sg2d_sound.play(code, this);
+	}
+	
 	destroy() {
 		if (sg2d_consts.ONLY_LOGIC) {
 			// no code
@@ -2929,606 +4061,11 @@ sg2d_tile_SG2DTile._textures_not_founded = [];
 
 /** @private */
 sg2d_tile_SG2DTile._spritesFromOptions = new Set();
-// CONCATENATED MODULE: ./src/sg2d-camera.js
-/**
- * SG2DCamera
- * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
- */
-
-
-
-
-
-
-
-
-class sg2d_camera_SG2DCamera extends sg_model["a" /* default */] {
-		
-	defaults() {
-		return {
-			scale: sg2d_camera_SG2DCamera.SCALE_NORMAL, // Scaling, for example: 16 -> 128px (200%), ..., 9 -> 72px (112%),  8 -> 64px (100%), 7 -> 56px, 6 -> 48px, 5 -> 40px, 4 -> 32px, 3 -> 24px, 2 -> 16px, 1-> 8px (12.5%)
-			rotation: false,
-			rotate: 0, // grad
-			position: {x: 0, y: 0}, // current camera position
-			target: {x: 0, y: 0}, // camera movement target
-			offset: {x: 0, y: 0},
-			wh: {w: 0, h: 0},
-			wh05: {w: 0, h: 0},
-			boundsPX: { left: 0, top: 0, right: 0, bottom: 0 },
-			boundsCluster: { left: 0, top: 0, right: 0, bottom: 0 },
-			frameCVC: 0, // frameChangeVisibleClusters - Changing this property means that some new clusters have appeared in the camera view, or some have disappeared
-			scale_wheel: true, // scale with scrolling
-			scale_min: sg2d_camera_SG2DCamera.SCALE_MIN,
-			scale_max: sg2d_camera_SG2DCamera.SCALE_MAX,
-			pointer_over_canvas: true,
-			movement_by_pointer: 0,
-			movement_state: 0
-		};
-	}
-	
-	/**
-	 * Config parameters and default values:
-	 * @param {object} properties
-	 * @param {boolean}	[properties.scale_wheel=true] Allow camera zoom
-	 * @param {number}		[scale=8] Start scale
-	 * @param {boolean}	[rotation=true] Allow camera rotation
-	 * @param {number}		[rotate=0] Start camera rotation
-	 * @param {object}		[start_position={ x: 0, y: 0}] Start position
-	 * @param {number}		[rotate_adjustment=0] Basic offset of the camera angle in degrees
-	 * @param {boolean}	[movement_by_pointer=0] Allow free movement of the camera with the right mouse button
-	 */
-	initialize(properties) {
-		
-		let config = properties || {};
-		config.scale_wheel = typeof config.scale_wheel !== "undefined" ? config.scale_wheel : true;
-		config.scale = +config.scale || sg2d_camera_SG2DCamera.SCALE_NORMAL;
-		config.rotation = !!config.rotation || false;
-		config.rotate = +config.rotate || 0;
-		config.position = config.position || null;
-		config.rotate_adjustment = +config.rotate_adjustment || sg2d_camera_SG2DCamera.ROTATE_ADJUSTMENT;
-		config.movement_by_pointer = +config.movement_by_pointer;
-		
-		this.rotate_adjustment = config.rotate_adjustment;
-		this.browser_scale_start = window.devicePixelRatio ? window.devicePixelRatio : window.outerWidth/window.innerWidth;
-		this.set("scale_min", +config.scale_min || sg2d_camera_SG2DCamera.SCALE_MIN);
-		this.set("scale_max", +config.scale_max || sg2d_camera_SG2DCamera.SCALE_MAX);
-		
-		this.scales_k = [];
-		this.scales_per = [];
-		var k = 1, p = 100, k_step = 1.00;
-		for (var i = sg2d_camera_SG2DCamera.SCALE_NORMAL; i <= this.properties.scale_max; i++) {
-			this.scales_k[i] = k;
-			this.scales_per[i] = ~~p;
-			k += 0.125 * k_step;
-			p += 12.5 * k_step;
-		}
-		var k = 1, p = 100;
-		for (var i = sg2d_camera_SG2DCamera.SCALE_NORMAL; i >= this.properties.scale_min; i--) {
-			this.scales_k[i] = k;
-			this.scales_per[i] = ~~p;
-			k -= 0.125 * k_step;
-			p -= 12.5 * k_step;
-		}
-		
-		this.positionPrev = {
-			x: this.properties.position.x,
-			y: this.properties.position.y
-		};
-		this.frame_lighting = 1;
-		this.boundsClusterPrev = null;
-		this.clustersInCamera = new Set();
-		
-		// Visible part of the area in PX units
-		this.boundsPXTops = { // The vertices of the rectangle are calculated with camera rotation and scaling
-			leftTop: {x:0,y:0},
-			rightTop: {x:0,y:0},
-			rightBottom: {x:0,y:0},
-			leftBottom: {x:0,y:0}
-		};
-		// Visible part of the area in Cells units
-		this.boundsClusterTops = { // The vertices of the rectangle are calculated with camera rotation and scaling
-			leftTop: {x:0,y:0},
-			rightTop: {x:0,y:0},
-			rightBottom: {x:0,y:0},
-			leftBottom: {x:0,y:0}
-		};
-		
-		this.clustersOut = []; // Clusters that disappeared from the camera view
-		this.clustersIn = []; // Clusters that appeared in the camera view
-		
-		this._addLinePoint = this._addLinePoint.bind(this);
-		
-		this.onPointerEnter = this.onPointerEnter.bind(this);
-		this.onPointerLeave = this.onPointerLeave.bind(this);
-		
-		this.onWheelScale = this.onWheelScale.bind(this);
-		if (this.properties.scale_wheel) {
-			this._onwheel(this.onWheelScale);
-		}
-		
-		// Boundaries of the visible part in Cells units (all points of 4 solid lines formed by boundsCluster vertices)
-		this.boundsPoint = [];
-		this.on("wh", (wh)=>{
-			var q = ~~((wh.w + wh.h) / sg2d_consts.CELLSIZEPIX * 4);
-			for (var i = 0; i < q; i++) this.boundsPoint[i] = {x: 0, y: 0}; // so as not to spawn objects every time!
-		});
-		
-		this.set("scale_wheel", config.scale_wheel);
-		this.set("scale", config.scale);
-		this.set("rotation", config.rotation);
-		
-		this.on("frameCVC", sg2d_debugging.drawDebug2);
-		
-		this.set("movement_by_pointer", config.movement_by_pointer);
-		
-		this._followToTile = null;
-	}
-	
-	/** @private */
-	_sg2dconnect(sg2d) {
-		this.sg2d = sg2d;
-		this.onResize();
-		this.sg2d.pixi.view.addEventListener("pointerenter", this.onPointerEnter);
-		this.sg2d.pixi.view.addEventListener("pointerleave", this.onPointerLeave);
-		this.set("rotate", this.properties.rotate);
-		this.sg2d.viewport.angle = -this.properties.rotate + this.rotate_adjustment;
-		this.startPosition(this.properties.position || null);
-		this._calc();
-	}
-	
-	/** Own setter for rotate property*/
-	setRotate(newRotate, options, flags = 0) {
-		if (! this.properties.rotation && ! (flags & sg_model["a" /* default */].FLAG_FORCE_CALLBACKS)) return; //?
-		newRotate = sg2d_math.normalize_a(newRotate);
-		let prevRotate = this.properties.rotate;
-		if (this.set("rotate", newRotate, options, flags | sg_model["a" /* default */].FLAG_IGNORE_OWN_SETTER)) {
-			this.sg2d.viewport.angle = -this.properties.rotate + this.rotate_adjustment;
-			let da = sg2d_math.normalize_a(newRotate - prevRotate);
-			let dx = this.properties.offset.x;
-			let dy = this.properties.offset.y;
-			sg2d_camera_SG2DCamera._point.x = dx * sg2d_math.cos(da, 1) - dy * sg2d_math.sin(da, 1);
-			sg2d_camera_SG2DCamera._point.y = dy * sg2d_math.cos(da, 1) + dx * sg2d_math.sin(da, 1);
-			this.set("offset", sg2d_camera_SG2DCamera._point);
-			this._calc();
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	/**
-	 * Set the starting position of the camera
-	 */
-	startPosition(position) {
-		this.moveTo(position, true);
-	}
-	
-	/** Own setter for position property*/
-	setPosition(value, options = sg_model["a" /* default */].OBJECT_EMPTY, flags = 0) {
-		value = value || this.positionPrev;
-		options = ! options ||  options === sg_model["a" /* default */].OBJECT_EMPTY ? sg_model["a" /* default */].OPTIONS_PRECISION_5 : options;
-		options.precision = options.precision || 5;
-		
-		if (! this.set("position", value, options, flags | sg_model["a" /* default */].FLAG_IGNORE_OWN_SETTER)) return false;
-		
-		this._calc();
-		
-		return true;
-	}
-	
-	/** @private */
-	_calc() {
-		
-		this.sg2d.viewport.x = this.sg2d.pixi.screen.width / 2;
-		this.sg2d.viewport.y = this.sg2d.pixi.screen.height / 2;
-		this.sg2d.viewport.pivot.x = this.properties.position.x;
-		this.sg2d.viewport.pivot.y = this.properties.position.y;
-		
-		var x = this.properties.position.x
-		var y = this.properties.position.y
-		var acos = sg2d_math.cos(this.properties.rotate, 1), asin = sg2d_math.sin(this.properties.rotate, 1);
-		var w05 = this.properties.wh05.w * sg2d_consts.DEBUGGING.CAMERA.WIDTH_HEIGHT_K;
-		var h05 = this.properties.wh05.h * sg2d_consts.DEBUGGING.CAMERA.WIDTH_HEIGHT_K;
-		var bpx = this.boundsPXTops;
-		var bc = this.boundsClusterTops;
-		
-		// boundsPXTops calc
-		bpx.leftTop.x = Math.round(x - w05 * acos + h05 * asin);
-		bpx.leftTop.y = Math.round(y - w05 * asin - h05 * acos);
-		bpx.rightTop.x = Math.round(x + w05 * acos + h05 * asin);
-		bpx.rightTop.y = Math.round(y + w05 * asin - h05 * acos);
-		bpx.rightBottom.x = Math.round(x + w05 * acos - h05 * asin);
-		bpx.rightBottom.y = Math.round(y + w05 * asin + h05 * acos);
-		bpx.leftBottom.x = Math.round(x - w05 * acos - h05 * asin);
-		bpx.leftBottom.y = Math.round(y - w05 * asin + h05 * acos);
-		
-		// boundsPX calc
-		var boundsPX = sg2d_camera_SG2DCamera._boundsPX;
-		boundsPX.left = boundsPX.top = boundsPX.right = boundsPX.bottom = void 0;
-		for (var p in bpx) {
-			var o = bpx[p];
-			if (boundsPX.left === void 0) boundsPX.left = o.x; else if (boundsPX.left > o.x) boundsPX.left = o.x;
-			if (boundsPX.top === void 0) boundsPX.top = o.y; else if (boundsPX.top > o.y) boundsPX.top = o.y;
-			if (boundsPX.right === void 0) boundsPX.right = o.x; else if (boundsPX.right < o.x) boundsPX.right = o.x;
-			if (boundsPX.bottom === void 0) boundsPX.bottom = o.y; else if (boundsPX.bottom < o.y) boundsPX.bottom = o.y;
-		}
-		var bChangeBoundsPX = false;
-		for (var p in this.properties.boundsPX) {
-			if (boundsPX[p] !== this.properties.boundsPX[p]) bChangeBoundsPX = true;
-			this.properties.boundsPX[p] = boundsPX[p];
-		}
-		
-		// boundsCluster calc
-		var boundsCluster = sg2d_camera_SG2DCamera._boundsCluster;
-		boundsCluster.left = Math.floor( 1 + boundsPX.left / sg2d_consts.CELLSIZEPIX );
-		boundsCluster.top = Math.floor( 1 + boundsPX.top / sg2d_consts.CELLSIZEPIX );
-		boundsCluster.right = Math.floor( 1 + boundsPX.right / sg2d_consts.CELLSIZEPIX );
-		boundsCluster.bottom = Math.floor( 1 + boundsPX.bottom / sg2d_consts.CELLSIZEPIX );
-		var bChangeBoundsCluster = false;
-		for (var p in boundsCluster) {
-			if (boundsCluster[p] !== this.properties.boundsCluster[p]) bChangeBoundsCluster = true;
-			this.properties.boundsCluster[p] = boundsCluster[p];
-		}
-		
-		if (! this.boundsClusterPrev) {
-			this.boundsClusterPrev = {
-				left: this.properties.boundsCluster.left,
-				top: this.properties.boundsCluster.top,
-				right: this.properties.boundsCluster.right,
-				bottom: this.properties.boundsCluster.bottom
-			}
-		}
-		
-		// boundsClusterTops calc - step 1
-		bc.leftTop.x = 0.5 + bpx.leftTop.x / sg2d_consts.CELLSIZEPIX;
-		bc.leftTop.y = 0.5 + bpx.leftTop.y / sg2d_consts.CELLSIZEPIX;
-		bc.rightTop.x = 0.5 + bpx.rightTop.x / sg2d_consts.CELLSIZEPIX;
-		bc.rightTop.y = 0.5 + bpx.rightTop.y / sg2d_consts.CELLSIZEPIX;
-		bc.rightBottom.x = 0.5 + bpx.rightBottom.x / sg2d_consts.CELLSIZEPIX;
-		bc.rightBottom.y = 0.5 + bpx.rightBottom.y / sg2d_consts.CELLSIZEPIX;
-		bc.leftBottom.x = 0.5 + bpx.leftBottom.x / sg2d_consts.CELLSIZEPIX;
-		bc.leftBottom.y = 0.5 + bpx.leftBottom.y / sg2d_consts.CELLSIZEPIX;
-		
-		// Calc line points
-		this.boundsPoint._length = -1;
-		sg2d_math.getLinePoints(bc.leftTop, bc.rightTop, this._addLinePoint);
-		sg2d_math.getLinePoints(bc.rightTop, bc.rightBottom, this._addLinePoint);
-		sg2d_math.getLinePoints(bc.rightBottom, bc.leftBottom, this._addLinePoint);
-		sg2d_math.getLinePoints(bc.leftBottom, bc.leftTop, this._addLinePoint);
-		this.boundsPoint._length++;
-		
-		// calculate visible clusters
-		var cluster, x ,y, x1, x2, state;
-		var frame_lighting_prev = this.frame_lighting++;
-		var frame_lighting = this.frame_lighting;
-		this.clustersOut.length = 0;
-		this.clustersIn.length = 0;
-
-		for (var i = 0; i < this.boundsPoint._length; i++) {
-			var p = this.boundsPoint[i];
-			if (cluster = this.sg2d.clusters.getCluster(p.x, p.y)) {
-				if (cluster.lighting_frame === 0) {
-					this.clustersIn.push(cluster);
-					this.clustersInCamera.add(cluster);
-				}
-				cluster.lighting_frame = frame_lighting;
-			}
-		}
-		
-		var x_min = Math.min(this.boundsClusterPrev.left, this.properties.boundsCluster.left);
-		var y_min = Math.min(this.boundsClusterPrev.top, this.properties.boundsCluster.top);
-		var x_max = Math.max(this.boundsClusterPrev.right, this.properties.boundsCluster.right);
-		var y_max = Math.max(this.boundsClusterPrev.bottom, this.properties.boundsCluster.bottom);
-		
-		for (y = y_min; y <= y_max; y++) {
-			state = 0;
-			x1 = 0;
-			x2 = 0;
-			for (x = x_min; x <= x_max; x++) {
-				if (cluster = this.sg2d.clusters.getCluster(x, y)) {
-					switch (state) {
-						case 0: { // Finding the first cluster with frame_lighting
-							switch (cluster.lighting_frame) {
-								case 0: break;
-								case frame_lighting_prev: {
-									this.clustersOut.push(cluster);
-									this.clustersInCamera.delete(cluster);
-									cluster.lighting_frame = 0;
-									break;
-								}
-								case frame_lighting: {
-									state = 1;
-									x1 = x;
-									x2 = x1;
-									break;
-								}
-								default:
-									debugger; throw "Error!";
-							}
-							break;
-						}
-						case 1: { // Finding the last cluster with frame lighting
-							switch (cluster.lighting_frame) {
-								case 0: case frame_lighting_prev: {
-									break;
-								}
-								case frame_lighting: {
-									x2 = x;
-									break;
-								}
-								default: 
-									console.log("cluster.lighting_frame=" + cluster.lighting_frame);
-									debugger; throw "Error!";
-							}
-							break;
-						}
-					}
-				}
-			}
-			if (x1 && x2) {
-				for (var x = x1; x <= x2; x++) {
-					if (cluster = this.sg2d.clusters.getCluster(x, y)) {
-						if (cluster.lighting_frame === 0) {
-							this.clustersIn.push(cluster);
-							this.clustersInCamera.add(cluster);
-						}
-						cluster.lighting_frame = frame_lighting;
-					}
-				}
-				for (var x = x2 + 1; x <= x_max; x++) {
-					if (cluster = this.sg2d.clusters.getCluster(x, y)) {
-						if (cluster.lighting_frame === frame_lighting_prev) {
-							this.clustersOut.push(cluster);
-							this.clustersInCamera.delete(cluster);
-						} //else break; // if left, sometimes the error in state=1 => cluster.lighting_frame is older than it could be!
-						cluster.lighting_frame = 0;
-					}
-				}
-			}
-		}
-		if (this.clustersOut.length || this.clustersIn.length) {
-			this.set("frameCVC", this.properties.frameCVC+1);
-			for (var i = 0; i < this.clustersOut.length; i++) {
-				this.clustersOut[i].outCamera();
-			}
-			for (var i = 0; i < this.clustersIn.length; i++) {
-				this.clustersIn[i].inCamera();
-			}
-		}
-		
-		// boundsClusterTops calc - step 2
-		for (var p in bc) {
-			bc[p].x = Math.floor(0.5 + bc[p].x);
-			bc[p].y = Math.floor(0.5 + bc[p].y);
-		}
-		
-		sg2d_debugging.drawDebug();
-		
-		this.positionPrev.x = this.properties.position.x;
-		this.positionPrev.y = this.properties.position.y;
-		
-		this.boundsClusterPrev.left = this.properties.boundsCluster.left;
-		this.boundsClusterPrev.top = this.properties.boundsCluster.top;
-		this.boundsClusterPrev.right = this.properties.boundsCluster.right;
-		this.boundsClusterPrev.bottom = this.properties.boundsCluster.bottom;
-		
-		if (bChangeBoundsPX) this.trigger("boundsPX");
-		if (bChangeBoundsCluster) this.trigger("boundsCluster");
-	}
-	
-	/**
-	 * Tile that the camera will follow
-	 */
-	followTo(tile) {
-		this._followToTile = tile;
-	}
-	
-	stopFollow() {
-		this._followToTile = null;
-	}
-	
-	getFollow() {
-		return this._followToTile;
-	}
-	
-	/**
-	 * Smoothly move the camera to position
-	 * @param {object|number, number} point
-	 * @param {boolean} [flag=false] Move instantly (true) or smoothly (false)
-	 */
-	moveTo() {
-		if (typeof arguments[0] === "object") {
-			this.set("target", arguments[0], sg_model["a" /* default */].OPTIONS_PRECISION_5);
-			if (arguments[1] === true) {
-				this.set("position", arguments[0], sg_model["a" /* default */].OPTIONS_PRECISION_5);
-			}
-		} else {
-			sg2d_camera_SG2DCamera._moveToTarget.x = arguments[0];
-			sg2d_camera_SG2DCamera._moveToTarget.y = arguments[1];
-			this.set("target", sg2d_camera_SG2DCamera._moveToTarget, sg_model["a" /* default */].OPTIONS_PRECISION_5);
-			if (arguments[2] === true) {
-				this.set("position", sg2d_camera_SG2DCamera._moveToTarget, sg_model["a" /* default */].OPTIONS_PRECISION_5);
-			}
-		}
-	}
-											
-	moveOffset(step = sg2d_consts.CELLSIZEPIX, rotate = 0) {
-		let k = this.scales_k[this.properties.scale];
-		let d = step / k;
-		rotate = rotate - this.properties.rotate + this.rotate_adjustment;
-		sg2d_camera_SG2DCamera._point.x = this.properties.offset.x + d * sg2d_math.cos(rotate, 1);
-		sg2d_camera_SG2DCamera._point.y = this.properties.offset.y - d * sg2d_math.sin(rotate, 1);
-		this.set("offset", sg2d_camera_SG2DCamera._point);
-	}
-	
-	onResize() {
-		var browser_scale = window.devicePixelRatio ? window.devicePixelRatio : window.outerWidth/window.innerWidth; // ignoring browser scaling
-		var k = this.scales_k[this.properties.scale] * this.browser_scale_start / browser_scale;
-		this.sg2d.viewport.scale.set(k);
-		if (this.rotate_adjustment === 0 || this.rotate_adjustment === 180 || this.rotate_adjustment === -180) {
-			this.set("wh", {w: this.sg2d.pixi.screen.width / k, h: this.sg2d.pixi.screen.height / k});
-		} else {
-			this.set("wh", {w: this.sg2d.pixi.screen.height / k, h: this.sg2d.pixi.screen.width / k});
-		}
-		this.set("wh05", {w: this.properties.wh.w>>1, h: this.properties.wh.h>>1});
-		
-		this.set("position", void 0, void 0, sg2d_camera_SG2DCamera.FLAG_FORCE_CALLBACKS);
-	}
-	
-	/** @private */
-	_iterate() {
-		if (this._followToTile) {
-			sg2d_camera_SG2DCamera._point.x = this._followToTile.properties.position.x + this.properties.offset.x;
-			sg2d_camera_SG2DCamera._point.y = this._followToTile.properties.position.y + this.properties.offset.y;
-			this.set("target", sg2d_camera_SG2DCamera._point);
-		}	
-		if (this.properties.target.x !== this.properties.position.x || this.properties.target.y !== this.properties.position.y) {
-			sg2d_camera_SG2DCamera._point.x = this.properties.position.x + sg2d_camera_SG2DCamera.SMOOTHNESS_FACTOR * (this.properties.target.x - this.properties.position.x);
-			sg2d_camera_SG2DCamera._point.y = this.properties.position.y + sg2d_camera_SG2DCamera.SMOOTHNESS_FACTOR * (this.properties.target.y - this.properties.position.y);
-			//SG2DCamera._point.x = this.properties.target.x; SG2DCamera._point.y = this.properties.target.y; // TODO DEL DEBUG
-			this.set("position", sg2d_camera_SG2DCamera._point);
-		}
-	}
-	
-	onPointerEnter(e) {
-		this.set("pointer_over_canvas", true);
-	}
-	
-	onPointerLeave(e) {
-		this.set("pointer_over_canvas", false);
-	}
-	
-	onWheelScale(e) {
-		if (! this.properties.pointer_over_canvas) return;
-		var delta = e.deltaY || e.detail || e.wheelDelta;
-		this.zoomInc(delta < 0 ? 1 : -1);
-	}
-	
-	zoom(scale = sg2d_camera_SG2DCamera.SCALE_NORMAL) {
-		scale = Math.max(this.properties.scale_min, scale);
-		scale = Math.min(this.properties.scale_max, scale);
-		this.set("scale", scale);
-		this.onResize();
-	}
-	
-	zoomInc(scaleIncrement = 1) {
-		var scale_next = this.properties.scale + scaleIncrement;
-		scale_next = Math.max(this.properties.scale_min, scale_next);
-		scale_next = Math.min(this.properties.scale_max, scale_next);
-		this.set("scale", scale_next);
-		this.onResize();
-	}
-	
-	/** @public */
-	getScale() {
-		return {
-			value: this.properties.scale,
-			percent: this.scales_per[this.properties.scale],
-			k: this.scales_k[this.properties.scale]
-		};
-	}
-	
-	/** @private */
-	_addLinePoint(x, y) { // Used in Math.GetLinePoints (..) as a callback
-		var p = this.boundsPoint[++this.boundsPoint._length];
-		p.x = (x < 1 ? 1 : (x > sg2d_consts.AREASIZE ? sg2d_consts.AREASIZE : x));
-		p.y = (y < 1 ? 1 : (y > sg2d_consts.AREASIZE ? sg2d_consts.AREASIZE : y));
-	}
-	
-	_onwheel(fCallback, e) {
-		if (! e) e = window;
-		if ("onwheel" in document) {
-			e.addEventListener("wheel", fCallback); // IE9+, FF17+, Ch31+
-		} else if ("onmousewheel" in document) {
-			e.addEventListener("mousewheel", fCallback); // obsolete version of the event
-		} else {
-			e.addEventListener("MozMousePixelScroll", fCallback); // Firefox < 17
-		}
-	}
-	_offwheel(fCallback, e) {
-		if (! e) e = window;
-		e.removeEventListener("wheel", fCallback);
-		e.removeEventListener("onmousewheel", fCallback);
-		e.removeEventListener("mousewheel", fCallback);
-		e.removeEventListener("MozMousePixelScroll", fCallback);
-	}
-	
-	destroy() {
-		this.sg2d.pixi.view.removeEventListener("pointerenter", this.onPointerEnter);
-		this.sg2d.pixi.view.removeEventListener("pointerleave", this.onPointerLeave);
-		this._offwheel(this.onWheelScale);
-		super.destroy();
-	}
-}
-
-sg2d_camera_SG2DCamera.singleInstance = true;
-
-sg2d_camera_SG2DCamera.ROTATE_ADJUSTMENT = 0; // default
-
-sg2d_camera_SG2DCamera.SCALE_MIN = 2;
-sg2d_camera_SG2DCamera.SCALE_NORMAL = 8;
-sg2d_camera_SG2DCamera.SCALE_MAX = 10;
-
-sg2d_camera_SG2DCamera.MOVEMENT_BY_POINTER = 0b00000001;
-sg2d_camera_SG2DCamera.MOVEMENT_BY_POINTER_LEFT = 0b00000001;
-sg2d_camera_SG2DCamera.MOVEMENT_BY_POINTER_RIGHT = 0b00000010;
-sg2d_camera_SG2DCamera.MOVEMENT_BY_POINTER_MIDDLE = 0b00000100;
-
-sg2d_camera_SG2DCamera.STATE_NO_MOVEMENT = 0;
-sg2d_camera_SG2DCamera.STATE_MOVEMENT_WAITING_SHIFT = 1;
-sg2d_camera_SG2DCamera.STATE_MOVING = 2;
-
-/**
- * Camera smoothness factor
- * @public
- */
-sg2d_camera_SG2DCamera.SMOOTHNESS_FACTOR = 0.25;
-
-sg2d_camera_SG2DCamera.typeProperties = {
-	rotate: sg_model["a" /* default */].TYPE_NUMBER,
-	rotation: sg_model["a" /* default */].TYPE_BOOLEAN,
-	position: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
-	target: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
-	offset: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
-	wh: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
-	wh05: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
-	boundsPX: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS,
-	boundsCluster: sg_model["a" /* default */].TYPE_OBJECT_NUMBERS
-};
-
-sg2d_camera_SG2DCamera.ownSetters = {
-	rotate: true,
-	position: true
-};
-
-/** @public */
-sg2d_camera_SG2DCamera.moveTo = function(...args) {
-	sg2d_camera_SG2DCamera.getInstance().moveTo.apply(sg2d_camera_SG2DCamera.getInstance(), ...args);
-}
-
-sg2d_camera_SG2DCamera.scaling = function(params) {
-	if (sg2d_camera_SG2DCamera.getInstance().properties.scale_wheel) {
-		sg2d_camera_SG2DCamera.getInstance().onWheelScale({deltaY: params.action === "-" ? 1 : -1});
-	}
-}
-
-/** @private */
-sg2d_camera_SG2DCamera._point = {x: void 0, y: void 0};
-
-/** @private */
-sg2d_camera_SG2DCamera._boundsPX = {};
-
-/** @private */
-sg2d_camera_SG2DCamera._boundsCluster = {};
-
-/** @private */
-sg2d_camera_SG2DCamera._moveToTarget = {x: 0, y: 0};
 // CONCATENATED MODULE: ./src/sg2d-pointer.js
 /**
  * SG2DPointer
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 
@@ -3752,7 +4289,7 @@ sg2d_pointer_SG2DPointer._startPointPXY = { x: 0, y: 0 };
 /**
  * SG2DEffects
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 
@@ -3883,9 +4420,9 @@ sg2d_effects_SG2DEffects.TYPE_BEVELS = 2;
 sg2d_effects_SG2DEffects.TYPE_DISPLACEMENT = 3;
 // CONCATENATED MODULE: ./src/sg2d-plugins.js
 /**
- * SG2DPlugins 1.0.0
+ * SG2DPlugins
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 
@@ -3928,10 +4465,10 @@ SG2DPlugins.load = function(asPlugins) {
 }
 // CONCATENATED MODULE: ./src/sg2d-plugin-base.js
 /**
- * SG2DPluginBase 1.0.0
+ * SG2DPluginBase
  * Base class for the plugin
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 
@@ -3978,8 +4515,9 @@ class SG2DPluginBase {
 /**
  * SG2DApplication 1.0.0
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
+
 
 
 
@@ -4016,7 +4554,6 @@ class sg2d_application_SG2DApplication {
 	 * @param {object}		[config.pointer] - Config or instanceof SG2DPointer
 	 * @param {function}	[config.iterate]
 	 * @param {function}	[config.resize]
-	 * @param {boolean}	[config.layers_enabled=true]
 	 * @param {object}		[config.layers={main: {}}]
 	 * @param {object}		[config.pixi] - Config for PIXI.Application constructor
 	 * @param {HTMLElement}	[config.pixi.resizeTo=canvas.parentElement]
@@ -4026,7 +4563,10 @@ class sg2d_application_SG2DApplication {
 	 * @param {number}			[config.pixi.width=100]
 	 * @param {number}			[config.pixi.height=100]
 	 * @param {object}		[config.matter = void 0] - Config for Matter.Engine constructor
-	 * @param {array}		[plugins=void 0] Array of string, example: ["sg2d-transitions", ...]
+	 * @param {array}		[plugins=void 0] - Array of string, example: ["sg2d-transitions", ...]
+	 * @param {object}		[sound=void 0] - Sound settings file path
+	 * @param {string|object}	[sound.config=void 0]
+	 * @param {object}		[deferred=SG2D.Deferred()] - Promise that will be executed when the scene is created and run
 	 */
 	constructor(config) {
 		
@@ -4076,26 +4616,24 @@ class sg2d_application_SG2DApplication {
 		
 		// Layers:
 		
-		this.layers_enabled = config.layers_enabled = (config.layers_enabled === void 0 ? true : config.layers_enabled);
-		
 		if (! config.layers) config.layers = { main: {} };
 		
-		var bNumbers = false;
 		if (typeof config.layers === "number") {
-			bNumbers = true;
 			var _layers = [];
 			for (var i = 0; i < config.layers; i++) _layers[i] = {};
 			config.layers = _layers;
 		}
 		
-		var bAbsContainer = false;
+		let bContainerFixedExists = false;
 		for (var l in config.layers) {
-			if (bNumbers) l = +l;
 			var layer_cfg = config.layers[l];
-			if (layer_cfg.position === sg2d_application_SG2DApplication.LAYER_POSITION_FIXED) { bAbsContainer = true; break; }
+			if (layer_cfg.position === SG2D.LAYER_POSITION_FIXED) {
+				bContainerFixedExists = true;
+				break;
+			}
 		}
 		
-		if (bAbsContainer) {
+		if (bContainerFixedExists) {
 			this.viewport = new PIXI.Container();
 			this.pixi.stage.addChild(this.viewport);
 		} else {
@@ -4105,27 +4643,22 @@ class sg2d_application_SG2DApplication {
 		
 		this.layers = {};
 		
-		var zindex = 0;
+		let zIndex = 0;
 		for (var l in config.layers) {
-			if (bNumbers) l = +l;
 			var layer_cfg = config.layers[l];
 			var layer = this.layers[l] = {
-				position: layer_cfg.position || sg2d_application_SG2DApplication.LAYER_POSITION_ABSOLUTE,
-				zindex: layer_cfg.zindex || ++zindex,
+				position: layer_cfg.position || SG2D.LAYER_POSITION_ABSOLUTE,
+				zIndex: layer_cfg.zIndex || ++zIndex,
 				sortableChildren: layer_cfg.sortableChildren === void 0 ? true : layer_cfg.sortableChildren
 			};
-			var container = layer.container = (l === "main" ? this.viewport : (config.layers_enabled || layer.position === sg2d_application_SG2DApplication.LAYER_POSITION_FIXED ? new PIXI.Container() : this.viewport));
-			if (config.layers_enabled || layer.position === sg2d_application_SG2DApplication.LAYER_POSITION_FIXED) {
-				container.sortableChildren = layer.sortableChildren;
-				container.zIndex = layer.zindex;
-			}
+			var container = layer.container = (l === "main" ? this.viewport : new PIXI.Container());
+			if (layer.sortableChildren !== void 0) container.sortableChildren = layer.sortableChildren;
+			if (layer.zIndex !== void 0) container.zIndex = layer.zIndex;
 			if (l !== "main") {
-				if (layer.position === sg2d_application_SG2DApplication.LAYER_POSITION_FIXED) {
+				if (layer.position === SG2D.LAYER_POSITION_FIXED) {
 					this.pixi.stage.addChild(container);
 				} else {
-					if (config.layers_enabled) {
-						this.viewport.addChild(container);
-					}
+					this.viewport.addChild(container);
 				}
 			}
 		}
@@ -4150,6 +4683,19 @@ class sg2d_application_SG2DApplication {
 		this.effects = config.effects instanceof sg2d_effects_SG2DEffects ? config.effects : new sg2d_effects_SG2DEffects(config.effects);
 		this.effects._sg2dconnect && this.effects._sg2dconnect(this);
 		
+		/*if (typeof config.sound === "string") {
+			
+		} else if (typeof config.sound === "object") {
+			this.sound = SG2DSound.initialize(config.sound.properties, void 0, config.sound.options);
+		}*/
+		sg2d_sound._sg2dconnect(this);
+		
+		if (config.deferred) {
+			this.deferred = config.deferred;
+		} else {
+			this.deferred = SG2D.Deferred();
+		}
+		
 		this.state = sg2d_application_SG2DApplication.STATE_IDLE;
 		if (autoStart) this.run();
 	}
@@ -4159,6 +4705,8 @@ class sg2d_application_SG2DApplication {
 			sg2d_application_SG2DApplication._initializationPromise,
 			sg2d_application_SG2DApplication._pluginsPromise
 		]).then(()=>{
+			this.deferred.resolve(this);
+			window.dispatchEvent(new Event('resize'));
 			this.initClustersInCamera();
 			this.pixi.start();
 			this.state = sg2d_application_SG2DApplication.STATE_RUN;
@@ -4202,6 +4750,10 @@ class sg2d_application_SG2DApplication {
 		
 		for (var effect of this.effects.effects) {
 			effect.iterate && effect.iterate();
+		}
+		
+		for (var tile of this.clusters.tilesset) {
+			tile.iterate && tile.iterate();
 		}
 		
 		this.iterate_out();
@@ -4346,10 +4898,6 @@ sg2d_application_SG2DApplication._initialize = function() {
 	});
 }
 
-/** @public */
-sg2d_application_SG2DApplication.LAYER_POSITION_ABSOLUTE = 0;
-sg2d_application_SG2DApplication.LAYER_POSITION_FIXED = 1;
-
 /** @readonly */
 sg2d_application_SG2DApplication.spritesCount = 0;
 
@@ -4385,7 +4933,7 @@ sg2d_application_SG2DApplication.setCellSizePix = function(v) {
 /**
  * SG2DBody
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 
@@ -4479,7 +5027,7 @@ sg2d_tilebody_SG2DTileBody.MATTER = {
 /**
  * SG2DFonts
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 
@@ -4592,9 +5140,9 @@ class sg2d_fonts_SG2DLabelCanvas {
 }
 // CONCATENATED MODULE: ./src/sg2d-sprite.js
 /**
- * SG2DSprite 1.0.0
+ * SG2DSprite
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 
@@ -4657,14 +5205,101 @@ class sg2d_sprite_SG2DSprite {
 }
 
 sg2d_sprite_SG2DSprite._options = {};
+// CONCATENATED MODULE: ./src/sg2d-message-toast.js
+/**
+ * SG2DMessageToast
+ * https://github.com/VediX/sg2d.github.io
+ * (c) Kalashnikov Ilya
+ */
+
+
+
+// Popup notification for a while, and then fade out
+let SG2DMessageToast = {
+	
+	process: { state: 0, t: void 0, opacity: 1 },
+	eDiv: void 0,
+	eMessage: void 0,
+	
+	holdInterval: 500,
+	
+	fadeOutInterval: 1000,
+	fadeOutSteps: 20,
+	fadeOutIntervalStep: void 0,
+	opacityStep: void 0,
+	
+	STATE_IDLE: 0,
+	STATE_HOLD: 1,
+	STATE_FADEOUT: 2,
+	
+	initialize: function() {
+		if (! this.eDiv) {
+			this.eDiv = document.querySelector("#message_toast");
+			if (! this.eDiv) {
+				document.body.insertAdjacentHTML("beforeend",`
+<div id="message_toast" style="color: white; position: fixed; left: 50%; margin-right: -50%; background: transparent; transform: translate(-50%, 200%); display: none">
+	<div class="content">
+		<div class="js-message" style="color: #fff; font: 20pt bold Arial;"></div>
+	</div>
+</div>`
+				);
+				this.eDiv = document.querySelector("#message_toast");
+			}
+			
+			this.eMessage = this.eDiv.querySelector(".js-message");
+			this.fadeOutIntervalStep = ~~(this.fadeOutInterval / this.fadeOutSteps);
+			this.opacityStep = 1 / SG2DMessageToast.fadeOutSteps;
+		}
+		
+		this.startFadeOut = this.startFadeOut.bind(this);
+		this.fadeOut = this.fadeOut.bind(this);
+	},
+	
+	show: function(config) {
+		
+		this.initialize();
+		
+		if (this.process.state) {
+			clearInterval(this.process.t);
+			this.process.t = null;
+		}
+		
+		this.process.state = this.STATE_HOLD;
+		this.process.t = setTimeout(this.startFadeOut, this.holdInterval);
+		
+		this.eMessage.innerHTML = config.text;
+		this.eDiv.style.display = "block";
+		this.eDiv.style.opacity = 0.99;
+	},
+	
+	startFadeOut: function() {
+		this.process.t = setInterval(this.fadeOut, this.fadeOutIntervalStep);
+	},
+	
+	fadeOut: function() {
+		this.eDiv.style.opacity -= this.opacityStep;
+		if (this.eDiv.style.opacity <= 0) {
+			this.eDiv.style.opacity = 1;
+			this.eDiv.style.display = "none";
+			clearInterval(this.process.t);
+			this.process.t = null;
+			this.process.state = this.STATE_IDLE;
+		}
+	}
+}
+
+/* harmony default export */ var sg2d_message_toast = (SG2DMessageToast);
 // CONCATENATED MODULE: ./src/sg2d.js
 /**
  * SG2D 1.0.0
- * 2D graphics engine based on PixiJS and optimized by tile clustering
+ * 2D game engine based on PixiJS and MatterJS, optimized by tile clustering
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
  * SG2D may be freely distributed under the MIT license
+ * (c) Kalashnikov Ilya 2019-2021
  */
+
+
+
 
 
 
@@ -4690,6 +5325,7 @@ sg2d_sprite_SG2DSprite._options = {};
 
 var sg2d_SG2D = {
 	Model: sg_model["a" /* default */],
+	Deferred: sg2d_deferred,
 	Consts: sg2d_consts,
 	Math: sg2d_math,
 	Utils: sg2d_utils,
@@ -4709,10 +5345,15 @@ var sg2d_SG2D = {
 	Label: sg2d_fonts_SG2DLabel,
 	LabelCanvas: sg2d_fonts_SG2DLabelCanvas,
 	Sprite: sg2d_sprite_SG2DSprite,
-	pixi: null,
-	matter: null,
-	version:  true ? "1.0.0" : undefined
+	MessageToast: sg2d_message_toast,
+	Sound: sg2d_sound
 };
+
+sg2d_SG2D.pixi = null;
+sg2d_SG2D.matter = null;
+sg2d_SG2D.version =  true ? "1.0.0" : undefined;
+sg2d_SG2D.LAYER_POSITION_ABSOLUTE = 0;
+sg2d_SG2D.LAYER_POSITION_FIXED = 1;
 
 if (typeof window === 'object' && window.document) window["SG2D"] = sg2d_SG2D;
 

@@ -1,7 +1,7 @@
 /**
  * SG2DTile
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 "use strict";
@@ -13,6 +13,7 @@ import SG2DUtils from './sg2d-utils.js';
 import SG2DMath from './sg2d-math.js';
 import SG2DClusters from './sg2d-clusters.js';
 import SG2DBounds from './sg2d-bounds.js';
+import SG2DSound from './sg2d-sound.js';
 import SG2DDebugging from './sg2d-debugging.js';
 
 export default class SG2DTile extends SGModel {
@@ -423,6 +424,10 @@ export default class SG2DTile extends SGModel {
 				}
 			}
 		}
+	}
+	
+	sound(code) {
+		SG2DSound.play(code, this);
 	}
 	
 	destroy() {

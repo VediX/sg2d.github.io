@@ -1,14 +1,15 @@
 /**
  * SG2D 1.0.0
- * 2D graphics engine based on PixiJS and optimized by tile clustering
+ * 2D game engine based on PixiJS and MatterJS, optimized by tile clustering
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
  * SG2D may be freely distributed under the MIT license
+ * (c) Kalashnikov Ilya 2019-2021
  */
 
 "use strict";
 
 import SGModel from './libs/sg-model.js';
+import SG2DDeferred from './sg2d-deferred.js';
 import SG2DConsts from './sg2d-consts.js';
 import SG2DMath from './sg2d-math.js';
 import SG2DUtils from './sg2d-utils.js';
@@ -27,9 +28,12 @@ import SG2DDebugging from './sg2d-debugging.js';
 import SG2DFonts from './sg2d-fonts.js';
 import {SG2DLabel, SG2DLabelCanvas} from './sg2d-fonts.js';
 import SG2DSprite from './sg2d-sprite.js';
+import SG2DMessageToast from './sg2d-message-toast.js';
+import SG2DSound from './sg2d-sound.js';
 
 var SG2D = {
 	Model: SGModel,
+	Deferred: SG2DDeferred,
 	Consts: SG2DConsts,
 	Math: SG2DMath,
 	Utils: SG2DUtils,
@@ -49,10 +53,15 @@ var SG2D = {
 	Label: SG2DLabel,
 	LabelCanvas: SG2DLabelCanvas,
 	Sprite: SG2DSprite,
-	pixi: null,
-	matter: null,
-	version: typeof __SG2D_VERSION__ !== 'undefined' ? __SG2D_VERSION__ : '*'
+	MessageToast: SG2DMessageToast,
+	Sound: SG2DSound
 };
+
+SG2D.pixi = null;
+SG2D.matter = null;
+SG2D.version = typeof __SG2D_VERSION__ !== 'undefined' ? __SG2D_VERSION__ : '*';
+SG2D.LAYER_POSITION_ABSOLUTE = 0;
+SG2D.LAYER_POSITION_FIXED = 1;
 
 if (typeof window === 'object' && window.document) window["SG2D"] = SG2D;
 

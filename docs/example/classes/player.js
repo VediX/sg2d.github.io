@@ -168,6 +168,8 @@ export default class Player extends ObjectBaseLifeBand {
 					y: this.properties.position.y + 110 * SG2D.Math.sin(this.sprites.turret.angle, 1)
 				}
 			});
+			
+			this.sound("player_tank_fire");
 		}
 	}
 	

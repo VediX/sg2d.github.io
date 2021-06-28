@@ -1,7 +1,7 @@
 /**
  * SG2DCamera
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 "use strict";
@@ -148,7 +148,7 @@ export default class SG2DCamera extends SGModel {
 	/** Own setter for rotate property*/
 	setRotate(newRotate, options, flags = 0) {
 		if (! this.properties.rotation && ! (flags & SGModel.FLAG_FORCE_CALLBACKS)) return; //?
-		newRotate = SG2DMath.normalize_a(newRotate);
+		newRotate = SG2DMath.normalize_a(newRotate, 1);
 		let prevRotate = this.properties.rotate;
 		if (this.set("rotate", newRotate, options, flags | SGModel.FLAG_IGNORE_OWN_SETTER)) {
 			this.sg2d.viewport.angle = -this.properties.rotate + this.rotate_adjustment;
@@ -188,16 +188,16 @@ export default class SG2DCamera extends SGModel {
 	/** @private */
 	_calc() {
 		
-		this.sg2d.viewport.x = this.sg2d.pixi.screen.width / 2;
-		this.sg2d.viewport.y = this.sg2d.pixi.screen.height / 2;
+		this.sg2d.viewport.x = (this.sg2d.pixi.screen.width  || 100) / 2;
+		this.sg2d.viewport.y = (this.sg2d.pixi.screen.height || 100) / 2;
 		this.sg2d.viewport.pivot.x = this.properties.position.x;
 		this.sg2d.viewport.pivot.y = this.properties.position.y;
 		
 		var x = this.properties.position.x
 		var y = this.properties.position.y
 		var acos = SG2DMath.cos(this.properties.rotate, 1), asin = SG2DMath.sin(this.properties.rotate, 1);
-		var w05 = this.properties.wh05.w * SG2DConsts.DEBUGGING.CAMERA.WIDTH_HEIGHT_K;
-		var h05 = this.properties.wh05.h * SG2DConsts.DEBUGGING.CAMERA.WIDTH_HEIGHT_K;
+		var w05 = this.properties.wh05.w * SG2DConsts.CAMERA.WIDTH_HEIGHT_K;
+		var h05 = this.properties.wh05.h * SG2DConsts.CAMERA.WIDTH_HEIGHT_K;
 		var bpx = this.boundsPXTops;
 		var bc = this.boundsClusterTops;
 		
@@ -435,9 +435,9 @@ export default class SG2DCamera extends SGModel {
 		var k = this.scales_k[this.properties.scale] * this.browser_scale_start / browser_scale;
 		this.sg2d.viewport.scale.set(k);
 		if (this.rotate_adjustment === 0 || this.rotate_adjustment === 180 || this.rotate_adjustment === -180) {
-			this.set("wh", {w: this.sg2d.pixi.screen.width / k, h: this.sg2d.pixi.screen.height / k});
+			this.set("wh", {w: (this.sg2d.pixi.screen.width || 100) / k, h: (this.sg2d.pixi.screen.height || 100) / k});
 		} else {
-			this.set("wh", {w: this.sg2d.pixi.screen.height / k, h: this.sg2d.pixi.screen.width / k});
+			this.set("wh", {w: (this.sg2d.pixi.screen.height || 100) / k, h: (this.sg2d.pixi.screen.width || 100) / k});
 		}
 		this.set("wh05", {w: this.properties.wh.w>>1, h: this.properties.wh.h>>1});
 		

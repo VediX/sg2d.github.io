@@ -1,7 +1,7 @@
 /**
  * SG2DApplication 1.0.0
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 "use strict";
@@ -17,6 +17,7 @@ import SG2DUtils from './sg2d-utils.js';
 import SG2DEffects from './sg2d-effects.js';
 import SG2DPlugins from './sg2d-plugins.js';
 import SG2DPluginBase from './sg2d-plugin-base.js';
+import SG2DSound from './sg2d-sound.js';
 import SG2DDebugging from './sg2d-debugging.js';
 
 export default class SG2DApplication {
@@ -39,7 +40,6 @@ export default class SG2DApplication {
 	 * @param {object}		[config.pointer] - Config or instanceof SG2DPointer
 	 * @param {function}	[config.iterate]
 	 * @param {function}	[config.resize]
-	 * @param {boolean}	[config.layers_enabled=true]
 	 * @param {object}		[config.layers={main: {}}]
 	 * @param {object}		[config.pixi] - Config for PIXI.Application constructor
 	 * @param {HTMLElement}	[config.pixi.resizeTo=canvas.parentElement]
@@ -49,7 +49,10 @@ export default class SG2DApplication {
 	 * @param {number}			[config.pixi.width=100]
 	 * @param {number}			[config.pixi.height=100]
 	 * @param {object}		[config.matter = void 0] - Config for Matter.Engine constructor
-	 * @param {array}		[plugins=void 0] Array of string, example: ["sg2d-transitions", ...]
+	 * @param {array}		[plugins=void 0] - Array of string, example: ["sg2d-transitions", ...]
+	 * @param {object}		[sound=void 0] - Sound settings file path
+	 * @param {string|object}	[sound.config=void 0]
+	 * @param {object}		[deferred=SG2D.Deferred()] - Promise that will be executed when the scene is created and run
 	 */
 	constructor(config) {
 		
@@ -99,26 +102,24 @@ export default class SG2DApplication {
 		
 		// Layers:
 		
-		this.layers_enabled = config.layers_enabled = (config.layers_enabled === void 0 ? true : config.layers_enabled);
-		
 		if (! config.layers) config.layers = { main: {} };
 		
-		var bNumbers = false;
 		if (typeof config.layers === "number") {
-			bNumbers = true;
 			var _layers = [];
 			for (var i = 0; i < config.layers; i++) _layers[i] = {};
 			config.layers = _layers;
 		}
 		
-		var bAbsContainer = false;
+		let bContainerFixedExists = false;
 		for (var l in config.layers) {
-			if (bNumbers) l = +l;
 			var layer_cfg = config.layers[l];
-			if (layer_cfg.position === SG2DApplication.LAYER_POSITION_FIXED) { bAbsContainer = true; break; }
+			if (layer_cfg.position === SG2D.LAYER_POSITION_FIXED) {
+				bContainerFixedExists = true;
+				break;
+			}
 		}
 		
-		if (bAbsContainer) {
+		if (bContainerFixedExists) {
 			this.viewport = new PIXI.Container();
 			this.pixi.stage.addChild(this.viewport);
 		} else {
@@ -128,27 +129,22 @@ export default class SG2DApplication {
 		
 		this.layers = {};
 		
-		var zindex = 0;
+		let zIndex = 0;
 		for (var l in config.layers) {
-			if (bNumbers) l = +l;
 			var layer_cfg = config.layers[l];
 			var layer = this.layers[l] = {
-				position: layer_cfg.position || SG2DApplication.LAYER_POSITION_ABSOLUTE,
-				zindex: layer_cfg.zindex || ++zindex,
+				position: layer_cfg.position || SG2D.LAYER_POSITION_ABSOLUTE,
+				zIndex: layer_cfg.zIndex || ++zIndex,
 				sortableChildren: layer_cfg.sortableChildren === void 0 ? true : layer_cfg.sortableChildren
 			};
-			var container = layer.container = (l === "main" ? this.viewport : (config.layers_enabled || layer.position === SG2DApplication.LAYER_POSITION_FIXED ? new PIXI.Container() : this.viewport));
-			if (config.layers_enabled || layer.position === SG2DApplication.LAYER_POSITION_FIXED) {
-				container.sortableChildren = layer.sortableChildren;
-				container.zIndex = layer.zindex;
-			}
+			var container = layer.container = (l === "main" ? this.viewport : new PIXI.Container());
+			if (layer.sortableChildren !== void 0) container.sortableChildren = layer.sortableChildren;
+			if (layer.zIndex !== void 0) container.zIndex = layer.zIndex;
 			if (l !== "main") {
-				if (layer.position === SG2DApplication.LAYER_POSITION_FIXED) {
+				if (layer.position === SG2D.LAYER_POSITION_FIXED) {
 					this.pixi.stage.addChild(container);
 				} else {
-					if (config.layers_enabled) {
-						this.viewport.addChild(container);
-					}
+					this.viewport.addChild(container);
 				}
 			}
 		}
@@ -173,6 +169,19 @@ export default class SG2DApplication {
 		this.effects = config.effects instanceof SG2DEffects ? config.effects : new SG2DEffects(config.effects);
 		this.effects._sg2dconnect && this.effects._sg2dconnect(this);
 		
+		/*if (typeof config.sound === "string") {
+			
+		} else if (typeof config.sound === "object") {
+			this.sound = SG2DSound.initialize(config.sound.properties, void 0, config.sound.options);
+		}*/
+		SG2DSound._sg2dconnect(this);
+		
+		if (config.deferred) {
+			this.deferred = config.deferred;
+		} else {
+			this.deferred = SG2D.Deferred();
+		}
+		
 		this.state = SG2DApplication.STATE_IDLE;
 		if (autoStart) this.run();
 	}
@@ -182,6 +191,8 @@ export default class SG2DApplication {
 			SG2DApplication._initializationPromise,
 			SG2DApplication._pluginsPromise
 		]).then(()=>{
+			this.deferred.resolve(this);
+			window.dispatchEvent(new Event('resize'));
 			this.initClustersInCamera();
 			this.pixi.start();
 			this.state = SG2DApplication.STATE_RUN;
@@ -225,6 +236,10 @@ export default class SG2DApplication {
 		
 		for (var effect of this.effects.effects) {
 			effect.iterate && effect.iterate();
+		}
+		
+		for (var tile of this.clusters.tilesset) {
+			tile.iterate && tile.iterate();
 		}
 		
 		this.iterate_out();
@@ -368,10 +383,6 @@ SG2DApplication._initialize = function() {
 		SG2DApplication._initialized = true;
 	});
 }
-
-/** @public */
-SG2DApplication.LAYER_POSITION_ABSOLUTE = 0;
-SG2DApplication.LAYER_POSITION_FIXED = 1;
 
 /** @readonly */
 SG2DApplication.spritesCount = 0;

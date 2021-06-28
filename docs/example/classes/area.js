@@ -107,5 +107,7 @@ export default class Area {
 				}
 			}
 		});
+		
+		return clusters;
 	}
 }

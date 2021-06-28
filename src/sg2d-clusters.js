@@ -1,7 +1,7 @@
 /**
  * SG2DClusters
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 "use strict";
@@ -12,10 +12,6 @@ import SG2DCluster from './sg2d-cluster.js';
 
 export default class SG2DClusters {
 	
-	/**
-	 * Config parameters and default values:
-	 *	areasize=128 Size of area. The default is 128
-	 */
 	constructor(config, clusterClass = SG2DCluster) {
 	
 		if (SG2DClusters._instance) { debugger; throw "SG2DClusters Error! There is an instance of the class! You must execute .destroy() on the previous instance!"; }

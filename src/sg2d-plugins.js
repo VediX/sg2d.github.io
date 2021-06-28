@@ -1,7 +1,7 @@
 /**
- * SG2DPlugins 1.0.0
+ * SG2DPlugins
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 "use strict";

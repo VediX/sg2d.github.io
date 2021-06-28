@@ -15,8 +15,10 @@
 		"2D graphic",
 		"game engine",
 		"pixijs",
+		"matterjs",
 		"html5",
-		"javascript"
+		"javascript",
+		"es6"
 	],
 	"devDependencies": {
 		"webpack": "^4.46.0",

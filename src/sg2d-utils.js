@@ -1,7 +1,7 @@
 /**
  * SG2D Utilities
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
+ * (c) Kalashnikov Ilya
  */
 
 "use strict";
@@ -27,6 +27,19 @@ var SG2DUtils = {
 			sResult = (d.getTime()/1000).toFixed(3);
 		}
 		return +sResult;
+	},
+	
+	loadJS: function(src, onload = void 0) {
+		return new Promise((resolve, reject)=>{
+			var script = document.createElement('script');
+			script.onload = (event)=>{
+				onload && onload(event);
+				resolve();
+			};
+			script.onerror = reject;
+			script.src = src;
+			document.head.append(script);
+		});
 	},
 
 	getTextureAsCanvas: function(mTexture) {
@@ -483,7 +496,7 @@ var SG2DUtils = {
 		graphics.drawCircle(x || 0, y || 0, r || 3);
 		graphics.endFill();
 		graphics.zIndex = 99999;
-		SG2DApplication.drawSprite(graphics);
+		SG2D.Application.drawSprite(graphics);
 	},
 
 	/** @public */
@@ -538,6 +551,13 @@ var SG2DUtils = {
 		for (var name in o) {
 			if (f.call(c, o[name])===false) break;
 		}
+	},
+	
+	/** @public */
+	propertiesCount: function(o) {
+		let q = 0;
+		for (var p in o) q++;
+		return q;
 	},
 
 	/** @public */

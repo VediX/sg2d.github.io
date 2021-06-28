@@ -14,7 +14,7 @@
 	<meta name="author" content="VediX System">
 	<meta name="copyright" content="(c) VediX System">
 	
-	<script type="text/javascript" charset="utf-8" src="libs/pixi/pixi.js" defer></script>
+	<script type="text/javascript" charset="utf-8" src="libs/pixi/pixi.min.js" defer></script>
 	<script type="text/javascript" charset="utf-8" src="libs/pixi/pixi-filters.js" defer></script>
 	<script type="text/javascript" charset="utf-8" src="libs/matter/matter.js" defer></script>
 	
@@ -24,17 +24,27 @@
 	
 	<script type="module" charset="utf-8" src="main.js" defer></script>
 	
+	<link rel="stylesheet" type="text/css" href="res/css/main.css"/>
+	
 	<style>
 		* { color: white }
 	</style>
 </head>
 <body style="padding: 0; margin: 0; background: #000;">
-	<div style="position: fixed; left: 0px; top: 0px; right: 0px; bottom: 0px; background: #333;">
-		<canvas id="canvas"></canvas>
+	
+	<div id="loader_screen" class="screen-loader">
+		<div id="loader_message" class="message" style="display: none">Initialization...</div>
+		<div class="button-start">
+			<img id="btnPlay" class="button-play" src="res/graphics/play.png" data-state="loading"/>
+		</div>
 	</div>
-	<div id="title" style="position: fixed; left: 0px; right: 0px; text-align: center; padding: 5px; z-index: 10">loading...</div>
-	<div id="info" style="position: fixed; left: 0px; bottom: 0px; color: white;">
-		FPS: <span>0</span> Sprites: <span>0</span>
+	
+	<div id="game_screen" class="screen-game" style="display: none;">
+		<canvas id="canvas"></canvas>
+		<div id="info">
+			FPS: <span>0</span> Sprites: <span>0</span>
+		</div>
+		<div id="title"></div>
 	</div>
 	
 <!-- Yandex.Metrika counter -->

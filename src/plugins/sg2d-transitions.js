@@ -4,8 +4,8 @@
  * Tiles or their constructors can specify the layer index (0..31) and the transition type (TRANSITIONS_STANDARD, ...) where the transition is generated.
  * The plugin only processes tiles with the static property useTransition=true and uses the texture from the static property of the tile!
  * https://github.com/VediX/sg2d.github.io
- * (c) 2019-2021 Kalashnikov Ilya
  * SG2DTransitions may be freely distributed under the MIT license
+ * (c) Kalashnikov Ilya
  */
 
 "use strict";

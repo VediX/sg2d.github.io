@@ -1,8 +1,7 @@
-import Deferred from "../libs/deferred.js";
 import GraphicsPreparer from "./graphics-preparer.js";
 
 export default class Menu {
-	static promise = Deferred();
+	static promise = SG2D.Deferred();
 	static load() {
 		Promise.all([
 			GraphicsPreparer.promise

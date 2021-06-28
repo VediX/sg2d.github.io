@@ -1,15 +1,14 @@
-import Deferred from "../libs/deferred.js";
 import { BlockStandard, BlockTriangle } from "./blocks.js";
 
 export default class GraphicsPreparer {
-	static promise = Deferred();
+	static promise = SG2D.Deferred();
 	static cursors = {};
 	static load() {
 		let loader = PIXI.Loader.shared;
 		loader.add([
-			{ name: "assets", url: "res/assets.json" },
-			{ name: "displacement_static", url: "res/displacement_static.jpg" },
-			{ name: "displacement_animation", url: "res/displacement_animation.png" }
+			{ name: "assets", url: "res/graphics/assets.json" },
+			{ name: "displacement_static", url: "res/graphics/displacement_static.jpg" },
+			{ name: "displacement_animation", url: "res/graphics/displacement_animation.png" }
 		]).load(async(loader, resources)=>{
 
 			// Parsing composite images, for example, "explosion_64x64.png" will be decomposed into several images
