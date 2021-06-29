@@ -1,3 +1,5 @@
+"use strict";
+
 export class BlockSteel extends SG2D.TileBody {
 	static texture = "elements/block-steel";
 	static layer = "bodies";

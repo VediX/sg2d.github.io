@@ -15,6 +15,22 @@ import Player from "./classes/player.js";
 
 class Application {
 	
+	static soundConfig = {
+		options: {
+			music_dir: "./res/music/",
+			sounds_dir: "./res/sounds/",
+			config: "./res/sounds.json" // or object
+		},
+		properties: {
+			sounds: true,
+			music: true,
+			musicVolume: 10,
+			volumeDecreaseDistance: 10, // units changes in clusters
+			environment2D: true,
+			view: "profile" // You can start the melodies in this way or in another way, see below
+		}
+	};
+	
 	constructor() {
 		
 		window.app = this;
@@ -28,24 +44,13 @@ class Application {
 			
 			Promise.all([
 				GraphicsPreparer.load(),
-				SG2D.Sound.load({
-					music_dir: "./res/music/",
-					sounds_dir: "./res/sounds/",
-					config: "./res/sound.json"
-				}, {
-					sounds: true,
-					music: true,
-					musicVolume: 10,
-					volumeDecreaseDistance: 10, // units changes in clusters
-					environment2D: true,
-					view: "scene" // You can start the melodies in this way or in another way, see below
-				}),
+				SG2D.Sound.load(Application.soundConfig.options, Application.soundConfig.properties),
 				Menu.load()
 			]).then(()=>{
 				document.querySelector("#loader_screen").style.display = "none";
 				document.querySelector("#game_screen").style.display = "block";
-				this.createScene();
-				//SG2D.Sound.musicPlay("scene"); // The second way to play the melody in a circle for the specified view
+				let scene = this.createScene();
+				//scene.deferred.then(()=>SG2D.Sound.musicPlay("level01")); // The second way to play the melody in a circle for the specified view
 			});
 		});
 	}
@@ -53,6 +58,7 @@ class Application {
 	createScene() {
 		
 		this.scene =  new SG2D.Application({
+			id: "level01",
 			canvasId: "canvas",
 			cellsizepix: 64,
 			clusters: {
@@ -95,7 +101,16 @@ class Application {
 				interface: { position: SG2D.LAYER_POSITION_FIXED, zIndex: 10 }
 			},
 			plugins: ["sg2d-transitions"],
-			sound: true // or for example: { sounds_dir: "./res/sounds/level1/", config: "./res/sounds_for_level1.json" }
+			sound: {
+				options: {
+					music_dir: "./res/music/",
+					sounds_dir: "./res/levels/01/",
+					config: "./res/levels/01/sounds.json"
+				},
+				properties: {
+					view: "level01"
+				}
+			}
 		});
 		
 		let camera = this.scene.camera;

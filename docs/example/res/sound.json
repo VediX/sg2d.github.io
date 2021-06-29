@@ -1,9 +1,0 @@
-{
-	"music": {
-		"scene": ["Kalashnikov Ilya - Tartariya - pizzicato timpani.mp3", "Kalashnikov Ilya - Tartariya - pizzicato timpani solovox.mp3"]
-	},
-	"sounds": {
-		"tank_whizbang_explosion": { "file": "explosion_j.mp3", "volume": 3, "start": 0.4 },
-		"player_tank_fire": { "file": "gun_fire_h.mp3", "volume": 0.7 }
-	}
-}

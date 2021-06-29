@@ -1,3 +1,5 @@
+"use strict";
+
 import SG2DTransitions from "./../libs/sg2d/plugins/sg2d-transitions.js";
 //import SG2DTransitions from "./../../../src/plugins/sg2d-transitions.js";
 

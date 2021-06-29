@@ -1,0 +1,16 @@
+{
+	"music": {
+		"profile": "Kalashnikov Ilya - Gyperboreya - synthLead.mp3"
+	},
+	"sounds": {
+		"button_click": "button_click.mp3",
+		"button_play": "button_play.mp3",
+		"button_ok": "button_ok.mp3",
+		"button_error": "button_error.mp3",
+		"button_cancel": "button_cancel.mp3",
+		"button_over": "button_over.mp3",
+		"input_check_on": "input_check_on.mp3",
+		"input_check_off": "input_check_off.mp3",
+		"input_range": "input_range.mp3"
+	}
+}

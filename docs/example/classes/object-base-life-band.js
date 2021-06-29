@@ -1,3 +1,5 @@
+"use strict";
+
 export default class ObjectBaseLifeBand extends SG2D.TileBody {
 	
 	static layer = "bodies";

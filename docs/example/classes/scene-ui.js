@@ -1,3 +1,5 @@
+"use strict";
+
 export default class SceneUI {
 	
 	static TYPE_PLAYER = 1;

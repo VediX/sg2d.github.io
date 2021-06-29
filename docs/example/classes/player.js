@@ -1,3 +1,5 @@
+"use strict";
+
 import ObjectBaseLifeBand from "./object-base-life-band.js";
 import {Whizbang} from "./whizbang.js";
 
@@ -6,7 +8,7 @@ export default class Player extends ObjectBaseLifeBand {
 	static singleInstance = true;
 	static zindex = 10;
 	
-	static sprites = SGModel.defaults({
+	static sprites = SG2D.Model.defaults({
 		platform: {
 			texture: "objects/player-platform",
 			zindex: 0,

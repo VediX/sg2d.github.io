@@ -1,0 +1,14 @@
+{
+	"music": {
+		"level01": ["Kalashnikov Ilya - Tartariya - pizzicato timpani.mp3", "Kalashnikov Ilya - Tartariya - pizzicato timpani solovox.mp3"]
+	},
+	"sounds": {
+		"cannon_fire": "gun_fire_g.mp3",
+		"gunlaser_fire": { "file": "gun_fire_a.mp3", "volume": 0.5 },
+		"cannon_whizbang_explosion": { "file": "explosion_g.mp3", "volume": 0.5 },
+		"laser_whizbang_explosion": { "file": "explosion_m.mp3", "volume": 0.2, "speed": 2 },
+		"tank_whizbang_explosion": { "file": "explosion_j.mp3", "volume": 3, "start": 0.4 },
+		"player_tank_fire": { "file": "gun_fire_h.mp3", "volume": 0.7 },
+		"player_guadgun_fire": { "file": "laser_fire_d.mp3", "volume": 0.3, "start": 0.2 }
+	}
+}

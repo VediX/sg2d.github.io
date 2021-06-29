@@ -1,3 +1,5 @@
+"use strict";
+
 import {Water, Grass, Sand, Medikit, Tree, Bush} from "./tiles.js";
 import {BlockSteel, BlockStandard, BlockTriangle} from "./blocks.js";
 import Utils from "./utils.js";

@@ -1,3 +1,5 @@
+"use strict";
+
 import { BlockStandard, BlockTriangle } from "./blocks.js";
 
 export default class GraphicsPreparer {
