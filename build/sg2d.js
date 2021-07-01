@@ -2990,24 +2990,16 @@ function _SG2DSound() {
 	this.music_views = {}; // Views and list music
 	this.music_view = null; // Current view object
 	
-	this.options = {
+	/** @protected */
+	this.bass = void 0;
+	
+	/** @private */
+	this._options = {
 		config: void 0,
 		music_dir:  void 0,
 		sounds_dir: void 0,
 		library_pathfile: void 0
 	};
-	
-	this.bass = void 0;
-	
-	/** @private */
-	this._resolveLibrary = void 0;
-	/** @private */
-	this._rejectLibrary = void 0;
-	/** @private */
-	this._promiseLibrary = new Promise((resolve, reject)=>{
-		this._resolveLibrary = resolve;
-		this._rejectLibrary = reject;
-	});
 	
 	/** @private */
 	this._initializationRunned = false;
@@ -3039,19 +3031,17 @@ function _SG2DSound() {
 			return;
 		}
 		
-		if (this._initializationRunned) {
-			this.destroy();
-		}
+		let promise;
+		
+		this._options.config = options.config;
+		this._options.music_dir = options.music_dir || this._options.music_dir || "./res/music/";
+		this._options.sounds_dir = options.sounds_dir || this._options.sounds_dir || "./res/sounds/";
+		this._options.library_pathfile = options.library_pathfile || this._options.library_pathfile || "./libs/pixi/pixi-sound.js";
 		
 		for (var p in properties) this.set(p, properties[p]);
 		
 		if (! this._initializationRunned) {
 			this._initializationRunned = true;
-			
-			if (options.config) this.options.config = options.config;
-			this.options.music_dir = options.music_dir || "./res/music/";
-			this.options.sounds_dir = options.sounds_dir || "./res/sounds/";
-			this.options.library_pathfile = options.library_pathfile || "./libs/pixi/pixi-sound.js";
 			
 			this.onEndMusic = this._onEndMusic.bind(this);
 			this.visibilityChange = this._visibilityChange.bind(this);
@@ -3071,30 +3061,46 @@ function _SG2DSound() {
 				}
 			});
 			
-			if (this._gestureDetected) {
-				this._libraryLoad(options);
-			} else {
-				let t = setInterval(()=>{
-					if (this._gestureDetected) {
-						clearInterval(t);
-						this._libraryLoad(options);
-					}
-				}, 100);
-			}
+			this.on("view", (view)=>{
+				this.musicPlay(view);
+			});
+			
+			promise = new Promise((resolve, reject)=>{
+				if (this._gestureDetected) {
+					this._libraryLoad(options, resolve, reject);
+				} else {
+					let t = setInterval(()=>{
+						if (this._gestureDetected) {
+							clearInterval(t);
+							this._libraryLoad(options, resolve, reject);
+						}
+					}, 100);
+				}
+			});
+			
+		} else if (this._options.config) {
+			promise = new Promise((resolve, reject)=>{
+				this.loadConfig(this._options.config, resolve, reject);
+			});
+		} else {
+			promise = Promise.resolve();
 		}
 		
-		return this._promiseLibrary;
+		return promise;
 	};
 	
 	/** @private */
-	this._libraryLoader = void 0;
+	this._libraryLoaded = false;
 	
 	/** @private */
-	this._libraryLoad = (options = {})=>{
+	this._libraryLoad = (options = {}, resolve, reject)=>{
 		
-		if (! this._libraryLoader) {
+		let promise;
+		
+		if (! this._libraryLoaded) {
+			this._libraryLoaded = true;
 			
-			this._libraryLoader = sg2d_utils.loadJS(this.options.library_pathfile, (event)=>{
+			promise = sg2d_utils.loadJS(this._options.library_pathfile, (event)=>{
 				
 				this.visibilityChange();
 				
@@ -3104,18 +3110,20 @@ function _SG2DSound() {
 				];
 				
 				if (options.config) {
-					this.loadConfig(options.config, this._resolveLibrary, this._rejectLibrary);
+					this.loadConfig(options.config, resolve, reject);
 				} else {
-					this._resolveLibrary();
+					resolve();
 				}
 			});
 			
-			this._libraryLoader.catch(error=>{
-				this._rejectLibrary("Error in SG2D.Sound! See options.library_pathfile=\"" + this.options.library_pathfile + "\"!");
+			promise.catch(error=>{
+				reject("Error in SG2D.Sound! See options.library_pathfile=\"" + this._options.library_pathfile + "\"!");
 			});
+		} else {
+			promise = Promise.resolve();
 		}
 		
-		return this._libraryLoader;
+		return promise;
 	};
 	
 	/** @private */
@@ -3157,7 +3165,7 @@ function _SG2DSound() {
 				sound.sound = PIXI.sound.add(name, {
 					autoPlay: false,
 					preload: true,
-					url: SG2DSound.options.sounds_dir+sound.file,
+					url: this._options.sounds_dir+sound.file,
 					loaded: (err, sound)=>{
 						if (err) {
 							if (typeof sound !== "undefined") sound.isError = true;
@@ -3181,7 +3189,7 @@ function _SG2DSound() {
 						autoPlay: false,
 						preload: false,
 						singleInstance: true,
-						url: SG2DSound.options.music_dir+list[i],
+						url: this._options.music_dir+list[i],
 						loaded: (err, music)=>{
 							if (err) {
 								if (typeof music !== "undefined") music.isError = true;
@@ -3224,8 +3232,9 @@ function _SG2DSound() {
 	 * Play music
 	 * @param {string|bool}	[viewcode=true] - Page code or true value. If true, then the current music starts playing if it is not playing yet
 	 * @param {object}		[options={}] - Options passed to the play() method, for example, sound volume, playback speed, start and end times
+	 * @param {boolean}	[strict=false] - If the melody is not loaded, then the console will display an error
 	 */
-	this.musicPlay = (viewcode = true, options = {})=>{
+	this.musicPlay = (viewcode = true, options = {}, strict = false)=>{
 		
 		if (viewcode === true) {
 			if (! this.music_view) return false;
@@ -3243,7 +3252,8 @@ function _SG2DSound() {
 		}
 		
 		if (! this.music_view) {
-			console.error("SG2D.Sound Error! The music file may not have been loaded yet!");
+			if (strict) console.error("SG2D.Sound Error! The music file may not have been loaded yet!");
+			return false;
 		}
 		
 		this.set("view", viewcode, void 0, sg_model["a" /* default */].FLAG_NO_CALLBACKS);
@@ -4564,20 +4574,36 @@ class sg2d_application_SG2DApplication {
 	 * @param {number}			[config.pixi.height=100]
 	 * @param {object}		[config.matter = void 0] - Config for Matter.Engine constructor
 	 * @param {array}		[plugins=void 0] - Array of string, example: ["sg2d-transitions", ...]
-	 * @param {object}		[sound=void 0] - Sound settings file path
-	 * @param {string|object}	[sound.config=void 0]
+	 * @param {string|object}[sound=void 0] - Sound config file path or sound settings
+	 * @param {object}			[sound.options={}]
+	 * @param {string|object}		[sound.options.config=void 0] - File path to sound config or object sound config
+	 * @param {string}				[sound.options.music_dir=void 0] - Music directory
+	 * @param {string}				[sound.options.sounds_dir=void 0] - Sounds directory
+	 * @param {string}				[sound.options.library_pathfile=void 0] - Path to the PIXI.Sound library file is applied only the first time the parameter is passed
+	 * @param {object}			[sound.properties={}]
+	 * @param {boolean}			[sound.properties.sounds=true]
+	 * @param {boolean}			[sound.properties.music=true]
+	 * @param {number}				[sound.properties.musicVolume=100]
+	 * @param {number}				[sound.properties.soundsVolume=100]
+	 * @param {boolean}			[sound.properties.muteOnLossFocus=true]
+	 * @param {number}				[sound.properties.volumeDecreaseDistance=0]
+	 * @param {boolean}			[sound.properties.environment2D=true]
+	 * @param {boolean}			[sound.properties.bass=false]
+	 * @param {string}				[sound.properties.view=void 0]
 	 * @param {object}		[deferred=SG2D.Deferred()] - Promise that will be executed when the scene is created and run
 	 */
 	constructor(config) {
 		
-		if (sg2d_application_SG2DApplication._instance) throw "SG2DApplication Error! There is an instance of the class! You must execute .destroy() on the previous instance!";
+		if (sg2d_application_SG2DApplication._instance) throw "SG2D.Application Error! There is an instance of the class! You must execute .destroy() on the previous instance!";
 		sg2d_application_SG2DApplication._instance = this;
 		
 		sg2d_application_SG2DApplication._initialized ? Promise.resolve() : sg2d_application_SG2DApplication._initialize();
 		
-		if (! config) throw "SG2DApplication Error! config is empty!";
+		if (! config) throw "SG2D.Application Error! config is empty!";
 		
 		if (+config.cellsizepix) sg2d_application_SG2DApplication.setCellSizePix(config.cellsizepix);
+		
+		this.id = config.id ? config.id : ++sg2d_application_SG2DApplication._uid;
 		
 		let pixi = config.pixi = config.pixi || {};
 		this.canvas = pixi.view = pixi.view || document.getElementById(config.canvasId) || document.querySelector("CANVAS");
@@ -4683,11 +4709,14 @@ class sg2d_application_SG2DApplication {
 		this.effects = config.effects instanceof sg2d_effects_SG2DEffects ? config.effects : new sg2d_effects_SG2DEffects(config.effects);
 		this.effects._sg2dconnect && this.effects._sg2dconnect(this);
 		
-		/*if (typeof config.sound === "string") {
-			
-		} else if (typeof config.sound === "object") {
-			this.sound = SG2DSound.initialize(config.sound.properties, void 0, config.sound.options);
-		}*/
+		if (typeof config.sound === "string") {
+			config.sound = { options: { config: config.sound } };
+		}
+		if (typeof config.sound === "object") {
+			sg2d_application_SG2DApplication._soundConfigPromise = sg2d_sound.load(config.sound.options, config.sound.properties);
+		} else {
+			sg2d_application_SG2DApplication._soundConfigPromise = Promise.resolve();
+		}
 		sg2d_sound._sg2dconnect(this);
 		
 		if (config.deferred) {
@@ -4703,7 +4732,8 @@ class sg2d_application_SG2DApplication {
 	run() {
 		Promise.all([
 			sg2d_application_SG2DApplication._initializationPromise,
-			sg2d_application_SG2DApplication._pluginsPromise
+			sg2d_application_SG2DApplication._pluginsPromise,
+			sg2d_application_SG2DApplication._soundConfigPromise
 		]).then(()=>{
 			this.deferred.resolve(this);
 			window.dispatchEvent(new Event('resize'));
@@ -4863,7 +4893,7 @@ sg2d_application_SG2DApplication.getInstance = function(bIgnoreEmpty) {
 	if (this._instance) {
 		return this._instance;
 	} else if (! bIgnoreEmpty) {
-		throw "Error! SG2DApplication._instance is empty!";
+		throw "Error! SG2D.Application._instance is empty!";
 	}
 	return null;
 }
@@ -4874,11 +4904,17 @@ sg2d_application_SG2DApplication.STATE_RUN = 1;
 sg2d_application_SG2DApplication.STATE_PAUSE = 2;
 sg2d_application_SG2DApplication.STATE_DESTROY = 1<<31; // leftmost bit
 
+/** @private */
+sg2d_application_SG2DApplication._uid = 0;
+
 /** @public */
 sg2d_application_SG2DApplication.plugins = null;
 
 /** @private */
 sg2d_application_SG2DApplication._pluginsPromise = null;
+
+/** @private */
+sg2d_application_SG2DApplication._soundConfigPromise = null;
 
 /** @private */
 sg2d_application_SG2DApplication._initialized = false;
