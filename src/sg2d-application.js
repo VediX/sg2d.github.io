@@ -48,7 +48,8 @@ export default class SG2DApplication {
 	 * @param {boolean}		[config.pixi.autoStart=true]
 	 * @param {number}			[config.pixi.width=100]
 	 * @param {number}			[config.pixi.height=100]
-	 * @param {object}		[config.matter = void 0] - Config for Matter.Engine constructor
+	 * @param {object}		[config.matter=void 0] - Config for Matter.Engine constructor. For MatterJS to connect, you need to transfer at least an empty object or true value!
+	 * @param {object}			[config.mstter.gravity=void 0] - Example for setting gravity
 	 * @param {array}		[plugins=void 0] - Array of string, example: ["sg2d-transitions", ...]
 	 * @param {string|object}[sound=void 0] - Sound config file path or sound settings
 	 * @param {object}			[sound.options={}]
@@ -101,6 +102,7 @@ export default class SG2DApplication {
 		SG2D.pixi = this.pixi = new PIXI.Application(pixi);
 		
 		if (config.matter) {
+			if (config.matter === true) config.matter = {};
 			SG2D.matter = this.matter = Matter.Engine.create(config.matter);
 			
 			Matter.Events.on(this.matter, "collisionStart", function(event) {
