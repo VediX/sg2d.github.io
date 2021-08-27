@@ -1,5 +1,5 @@
 /**
- * SGModel 1.0.2
+ * SGModel 1.0.3
  * A fast lightweight library (ES6) for structuring web applications using binding models and custom events. This is a faster and more simplified analogue of Backbone.js!
  * https://github.com/VediX/SGModel
  * (c) 2019-2021 Kalashnikov Ilya
@@ -17,9 +17,9 @@ export default class SGModel {
 	
 	/**
 	 * SGModel constructor
-	 * @param {object} props Properties
-	 * @param {object} thisProps Properties and methods passed to the "this" context of the created instance
-	 * @param {object} options Custom settings
+	 * @param {object} [props={}] Properties
+	 * @param {object} [thisProps=void 0] Properties and methods passed to the "this" context of the created instance
+	 * @param {object} [options=void 0] Custom settings
 	 */
 	constructor(properties = {}, thisProps = void 0, options = void 0) {
 		
@@ -33,7 +33,7 @@ export default class SGModel {
 		// override defaults by localStorage data
 		if (this.constructor.localStorageKey) {
 			let lsData = void 0;
-			let data = localStorage.getItem(this.constructor.localStorageKey + (! this.constructor.singleInstance ? "_" + props.id : ""));
+			let data = localStorage.getItem(this.constructor.localStorageKey + (! this.constructor.singleInstance ? "_" + properties.id : ""));
 			if (data) lsData = JSON.parse(data);
 			if (lsData) SGModel.initObjectByObject(defaults, lsData);
 		}
@@ -76,7 +76,7 @@ export default class SGModel {
 					break;
 				}
 				case SGModel.TYPE_STRING: properties[p] = ''+value; break;
-				case SGModel.TYPE_BOOLEAN: properties[p] = !! value; break;
+				case SGModel.TYPE_BOOLEAN: properties[p] = SGModel.toBoolean(value); break;
 				case SGModel.TYPE_OBJECT:
 					if (Array.isArray(value)) {
 						var valueDefault = defaults[p];
@@ -130,12 +130,12 @@ export default class SGModel {
 	
 	/**
 	* Set property value
-	* @param {string} name
-	* @param {mixed} val
+	* @param {string}	name
+	* @param {mixed}	 val
 	* @param {object}	[options=void 0]
 	* @param {number}		[options.precision] - Rounding precision
 	* @param {mixed}		[options.previous_value] - Use this value as the previous value
-	* @param {number} flags	- Valid flags: FLAG_OFF_MAY_BE | FLAG_PREV_VALUE_CLONE | FLAG_NO_CALLBACKS | FLAG_FORCE_CALLBACKS | FLAG_IGNORE_OWN_SETTER
+	* @param {number}	[flags=0] - Valid flags: FLAG_OFF_MAY_BE | FLAG_PREV_VALUE_CLONE | FLAG_NO_CALLBACKS | FLAG_FORCE_CALLBACKS | FLAG_IGNORE_OWN_SETTER
 	* @return {boolean} If the value was changed will return true
 	*/
 	set(name, value, options = void 0, flags = 0) {
@@ -163,7 +163,7 @@ export default class SGModel {
 				case SGModel.TYPE_ARRAY: case SGModel.TYPE_ARRAY_NUMBERS: return this._setArray.apply(this, arguments);
 				case SGModel.TYPE_OBJECT: case SGModel.TYPE_OBJECT_NUMBERS: return this._setObject.apply(this, arguments);
 				case SGModel.TYPE_STRING: value = ''+value; break;
-				case SGModel.TYPE_BOOLEAN: value = !! value; break;
+				case SGModel.TYPE_BOOLEAN: value = SGModel.toBoolean(value); break;
 			}
 		}
 		
@@ -177,21 +177,26 @@ export default class SGModel {
 		}
 		
 		if (! (flags & SGModel.FLAG_NO_CALLBACKS)) {
+			
 			SGModel._prevValue = (options.previous_value !== void 0 ? options.previous_value : ((flags & SGModel.FLAG_PREV_VALUE_CLONE) ? SGModel.clone(val) : val));
+			
 			var callbacks = this.onChangeCallbacks[name];
+			
 			if (callbacks) {
 				if (flags & SGModel.FLAG_OFF_MAY_BE) callbacks = SGModel.clone(callbacks);
 				var _val = void 0;
 				for (var i in callbacks) {
 					var c = callbacks[i];
 					if (c.d) {
-						_val = c.f.call(c.c ? c.c : this, c.d, value, SGModel._prevValue);
+						_val = c.f.call(c.c ? c.c : this, c.d, value, SGModel._prevValue, name);
 					} else {
-						_val = c.f.call(c.c ? c.c : this, value, SGModel._prevValue);
+						_val = c.f.call(c.c ? c.c : this, value, SGModel._prevValue, name);
 					}
 					if (_val !== void 0) val = _val;
 				}
 			}
+			
+			if (this.onAllCallback) this.onAllCallback();
 		}
 		
 		return true;
@@ -384,9 +389,9 @@ export default class SGModel {
 				for (var i in callbacks) {
 					var c = callbacks[i];
 					if (c.d) {
-						_val = c.f.call(c.c ? c.c : this, c.d, values, SGModel._prevValue);
+						_val = c.f.call(c.c ? c.c : this, c.d, values, SGModel._prevValue, name);
 					} else {
-						_val = c.f.call(c.c ? c.c : this, values, SGModel._prevValue);
+						_val = c.f.call(c.c ? c.c : this, values, SGModel._prevValue, name);
 					}
 					if (_val !== void 0) values = _val;
 				}
@@ -400,7 +405,7 @@ export default class SGModel {
 
 	/**
 	 * Set trigger for property change
-	 * @param {string} name
+	 * @param {string|array} name
 	 * @param {function} func
 	 * @param {object} context If not specified, the "this" of the current object is passed
 	 * @param {mixed} data	If "data" is set, then this value (data) is passed in the first arguments [] callback
@@ -408,35 +413,88 @@ export default class SGModel {
 	 *		SGModel.FLAG_IMMEDIATELY - "func" will be executed once now
 	 */
 	on(name, func, context, data, flags = 0) {
+		if (Array.isArray(name)) {
+			for (var i = 0; i < name.length; i++) {
+				this._on.call(this,
+					name[i],
+					func,
+					Array.isArray(context) ? context[i] : context,
+					Array.isArray(data) ? data[i] : data,
+					flags
+				);
+			}
+		} else {
+			this._on.apply(this, arguments);
+		}
+	}
+	
+	/** @private */
+	_on(name, func, context, data, flags = 0) {
 		var callbacks = this.onChangeCallbacks[name];
 		if (! callbacks) callbacks = this.onChangeCallbacks[name] = [];
 		callbacks.push({f: func, c: context, d: data});
 		if (flags === SGModel.FLAG_IMMEDIATELY) {
 			if (data) {
-				func.call(context ? context : this, data, this.properties[name], this.properties[name]);
+				func.call(context ? context : this, data, this.properties[name], this.properties[name], name);
 			} else {
-				func.call(context ? context : this, this.properties[name], this.properties[name]);
+				func.call(context ? context : this, this.properties[name], this.properties[name], name);
 			}
 		}
 	}
+	
+	/**
+	 * Check if there is a property in the model
+	 */
+	has(name) {
+		return this.properties.hasOwnProperty(name);
+	}
+	
+	/**
+	 * Set trigger to change any property
+	 * @param {function} func
+	 * @param {number} flags Valid flags:
+	 *		SGModel.FLAG_IMMEDIATELY - "func" will be executed once now
+	 */
+	setOnAllCallback(func, flags = 0) {
+		this.onAllCallback = func;
+		if (flags === SGModel.FLAG_IMMEDIATELY) {
+			this.onAllCallback();
+		}
+	}
 
+	/**
+	 * Remove trigger on property change
+	 * @param {string|array} name
+	 * @param {function} func
+	 */
 	off(name, func) {
 		if (name) {
-			var callbacks = this.onChangeCallbacks[name];
-			if (callbacks) {
-				if (func) {
-					for (var i = 0; i < callbacks.length; i++) {
-						if (callbacks[i].f === func) {
-							callbacks.splice(i, 1);
-							i--;
-						}
-					}
-				} else {
-					callbacks.length = 0;
+			if (Array.isArray(name)) {
+				for (var i = 0; i < name.length; i++) {
+					this._off.call(this, name[i], func);
 				}
+			} else {
+				this._on.apply(this, arguments);
 			}
 		} else {
 			for (var f in this.onChangeCallbacks) this.onChangeCallbacks[f].length = 0;
+		}
+	}
+	
+	/** @private */
+	_off(name, func) {
+		var callbacks = this.onChangeCallbacks[name];
+		if (callbacks) {
+			if (func) {
+				for (var i = 0; i < callbacks.length; i++) {
+					if (callbacks[i].f === func) {
+						callbacks.splice(i, 1);
+						i--;
+					}
+				}
+			} else {
+				callbacks.length = 0;
+			}
 		}
 	}
 	
@@ -452,7 +510,12 @@ export default class SGModel {
 		if (callbacks) {
 			if (flags & SGModel.FLAG_OFF_MAY_BE) callbacks = SGModel.clone(callbacks);
 			for (var i in callbacks) {
-				callbacks[i].f.call(callbacks[i].c ? callbacks[i].c : this, (callbacks[i].d ? callbacks[i].d : this.properties[name]));
+				var cb = callbacks[i];
+				if (cb.d) {
+					cb.f.call( cb.c ? cb.c : this, cb.d, this.properties[name], this.properties[name], name );
+				} else {
+					cb.f.call( cb.c ? cb.c : this, this.properties[name], this.properties[name], name );
+				}
 			}
 		}
 	}
@@ -469,11 +532,20 @@ export default class SGModel {
 			delete this.properties.id;
 		}
 		
-		// Discard properties starting with "_"
 		let dest = {};
-		for (var p in this.properties) {
-			if (p[0] === "_") continue;
-			dest[p] = this.properties[p];
+		
+		if (this.constructor.localStorageProperties) {
+			debugger;
+			for (var i = 0; i < this.constructor.localStorageProperties.length; i++) {
+				let name = this.constructor.localStorageProperties[i];
+				dest[name] = this.properties[name];
+			}
+		} else {
+			// Discard properties starting with "_"
+			for (var p in this.properties) {
+				if (p[0] === "_") continue;
+				dest[p] = this.properties[p];
+			}
 		}
 		
 		localStorage.setItem(this.constructor.localStorageKey + (! this.constructor.singleInstance ? "_" + id : ""), JSON.stringify(dest));
@@ -494,7 +566,7 @@ export default class SGModel {
 SGModel.typeProperties = {};
 	
 SGModel.defaultsProperties = {}; // override
-	
+
 SGModel.TYPE_ANY = void 0;
 SGModel.TYPE_NUMBER = 1;
 SGModel.TYPE_STRING = 2;
@@ -508,7 +580,7 @@ SGModel.TYPE_NUMBER_OR_XY = 8;
 // The flag passed in the .on(...) call to execute the callback
 SGModel.FLAG_IMMEDIATELY = true;
 
-// Private property
+/** @private */
 SGModel.OBJECT_EMPTY = Object.preventExtensions({});
 
 SGModel.FLAG_OFF_MAY_BE = 0b00000001; // if set can be .off(), then you need to pass this flag
@@ -546,7 +618,7 @@ SGModel._uid = 0;
 /** @private */
 SGModel.uid = function() {
 	return ++SGModel._uid;
-}
+};
 
 /** @public */
 SGModel.defaults = function(dest, ...sources) {
@@ -559,7 +631,7 @@ SGModel.defaults = function(dest, ...sources) {
 		}
 	}
 	return dest;
-}
+};
 
 /**
  * Full cloning (with nested objects).
@@ -583,7 +655,7 @@ SGModel.clone = function(source) {
 		dest = source;
 	}
 	return dest;
-}
+};
 
 /**
  * Fill the values of the object / array dest with the values from the object / array source (with recursion)
@@ -614,18 +686,23 @@ SGModel.initObjectByObject = function(dest, source) {
 		dest = source;
 	}
 	return dest;
-}
+};
 
 /** @public */
 SGModel.upperFirstLetter = function(s) {
 	return s.charAt(0).toUpperCase() + s.slice(1);
-}
+};
 
 /** @public */
 SGModel.roundTo = function(value, precision = 0) {
 	let m = 10 ** precision;
 	return Math.round(value * m) / m;
-}
+};
+
+/** @public */
+SGModel.toBoolean = function(value) {
+	return (typeof value === "string" ? (value === "1" || value.toUpperCase() === "TRUE" ? true : false) : !! value);
+};
 
 /** @private */
 SGModel._instance = null;
@@ -642,7 +719,21 @@ SGModel.getInstance = function(bIgnoreEmpty = false) {
 		throw "Error! this._instance is empty!";
 	}
 	return null;
-}
+};
+
+/** @public */
+SGModel.save = function() {
+	if (this._instance) {
+		if (this.singleInstance) {
+			return this._instance.save();
+		} else {
+			debugger; throw "Error! The class must be with singleInstance=true!";
+		}
+	} else {
+		debugger; throw "Error! this._instance is empty!";
+	}
+	return null;
+};
 
 /**
  * Method get() for single instance of a class
@@ -650,7 +741,7 @@ SGModel.getInstance = function(bIgnoreEmpty = false) {
  */
 SGModel.get = function(...args) {
 	return this._instance && this._instance.get(...args);
-}
+};
 
 /**
  * Method set() for single instance of a class
@@ -658,7 +749,7 @@ SGModel.get = function(...args) {
  */
 SGModel.set = function(...args) {
 	return this._instance && this._instance.set(...args);
-}
+};
 
 /**
  * Method on() for single instance of a class
@@ -666,7 +757,7 @@ SGModel.set = function(...args) {
  */
 SGModel.on = function(...args) {
 	return this._instance && this._instance.on(...args);
-}
+};
 
 /**
  * Method off() for single instance of a class
@@ -674,7 +765,15 @@ SGModel.on = function(...args) {
  */
 SGModel.off = function(...args) {
 	return this._instance && this._instance.off(...args);
-}
+};
+
+/**
+ * Method getProperties() for single instance of a class
+ * @public
+ */
+SGModel.getProperties = function(...args) {
+	return this._instance && this._instance.properties;
+};
 
 /**
  * If a non-empty string value is specified, then the data is synchronized with the local storage.
@@ -697,8 +796,10 @@ SGModel._prevValue = void 0;
 /** @private */
 SGModel._xy = {x: 0, y: 0};
 
+SGModel.version = typeof __SGMODEL_VERSION__ !== 'undefined' ? __SGMODEL_VERSION__ : '*';
+
 if (typeof exports === 'object' && typeof module === 'object') module.exports = SGModel;
-else if (typeof define === 'function' && define.amd) define("SG2D", [], ()=>SGModel);
+else if (typeof define === 'function' && define.amd) define("SGModel", [], ()=>SGModel);
 else if (typeof exports === 'object') exports["SGModel"] = SGModel;
 else if (typeof window === 'object' && window.document) window["SGModel"] = SGModel;
 else this["SGModel"] = SGModel;

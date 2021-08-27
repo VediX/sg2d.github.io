@@ -2,11 +2,12 @@
  * SG2DPointer
  * https://github.com/VediX/sg2d.github.io
  * (c) Kalashnikov Ilya
+ * TODO: To prevent the browser from creating a new request every time you change cursor url, you need to display cursor using PixiJS
  */
 
 "use strict";
 
-import SGModel from './libs/sg-model.js';
+import SGModel from './libs/sg-model/sg-model.js';
 import SG2DConsts from './sg2d-consts.js';
 import SG2DUtils from './sg2d-utils.js';
 import SG2DMath from "./sg2d-math.js";
@@ -51,13 +52,17 @@ export default class SG2DPointer extends SGModel {
 		//this.sg2d.viewport.on("pointerover", this.pointerover.bind(this));
 		//this.sg2d.canvas.addEventListener("pointerup", (e)=>{ debugger; });
 		
-		// Css style for icons
+		this.cursors = {}; // { default: "", hover: "", move: "", /*...*/}; // cursor icons
 		for (var p in this.properties.cursors) {
 			var s = this.properties.cursors[p];
-			if (s) {
-				this.sg2d.pixi.renderer.plugins.interaction.cursorStyles[p] = s;
-			}
+			this.cursors[p] = s;
+			this.sg2d.pixi.renderer.plugins.interaction.cursorStyles[p] = s;
 		}
+		this.properties.cursors;
+		
+		this.tCursorUpdater = setInterval(()=>{
+			this.set("cursor", this.sg2d.pixi.renderer.plugins.interaction.currentCursorMode);
+		}, 100);
 	}
 	
 	/*getTileByPXY(pxy, bClick) {
@@ -185,6 +190,11 @@ export default class SG2DPointer extends SGModel {
 		SG2DPointer._newPosition.y = ~~SG2DPointer._newPosition.y;
 		this.set("pxy", [SG2DPointer._newPosition.x, SG2DPointer._newPosition.y]);
 	}
+	
+	destroy() {
+		this.tCursorUpdater && clearInterval(this.tCursorUpdater);
+		super.destroy();
+	}
 }
 
 SG2DPointer.typeProperties = {
@@ -210,8 +220,8 @@ SG2DPointer.defaultProperties = {
 	global: void 0, // relative to the screen
 	pxy: { x: 0, y: 0 }, // in the coordinates of the game world: PX
 	cxy: { x: 0, y: 0 }, // in the coordinates of the game world: Cluster
-	cursors: { default: "", hover: "", move: "", /*...*/} // cursor icons
-}
+	cursor: "default" // current cursor
+};
 
 /** @private */
 SG2DPointer._position = {x: 0, y: 0};

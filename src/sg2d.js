@@ -8,7 +8,7 @@
 
 "use strict";
 
-import SGModel from './libs/sg-model.js';
+import SGModel from './libs/sg-model/sg-model.js';
 import SG2DDeferred from './sg2d-deferred.js';
 import SG2DConsts from './sg2d-consts.js';
 import SG2DMath from './sg2d-math.js';

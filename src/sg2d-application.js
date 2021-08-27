@@ -6,7 +6,7 @@
 
 "use strict";
 
-import SGModel from './libs/sg-model.js';
+import SGModel from './libs/sg-model/sg-model.js';
 import SG2DConsts from './sg2d-consts.js';
 import SG2DClusters from './sg2d-clusters.js';
 import SG2DTile from './sg2d-tile.js';

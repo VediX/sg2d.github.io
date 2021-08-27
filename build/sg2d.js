@@ -163,7 +163,7 @@ class SGModel {
 		// override defaults by localStorage data
 		if (this.constructor.localStorageKey) {
 			let lsData = void 0;
-			let data = localStorage.getItem(this.constructor.localStorageKey + (! this.constructor.singleInstance ? "_" + props.id : ""));
+			let data = localStorage.getItem(this.constructor.localStorageKey + (! this.constructor.singleInstance ? "_" + properties.id : ""));
 			if (data) lsData = JSON.parse(data);
 			if (lsData) SGModel.initObjectByObject(defaults, lsData);
 		}
@@ -599,11 +599,20 @@ class SGModel {
 			delete this.properties.id;
 		}
 		
-		// Discard properties starting with "_"
 		let dest = {};
-		for (var p in this.properties) {
-			if (p[0] === "_") continue;
-			dest[p] = this.properties[p];
+		
+		if (this.constructor.localStorageProperties) {
+			debugger;
+			for (var i = 0; i < this.constructor.localStorageProperties.length; i++) {
+				let name = this.constructor.localStorageProperties[i];
+				dest[name] = this.properties[name];
+			}
+		} else {
+			// Discard properties starting with "_"
+			for (var p in this.properties) {
+				if (p[0] === "_") continue;
+				dest[p] = this.properties[p];
+			}
 		}
 		
 		localStorage.setItem(this.constructor.localStorageKey + (! this.constructor.singleInstance ? "_" + id : ""), JSON.stringify(dest));
@@ -676,7 +685,7 @@ SGModel._uid = 0;
 /** @private */
 SGModel.uid = function() {
 	return ++SGModel._uid;
-}
+};
 
 /** @public */
 SGModel.defaults = function(dest, ...sources) {
@@ -689,7 +698,7 @@ SGModel.defaults = function(dest, ...sources) {
 		}
 	}
 	return dest;
-}
+};
 
 /**
  * Full cloning (with nested objects).
@@ -713,7 +722,7 @@ SGModel.clone = function(source) {
 		dest = source;
 	}
 	return dest;
-}
+};
 
 /**
  * Fill the values of the object / array dest with the values from the object / array source (with recursion)
@@ -744,18 +753,18 @@ SGModel.initObjectByObject = function(dest, source) {
 		dest = source;
 	}
 	return dest;
-}
+};
 
 /** @public */
 SGModel.upperFirstLetter = function(s) {
 	return s.charAt(0).toUpperCase() + s.slice(1);
-}
+};
 
 /** @public */
 SGModel.roundTo = function(value, precision = 0) {
 	let m = 10 ** precision;
 	return Math.round(value * m) / m;
-}
+};
 
 /** @private */
 SGModel._instance = null;
@@ -772,7 +781,21 @@ SGModel.getInstance = function(bIgnoreEmpty = false) {
 		throw "Error! this._instance is empty!";
 	}
 	return null;
-}
+};
+
+/** @public */
+SGModel.save = function() {
+	if (this._instance) {
+		if (this.singleInstance) {
+			return this._instance.save();
+		} else {
+			debugger; throw "Error! The class must be with singleInstance=true!";
+		}
+	} else {
+		debugger; throw "Error! this._instance is empty!";
+	}
+	return null;
+};
 
 /**
  * Method get() for single instance of a class
@@ -780,7 +803,7 @@ SGModel.getInstance = function(bIgnoreEmpty = false) {
  */
 SGModel.get = function(...args) {
 	return this._instance && this._instance.get(...args);
-}
+};
 
 /**
  * Method set() for single instance of a class
@@ -788,7 +811,7 @@ SGModel.get = function(...args) {
  */
 SGModel.set = function(...args) {
 	return this._instance && this._instance.set(...args);
-}
+};
 
 /**
  * Method on() for single instance of a class
@@ -796,7 +819,7 @@ SGModel.set = function(...args) {
  */
 SGModel.on = function(...args) {
 	return this._instance && this._instance.on(...args);
-}
+};
 
 /**
  * Method off() for single instance of a class
@@ -804,7 +827,15 @@ SGModel.on = function(...args) {
  */
 SGModel.off = function(...args) {
 	return this._instance && this._instance.off(...args);
-}
+};
+
+/**
+ * Method getProperties() for single instance of a class
+ * @public
+ */
+SGModel.getProperties = function(...args) {
+	return this._instance && this._instance.properties;
+};
 
 /**
  * If a non-empty string value is specified, then the data is synchronized with the local storage.
@@ -3256,7 +3287,7 @@ function _SG2DSound() {
 			return false;
 		}
 		
-		this.set("view", viewcode, void 0, sg_model["a" /* default */].FLAG_NO_CALLBACKS);
+		this.set("view", this.music_view.viewcode, void 0, sg_model["a" /* default */].FLAG_NO_CALLBACKS);
 		
 		this.music_view.status = true;
 		
@@ -4076,6 +4107,7 @@ sg2d_tile_SG2DTile._spritesFromOptions = new Set();
  * SG2DPointer
  * https://github.com/VediX/sg2d.github.io
  * (c) Kalashnikov Ilya
+ * TODO: To prevent the browser from creating a new request every time you change cursor url, you need to display cursor using PixiJS
  */
 
 
@@ -4125,13 +4157,17 @@ class sg2d_pointer_SG2DPointer extends sg_model["a" /* default */] {
 		//this.sg2d.viewport.on("pointerover", this.pointerover.bind(this));
 		//this.sg2d.canvas.addEventListener("pointerup", (e)=>{ debugger; });
 		
-		// Css style for icons
+		this.cursors = {}; // { default: "", hover: "", move: "", /*...*/}; // cursor icons
 		for (var p in this.properties.cursors) {
 			var s = this.properties.cursors[p];
-			if (s) {
-				this.sg2d.pixi.renderer.plugins.interaction.cursorStyles[p] = s;
-			}
+			this.cursors[p] = s;
+			this.sg2d.pixi.renderer.plugins.interaction.cursorStyles[p] = s;
 		}
+		this.properties.cursors;
+		
+		this.tCursorUpdater = setInterval(()=>{
+			this.set("cursor", this.sg2d.pixi.renderer.plugins.interaction.currentCursorMode);
+		}, 100);
 	}
 	
 	/*getTileByPXY(pxy, bClick) {
@@ -4259,6 +4295,11 @@ class sg2d_pointer_SG2DPointer extends sg_model["a" /* default */] {
 		sg2d_pointer_SG2DPointer._newPosition.y = ~~sg2d_pointer_SG2DPointer._newPosition.y;
 		this.set("pxy", [sg2d_pointer_SG2DPointer._newPosition.x, sg2d_pointer_SG2DPointer._newPosition.y]);
 	}
+	
+	destroy() {
+		this.tCursorUpdater && clearInterval(this.tCursorUpdater);
+		super.destroy();
+	}
 }
 
 sg2d_pointer_SG2DPointer.typeProperties = {
@@ -4284,8 +4325,8 @@ sg2d_pointer_SG2DPointer.defaultProperties = {
 	global: void 0, // relative to the screen
 	pxy: { x: 0, y: 0 }, // in the coordinates of the game world: PX
 	cxy: { x: 0, y: 0 }, // in the coordinates of the game world: Cluster
-	cursors: { default: "", hover: "", move: "", /*...*/} // cursor icons
-}
+	cursor: "default" // current cursor
+};
 
 /** @private */
 sg2d_pointer_SG2DPointer._position = {x: 0, y: 0};
@@ -4572,7 +4613,8 @@ class sg2d_application_SG2DApplication {
 	 * @param {boolean}		[config.pixi.autoStart=true]
 	 * @param {number}			[config.pixi.width=100]
 	 * @param {number}			[config.pixi.height=100]
-	 * @param {object}		[config.matter = void 0] - Config for Matter.Engine constructor
+	 * @param {object}		[config.matter=void 0] - Config for Matter.Engine constructor. For MatterJS to connect, you need to transfer at least an empty object or true value!
+	 * @param {object}			[config.mstter.gravity=void 0] - Example for setting gravity
 	 * @param {array}		[plugins=void 0] - Array of string, example: ["sg2d-transitions", ...]
 	 * @param {string|object}[sound=void 0] - Sound config file path or sound settings
 	 * @param {object}			[sound.options={}]
@@ -4625,6 +4667,7 @@ class sg2d_application_SG2DApplication {
 		SG2D.pixi = this.pixi = new PIXI.Application(pixi);
 		
 		if (config.matter) {
+			if (config.matter === true) config.matter = {};
 			SG2D.matter = this.matter = Matter.Engine.create(config.matter);
 			
 			Matter.Events.on(this.matter, "collisionStart", function(event) {

@@ -6,7 +6,7 @@
 
 "use strict";
 
-import SGModel from './libs/sg-model.js';
+import SGModel from './libs/sg-model/sg-model.js';
 import SG2DUtils from './sg2d-utils.js';
 import SG2DMath from './sg2d-math.js';
 import SG2DCamera from './sg2d-camera.js';
@@ -298,7 +298,7 @@ function _SG2DSound() {
 			return false;
 		}
 		
-		this.set("view", viewcode, void 0, SGModel.FLAG_NO_CALLBACKS);
+		this.set("view", this.music_view.viewcode, void 0, SGModel.FLAG_NO_CALLBACKS);
 		
 		this.music_view.status = true;
 		
