@@ -1,29 +1,30 @@
-## Documentation
+# SG2D
 
-2D game engine based on PixiJS (WebGL) and MatterJS (physics engine), optimized for large maps through matrix clustering of tiles. Written in modern ES6. Supported by the latest versions of Chrome, Opera, Mozilla and Yandex browsers.
+SG2D - 2D игровой движок на PixiJS и MatterJS (физический движок), оптимизированный для больших карт. Используется матричная кластеризация тайлов. Написан на ES6. Поддерживается последними версиями браузеров Chrome, Opera, Mozilla, Yandex.
 
-[See Wiki for API documentation](https://github.com/VediX/sg2d.github.io/wiki/SG2D-API)
+* SG2D на GitHub'е: [https://github.com/VediX/sg2d.github.io](https://github.com/VediX/sg2d.github.io)
+* Документация по API: [https://github.com/VediX/sg2d.github.io/wiki/SG2D-API](https://github.com/VediX/sg2d.github.io/wiki/SG2D-API)
 
-## Ready installation
+**Готовые сборки (v 1.0.0):**
 
 * [sg2d.js (187KB)](https://raw.githubusercontent.com/VediX/sg2d.github.io/main/build/sg2d.js)
 * [sg2d.min.js (94KB)](https://raw.githubusercontent.com/VediX/sg2d.github.io/main/build/sg2d.min.js)
 
-## Plugins
+**Плагины:**
 
 * [sg2d-transitions.js](https://raw.githubusercontent.com/VediX/sg2d.github.io/main/build/plugins/sg2d-transitions.js)
 
-## Connection in HTML5 application
+## Подключение
 
-Library connection (for example index.html):
+Пример HTML-кода:
 
 ```html
 <script src="sg2d/sg2d.js" type="text/javascript"></script>
 ```
 
-## Plugins connection:
+**Подключение плагинов:**
 
-Plugin registration in SG2D application:
+Плагин подключается в SG2D-приложении следующим образом:
 
 ```js
 let sg2dApp =  new SG2D.Application({
@@ -32,7 +33,7 @@ let sg2dApp =  new SG2D.Application({
 });
 ```
 
-To use the functionality of plugin, you can connect it in your scripts using ES6 import:
+Если требуется использовать функционал плагина, его нужно подключить с помощью ES6 import'а, например:
 
 ```js
 import SG2DTransitions from "./sg2d/plugins/sg2d-transitions.js";
@@ -44,15 +45,15 @@ SG2DTransitions.ready(()=>{
 ...
 ```
 
-## Examples
+## Примеры
 
-Example of realizing game on the engine SG2D and SG2DTransitions plugin: [https://demo.sg2d.ru/](https://demo.sg2d.ru/)
+Пример реализации игры на движке SG2D с плагином SG2DTransitions: [https://demo.sg2d.ru/](https://demo.sg2d.ru/)
 
-Controls: W and S - movement, A and D - turn, Shift + W - forward acceleration, left mouse button - shot, right mouse button - move around the map, scrolling - map zoom
+Управление: W и S - двигаться, A и D - повернуть, Shift + W - ускоритель движения, левая кнопка мыши - выстрел, правая кнопка мыши - свободное перемещение по карте, скроллинг - масштабирование карты
 
-![SG2D Example 2D game](https://sg2d.ru/example.png "SG2D Example 2D game")
+![SG2D Пример 2D игры](res/example.png "SG2D Пример 2D игры")
 
-## License
+## Лицензия
 
 SG2D is licensed under [The MIT License (MIT)](https://opensource.org/licenses/MIT)  
 Copyright (c) 2021 Ilya Kalashnikov
