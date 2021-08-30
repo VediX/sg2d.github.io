@@ -3,7 +3,8 @@
 SG2D - 2D игровой движок на PixiJS и MatterJS (физический движок), оптимизированный для больших карт. Используется матричная кластеризация тайлов. Написан на ES6. Поддерживается последними версиями браузеров Chrome, Opera, Mozilla, Yandex.
 
 * SG2D на GitHub'е: [https://github.com/VediX/sg2d.github.io](https://github.com/VediX/sg2d.github.io)
-* Документация по API: [https://github.com/VediX/sg2d.github.io/wiki/SG2D-API](https://github.com/VediX/sg2d.github.io/wiki/SG2D-API)
+* Документация по API (JSDoc): в разработке...
+* [Описание объекта-аксессора SG2D](https://github.com/VediX/sg2d.github.io/wiki/SG2D-API)
 
 **Готовые сборки (v 1.0.0):**
 

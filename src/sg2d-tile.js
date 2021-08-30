@@ -461,7 +461,7 @@ SG2DTile.typeProperties = { // overriden with Object.assign(...)
 	cxy: SGModel.TYPE_OBJECT_NUMBERS
 };
 
-/**@type {(void 0|string)} */
+/**@type {(undefined|string)} */
 SG2DTile.layer = void 0; // if equal to void 0, the default layer is used (PIXI.Container)
 
 /**@type {string} */

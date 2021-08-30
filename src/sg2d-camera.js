@@ -402,7 +402,7 @@ export default class SG2DCamera extends SGModel {
 	
 	/**
 	 * Smoothly move the camera to position
-	 * @param {object|number, number} point
+	 * @param {object} point
 	 * @param {boolean} [flag=false] Move instantly (true) or smoothly (false)
 	 */
 	moveTo() {

@@ -2,7 +2,7 @@
 	"name": "SG2D",
 	"version": "1.0.0",
 	"description": "a 2D graphics engine based on PixiJS and MatterJS, optimized for large maps through matrix tile clustering",
-	"main": "build/sg2d.js",
+	"main": "./src/sg2d.js",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/VediX/sg2d.github.io.git"
@@ -20,12 +20,17 @@
 		"javascript",
 		"es6"
 	],
+	"files": [
+		"src"
+	],
 	"devDependencies": {
+		"jsdoc-to-markdown": "^7.0.1",
 		"webpack": "^4.46.0",
 		"webpack-cli": "^4.7.2"
 	},
 	"scripts": {
-		"build": "webpack --mode=production & webpack --mode=production --env MINIMIZE=true"
+		"build": "webpack --mode=production & webpack --mode=production --env MINIMIZE=true",
+		"docs": "jsdoc2md -t doc/README.hbs src/sg2d-application.js > doc/sg2d-application.md"
 	},
 	"dependencies": {}
 }

@@ -1,7 +1,8 @@
 /**
- * SG2DApplication 1.0.0
- * https://github.com/VediX/sg2d.github.io
- * (c) Kalashnikov Ilya
+ * SG2DApplication
+ * @version 1.0.0
+ * @copyright Kalashnikov Ilya 2019-2021 (https://github.com/VediX/sg2d.github.io)
+ * @license MIT
  */
 
 "use strict";
@@ -20,54 +21,58 @@ import SG2DPluginBase from './sg2d-plugin-base.js';
 import SG2DSound from './sg2d-sound.js';
 import SG2DDebugging from './sg2d-debugging.js';
 
+/**
+ * @module sg2d-application
+ */
 export default class SG2DApplication {
 	
 	/**
 	 * SG2DApplication constructor
 	 * @param {object} config
-	 * @param {string}		[config.canvasId]
-	 * @param {number}		[config.cellsizepix=32]
-	 * @param {object}		[config.camera] - Config or instanceof SG2DCamera
-	 * @param {boolean}		[config.camera.rotation=true]
-	 * @param {number}			[config.camera.rotate=0]
-	 * @param {object}			[config.camera.position={x: 0, y: 0}]
-	 * @param {number}			[config.camera.scale_min=1]
-	 * @param {number}			[config.camera.scale_max=16]
-	 * @param {flag}			[config.camera.movement_by_pointer=0]
-	 * @param {number}			[config.camera.rotate_adjustment=0
-	 * @param {object}		[config.clusters] - Config or instanceof SG2DClusters
-	 * @param {number}			[config.clusters.areasize=128]
-	 * @param {object}		[config.pointer] - Config or instanceof SG2DPointer
-	 * @param {function}	[config.iterate]
-	 * @param {function}	[config.resize]
-	 * @param {object}		[config.layers={main: {}}]
-	 * @param {object}		[config.pixi] - Config for PIXI.Application constructor
-	 * @param {HTMLElement}	[config.pixi.resizeTo=canvas.parentElement]
-	 * @param {number}			[config.pixi.backgroundColor=0x000000]
-	 * @param {boolean}		[config.pixi.antialias=false]
-	 * @param {boolean}		[config.pixi.autoStart=true]
-	 * @param {number}			[config.pixi.width=100]
-	 * @param {number}			[config.pixi.height=100]
-	 * @param {object}		[config.matter=void 0] - Config for Matter.Engine constructor. For MatterJS to connect, you need to transfer at least an empty object or true value!
-	 * @param {object}			[config.mstter.gravity=void 0] - Example for setting gravity
-	 * @param {array}		[plugins=void 0] - Array of string, example: ["sg2d-transitions", ...]
-	 * @param {string|object}[sound=void 0] - Sound config file path or sound settings
-	 * @param {object}			[sound.options={}]
-	 * @param {string|object}		[sound.options.config=void 0] - File path to sound config or object sound config
-	 * @param {string}				[sound.options.music_dir=void 0] - Music directory
-	 * @param {string}				[sound.options.sounds_dir=void 0] - Sounds directory
-	 * @param {string}				[sound.options.library_pathfile=void 0] - Path to the PIXI.Sound library file is applied only the first time the parameter is passed
-	 * @param {object}			[sound.properties={}]
-	 * @param {boolean}			[sound.properties.sounds=true]
-	 * @param {boolean}			[sound.properties.music=true]
-	 * @param {number}				[sound.properties.musicVolume=100]
-	 * @param {number}				[sound.properties.soundsVolume=100]
-	 * @param {boolean}			[sound.properties.muteOnLossFocus=true]
-	 * @param {number}				[sound.properties.volumeDecreaseDistance=0]
-	 * @param {boolean}			[sound.properties.environment2D=true]
-	 * @param {boolean}			[sound.properties.bass=false]
-	 * @param {string}				[sound.properties.view=void 0]
-	 * @param {object}		[deferred=SG2D.Deferred()] - Promise that will be executed when the scene is created and run
+	 * @param {string}			[config.canvasId]
+	 * @param {number}			[config.cellsizepix=32]
+	 * @param {object}			[config.camera=void 0] - Config or instanceof SG2DCamera
+	 * @param {boolean}			[config.camera.rotation=true]
+	 * @param {number}				[config.camera.rotate=0]
+	 * @param {object}				[config.camera.position={x: 0, y: 0}]
+	 * @param {number}				[config.camera.scale_min=1]
+	 * @param {number}				[config.camera.scale_max=16]
+	 * @param {flag}				[config.camera.movement_by_pointer=0]
+	 * @param {number}				[config.camera.rotate_adjustment=0
+	 * @param {object}			[config.clusters=void 0] - Config or instanceof SG2DClusters
+	 * @param {number}				[config.clusters.areasize=128]
+	 * @param {object}			[config.pointer=void 0] - Config or instanceof SG2DPointer
+	 * @param {function}		[config.iterate=void 0]
+	 * @param {function}		[config.resize=void 0]
+	 * @param {object}			[config.layers={main: {}}]
+	 * @param {object}			[config.pixi] - Config for PIXI.Application constructor
+	 * @param {HTMLElement}		[config.pixi.resizeTo=canvas.parentElement]
+	 * @param {number}				[config.pixi.backgroundColor=0x000000]
+	 * @param {boolean}			[config.pixi.antialias=false]
+	 * @param {boolean}			[config.pixi.autoStart=true]
+	 * @param {number}				[config.pixi.width=100]
+	 * @param {number}				[config.pixi.height=100]
+	 * @param {object}	[config.matter=void 0] - Config for Matter.Engine constructor. For MatterJS to connect, you need to transfer at least an empty object or true value!
+	 * @param {object}		[config.matter.gravity=void 0] - Example for setting gravity
+	 * @param {array}	[config.plugins=void 0] - Array of string, example: ["sg2d-transitions", ...]
+	 * @param {object|string}	[config.sound=void 0] - Sound config file path or sound settings
+	 * @param {object}				[config.sound.options={}]
+	 * @param {object|string}			[config.sound.options.config=void 0] - File path to sound config or object sound config
+	 * @param {undefined|string}			[config.sound.options.music_dir=void 0] - Music directory
+	 * @param {undefined|string}			[config.sound.options.sounds_dir=void 0] - Sounds directory
+	 * @param {undefined|string}			[config.sound.options.library_pathfile=void 0] - Path to the PIXI.Sound library file is applied only the first time the parameter is passed
+	 * @param {object}				[config.sound.properties={}]
+	 * @param {boolean}				[config.sound.properties.sounds=true]
+	 * @param {boolean}				[config.sound.properties.music=true]
+	 * @param {number}					[config.sound.properties.musicVolume=100]
+	 * @param {number}					[config.sound.properties.soundsVolume=100]
+	 * @param {boolean}				[config.sound.properties.muteOnLossFocus=true]
+	 * @param {number}					[config.sound.properties.volumeDecreaseDistance=0]
+	 * @param {boolean}				[config.sound.properties.environment2D=true]
+	 * @param {boolean}				[config.sound.properties.bass=false]
+	 * @param {undefined|string}			[config.sound.properties.view=void 0]
+	 * @param {object}			[config.deferred=SG2D.Deferred()] - Promise that will be executed when the scene is created and run
+	 * @alias module:sg2d-application
 	 */
 	constructor(config) {
 		
@@ -215,7 +220,7 @@ export default class SG2DApplication {
 		]).then(()=>{
 			this.deferred.resolve(this);
 			window.dispatchEvent(new Event('resize'));
-			this.initClustersInCamera();
+			this._initClustersInCamera();
 			this.pixi.start();
 			this.state = SG2DApplication.STATE_RUN;
 		}, (e)=>{
@@ -223,12 +228,11 @@ export default class SG2DApplication {
 		});
 	}
 	
-	initClustersInCamera() {
-		let q = 0; // TODO DEL
+	/** @private */
+	_initClustersInCamera() {
 		this.clusters.each((cluster)=>{
 			if (cluster.drawed) {
 				cluster.inCamera(true);
-				q++;
 			}
 		});
 	}

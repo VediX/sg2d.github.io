@@ -1,9 +1,9 @@
 /**
- * SG2D 1.0.0
- * 2D game engine based on PixiJS and MatterJS, optimized by tile clustering
- * https://github.com/VediX/sg2d.github.io
- * SG2D may be freely distributed under the MIT license
- * (c) Kalashnikov Ilya 2019-2021
+ * SG2D - 2D игровой движок использующий PixiJS и MatterJS. Кластерная оптимизация отрисовки тайлов.
+ * @version 1.0.0
+ * @copyright Kalashnikov Ilya 2019-2021 (https://github.com/VediX/sg2d.github.io)
+ * @license MIT
+ * @typicalname hbjs
  */
 
 "use strict";
@@ -31,6 +31,10 @@ import SG2DSprite from './sg2d-sprite.js';
 import SG2DMessageToast from './sg2d-message-toast.js';
 import SG2DSound from './sg2d-sound.js';
 
+/**
+ * Объект-аксессор ко всей функциональности библиотеки
+ * @module sg2d
+ */
 var SG2D = {
 	Model: SGModel,
 	Deferred: SG2DDeferred,
