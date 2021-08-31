@@ -1,22 +1,10 @@
-
-* [sg2d-application](#module_sg2d-application)
-    * [module.exports](#exp_module_sg2d-application--module.exports) ⏏
-        * [new module.exports(config)](#new_module_sg2d-application--module.exports_new)
-
-<a name="exp_module_sg2d-application--module.exports"></a>
-
-### module.exports ⏏
-**Kind**: Exported class  
-<a name="new_module_sg2d-application--module.exports_new"></a>
-
-#### new module.exports(config)
 SG2DApplication constructor
 
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | config | <code>object</code> |  |  |
-| [config.canvasId] | <code>string</code> |  |  |
+| [config.canvasId] | <code>undefined</code> \| <code>string</code> | <code>void 0</code> | По умолчанию ищется первый CANVAS |
 | [config.cellsizepix] | <code>number</code> | <code>32</code> |  |
 | [config.camera] | <code>object</code> | <code>void 0</code> | Config or instanceof SG2DCamera |
 | [config.camera.rotation] | <code>boolean</code> | <code>true</code> |  |

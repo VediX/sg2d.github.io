@@ -8,7 +8,7 @@
 	<link href="/res/bootstrap/bootstrap.min.css" rel="stylesheet">
 	<meta name="theme-color" content="#7952b3">
 	<link href="/res/main.css" rel="stylesheet">
-	<script src="/res/markdown/showdown.min.js" defer></script>
+	<script src="/res/showdown/showdown.min.js" defer></script>
 	<link rel="stylesheet" href="/res/highlight/styles/default.min.css">
 	<script src="/res/highlight/highlight.min.js"></script>
 	<script src="/res/main.js" defer></script>
@@ -20,13 +20,14 @@
 		<main>
 			<div class="row">
 				<div class="col"></div>
-				<div class="col-lg-6" id="markdown_content" style="display: none">
+				<div class="col-lg-10" id="markdown_content" style="display: none">
 # SG2D
 
 SG2D - 2D игровой движок на PixiJS и MatterJS (физический движок), оптимизированный для больших карт. Используется матричная кластеризация тайлов. Написан на ES6. Поддерживается последними версиями браузеров Chrome, Opera, Mozilla, Yandex.
 
 * SG2D на GitHub'е: [https://github.com/VediX/sg2d.github.io](https://github.com/VediX/sg2d.github.io)
-* Документация по API: [https://github.com/VediX/sg2d.github.io/wiki/SG2D-API](https://github.com/VediX/sg2d.github.io/wiki/SG2D-API)
+* Документация по API (JSDoc): в разработке...
+* [Описание объекта-аксессора SG2D](https://github.com/VediX/sg2d.github.io/wiki/SG2D-API)
 
 **Готовые сборки (v 1.0.0):**
 
@@ -36,6 +37,53 @@ SG2D - 2D игровой движок на PixiJS и MatterJS (физическ�
 **Плагины:**
 
 * [sg2d-transitions.js](https://raw.githubusercontent.com/VediX/sg2d.github.io/main/build/plugins/sg2d-transitions.js)
+
+## Подключение
+
+Пример HTML-кода:
+
+```html
+Loading...
+```
+
+**Подключение плагинов:**
+
+Плагин подключается в SG2D-приложении следующим образом:
+
+```js
+let sg2dApp =  new SG2D.Application({
+	...
+	plugins: ["sg2d-transitions", ...]
+});
+```
+
+Если требуется использовать функционал плагина, его нужно подключить с помощью ES6 import'а, например:
+
+```js
+import SG2DTransitions from "./sg2d/plugins/sg2d-transitions.js";
+...
+// Smooth transitions between different land types (use plugin)
+SG2DTransitions.ready(()=>{
+	SG2DTransitions.run(sg2dApp.clusters);
+});
+...
+```
+
+## Примеры
+
+Пример реализации игры на движке SG2D с плагином SG2DTransitions: [https://demo.sg2d.ru/](https://demo.sg2d.ru/)
+
+Управление: W и S - двигаться, A и D - повернуть, Shift + W - ускоритель движения, левая кнопка мыши - выстрел, правая кнопка мыши - свободное перемещение по карте, скроллинг - масштабирование карты
+
+![SG2D Пример 2D игры](res/example.png "SG2D Пример 2D игры")
+
+## Лицензия
+
+SG2D is licensed under [The MIT License (MIT)](https://opensource.org/licenses/MIT)  
+Copyright (c) 2021 Ilya Kalashnikov
+
+This license is also supplied with the release and source code.
+As stated in the license, absolutely no warranty is provided.
 				</div>
 				<div class="col"></div>
 			</div>
