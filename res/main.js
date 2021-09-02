@@ -1,5 +1,5 @@
-fetch("/doc/sg2d-application.md").then(async function(response) {
-//fetch("/README.md").then(async function(response) {
+//fetch("/doc/sg2d-application.md").then(async function(response) {
+fetch("/README.md").then(async function(response) {
 	let converter = new showdown.Converter({ tables: true, literalMidWordUnderscoes: true });
 	let text = await response.text();
 	let html = converter.makeHtml(text);
