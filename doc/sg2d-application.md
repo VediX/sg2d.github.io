@@ -1,4 +1,34 @@
-SG2DApplication constructor
+<a name="SG2DApplication"></a>
+
+## SG2DApplication
+SG2DApplication - Сцена
+
+**Kind**: global class  
+**this**: <code>{SG2D.Application}</code>  
+
+* [SG2DApplication](#SG2DApplication)
+    * [new SG2DApplication(config)](#new_SG2DApplication_new)
+    * _instance_
+        * [.run()](#SG2DApplication+run)
+        * [.iterate()](#SG2DApplication+iterate)
+        * [.matterIterate()](#SG2DApplication+matterIterate)
+        * [.pause()](#SG2DApplication+pause)
+        * [.destroy()](#SG2DApplication+destroy)
+        * [.resize()](#SG2DApplication+resize)
+    * _static_
+        * [.STATE_IDLE](#SG2DApplication.STATE_IDLE)
+        * [.STATE_RUN](#SG2DApplication.STATE_RUN)
+        * [.STATE_PAUSE](#SG2DApplication.STATE_PAUSE)
+        * [.STATE_DESTROY](#SG2DApplication.STATE_DESTROY)
+        * [.plugins](#SG2DApplication.plugins)
+        * [.spritesCount](#SG2DApplication.spritesCount)
+        * [.getInstance([bIgnoreEmpty])](#SG2DApplication.getInstance) ⇒ <code>object</code>
+        * [.setCellSizePix()](#SG2DApplication.setCellSizePix)
+
+<a name="new_SG2DApplication_new"></a>
+
+### new SG2DApplication(config)
+Создает экземпляр сцены SG2D.Application
 
 
 | Param | Type | Default | Description |
@@ -48,3 +78,85 @@ SG2DApplication constructor
 | [config.sound.properties.view] | <code>undefined</code> \| <code>string</code> | <code>void 0</code> |  |
 | [config.deferred] | <code>object</code> | <code>SG2D.Deferred()</code> | Promise that will be executed when the scene is created and run |
 
+<a name="SG2DApplication+run"></a>
+
+### sG2DApplication.run()
+Запустить сцену
+
+**Kind**: instance method of [<code>SG2DApplication</code>](#SG2DApplication)  
+<a name="SG2DApplication+iterate"></a>
+
+### sG2DApplication.iterate()
+Итерация сцены
+
+**Kind**: instance method of [<code>SG2DApplication</code>](#SG2DApplication)  
+<a name="SG2DApplication+matterIterate"></a>
+
+### sG2DApplication.matterIterate()
+Итерация физического движка
+
+**Kind**: instance method of [<code>SG2DApplication</code>](#SG2DApplication)  
+<a name="SG2DApplication+pause"></a>
+
+### sG2DApplication.pause()
+Поставить на паузу сцену
+
+**Kind**: instance method of [<code>SG2DApplication</code>](#SG2DApplication)  
+<a name="SG2DApplication+destroy"></a>
+
+### sG2DApplication.destroy()
+Удалить сцену
+
+**Kind**: instance method of [<code>SG2DApplication</code>](#SG2DApplication)  
+<a name="SG2DApplication+resize"></a>
+
+### sG2DApplication.resize()
+Обработчик события на изменение размера экрана, в т.ч. поворот экрана для мобильных устройств
+
+**Kind**: instance method of [<code>SG2DApplication</code>](#SG2DApplication)  
+<a name="SG2DApplication.STATE_IDLE"></a>
+
+### SG2DApplication.STATE\_IDLE
+**Kind**: static property of [<code>SG2DApplication</code>](#SG2DApplication)  
+**Access**: public  
+<a name="SG2DApplication.STATE_RUN"></a>
+
+### SG2DApplication.STATE\_RUN
+**Kind**: static property of [<code>SG2DApplication</code>](#SG2DApplication)  
+**Access**: public  
+<a name="SG2DApplication.STATE_PAUSE"></a>
+
+### SG2DApplication.STATE\_PAUSE
+**Kind**: static property of [<code>SG2DApplication</code>](#SG2DApplication)  
+**Access**: public  
+<a name="SG2DApplication.STATE_DESTROY"></a>
+
+### SG2DApplication.STATE\_DESTROY
+**Kind**: static property of [<code>SG2DApplication</code>](#SG2DApplication)  
+**Access**: public  
+<a name="SG2DApplication.plugins"></a>
+
+### SG2DApplication.plugins
+**Kind**: static property of [<code>SG2DApplication</code>](#SG2DApplication)  
+**Access**: public  
+<a name="SG2DApplication.spritesCount"></a>
+
+### SG2DApplication.spritesCount
+**Kind**: static property of [<code>SG2DApplication</code>](#SG2DApplication)  
+**Read only**: true  
+<a name="SG2DApplication.getInstance"></a>
+
+### SG2DApplication.getInstance([bIgnoreEmpty]) ⇒ <code>object</code>
+Получить singleton-экземпляр сцены
+
+**Kind**: static method of [<code>SG2DApplication</code>](#SG2DApplication)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [bIgnoreEmpty] | <code>boolean</code> | <code>false</code> | true - не генерировать ошибку при отсутствующем singleton-экземпляре |
+
+<a name="SG2DApplication.setCellSizePix"></a>
+
+### SG2DApplication.setCellSizePix()
+**Kind**: static method of [<code>SG2DApplication</code>](#SG2DApplication)  
+**Access**: public  

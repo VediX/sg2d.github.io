@@ -16,7 +16,12 @@ import SG2DBounds from './sg2d-bounds.js';
 import SG2DSound from './sg2d-sound.js';
 import SG2DDebugging from './sg2d-debugging.js';
 
-export default class SG2DTile extends SGModel {
+/**
+ * Tile class
+ * @class SG2D.Tile
+ * @extends Point
+ */
+class SG2DTile extends SGModel {
 	
 	initialize(properties, thisProps, options) {
 		
@@ -644,3 +649,5 @@ SG2DTile._textures_not_founded = [];
 
 /** @private */
 SG2DTile._spritesFromOptions = new Set();
+
+export default SG2DTile;

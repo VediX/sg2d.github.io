@@ -23,14 +23,38 @@
 	"files": [
 		"src"
 	],
+	"type": "module",
 	"devDependencies": {
 		"jsdoc-to-markdown": "^7.0.1",
+		"nodemon": "^2.0.12",
 		"webpack": "^4.46.0",
 		"webpack-cli": "^4.7.2"
 	},
 	"scripts": {
 		"build": "webpack --mode=production & webpack --mode=production --env MINIMIZE=true",
-		"docs": "jsdoc2md -t doc/README.hbs src/sg2d-application.js > doc/sg2d-application.md"
+		"docs_": "jsdoc2md -t doc/README.hbs src/sg2d.js > doc/sg2d.md",
+		"doc01": "jsdoc2md src/sg2d.js > doc/sg2d.md",
+		"doc02": "jsdoc2md src/sg2d-application.js > doc/sg2d-application.md",
+		"doc03": "jsdoc2md src/sg2d-clusters.js > doc/sg2d-clusters.md",
+		"doc04": "jsdoc2md src/sg2d-cluster.js > doc/sg2d-cluster.md",
+		"doc05": "jsdoc2md src/sg2d-camera.js > doc/sg2d-camera.md",
+		"doc06": "jsdoc2md src/sg2d-pointer.js > doc/sg2d-pointer.md",
+		"doc07": "jsdoc2md src/sg2d-tile.js > doc/sg2d-tile.md",
+		"doc08": "jsdoc2md src/sg2d-tilebody.js > doc/sg2d-tilebody.md",
+		"doc09": "jsdoc2md src/sg2d-sprite.js > doc/sg2d-sprite.md",
+		"doc10": "jsdoc2md src/sg2d-effects.js > doc/sg2d-effects.md",
+		"doc11": "jsdoc2md src/sg2d-fonts.js > doc/sg2d-fonts.md",
+		"doc12": "jsdoc2md src/sg2d-bounds.js > doc/sg2d-bounds.md",
+		"doc13": "jsdoc2md src/sg2d-math.js > doc/sg2d-math.md",
+		"doc14": "jsdoc2md src/sg2d-utils.js > doc/sg2d-utils.md",
+		"doc15": "jsdoc2md src/sg2d-consts.js > doc/sg2d-consts.md",
+		"doc16": "jsdoc2md src/sg2d-plugins.js > doc/sg2d-plugins.md",
+		"doc17": "jsdoc2md src/sg2d-plugin-base.js > doc/sg2d-plugin-base.md",
+		"doc18": "jsdoc2md src/sg2d-sound.js > doc/sg2d-sound.md",
+		"doc19": "jsdoc2md src/sg2d-message-toast.js > doc/sg2d-message-toast.md",
+		"doc20": "jsdoc2md src/sg2d-debugging.js > doc/sg2d-debugging.md",
+		"docs": "npm run doc01 && npm run doc02 && npm run doc03 && npm run doc04 && npm run doc05 && npm run doc06 && npm run doc07 && npm run doc08 && npm run doc09 && npm run doc10 && npm run doc11 && npm run doc12 && npm run doc13 && npm run doc14 && npm run doc15 && npm run doc16 && npm run doc17 && npm run doc18 && npm run doc19 && npm run doc20",
+		"nodemondoc": "nodemon --watch src --delay 100ms --exec \"npm run doc02\""
 	},
 	"dependencies": {}
 }

@@ -1,5 +1,5 @@
-//fetch("/doc/sg2d-application.md").then(async function(response) {
-fetch("/README.md").then(async function(response) {
+fetch("/doc/sg2d-application.md").then(async function(response) {
+//fetch("/README.md").then(async function(response) {
 	let converter = new showdown.Converter({ tables: true, literalMidWordUnderscoes: true });
 	let text = await response.text();
 	let html = converter.makeHtml(text);
@@ -20,5 +20,5 @@ fetch("/README.md").then(async function(response) {
 		element.innerHTML = element.innerHTML.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 	});
 	
-	hljs.highlightAll();
+	hljs.highlightAll(); // https://highlightjs.org/download/ (Custom package)
 });
