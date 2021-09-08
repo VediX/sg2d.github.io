@@ -1,6 +1,5 @@
-/**
+/*
  * 2D игровой движок использующий PixiJS и MatterJS. Кластерная оптимизация отрисовки тайлов.
- * @module SG2D
  * @version 1.0.0
  * @license MIT
  * @copyright Kalashnikov Ilya 2019-2021 (https://github.com/VediX/sg2d.github.io)
@@ -31,28 +30,31 @@ import SG2DSprite from './sg2d-sprite.js';
 import SG2DMessageToast from './sg2d-message-toast.js';
 import SG2DSound from './sg2d-sound.js';
 
+
 /**
- * SG2D - Объект-аксессор ко всей функциональности библиотеки:
- * - [SG2D.Application](/sg2d-application) - Сцена
- * - SG2D.Clusters - Кластеры
- * - SG2D.Cluster - Кластер
- * - SG2D.Camera - Камера
- * - SG2D.Pointer - Мышь/тач
- * - SG2D.Tile - Тайл. Может содержать несколько спрайтов и анимаций
- * - SG2D.TileBody - Тайл с физическим телом (matterjs)
- * - SG2D.Sprite - Одиночный спрайт
- * - SG2D.Effects - Графические эффекты, в т.ч. шейдеры
- * - SG2D.Fonts - Графические шрифты
- * - SG2D.Bounds - Границы
- * - SG2D.Math - Математические функции
- * - SG2D.Utils - Графические утилиты
- * - SG2D.Consts - Константы
- * - SG2D.Plugins - Загрузчик плагинов
- * - SG2D.PluginBase - Базовый класс для плагинов
- * - SG2D.Sound - Звуки и музыка. Поддержка 2D окружения
- * - SG2D.MessageToast - Плавно исчезающее уведомление
- * - SG2D.Debugging - Визуальная отладка графики
- * @alias module:SG2D
+ * Объект-аксессор ко всей функциональности библиотеки
+ * @module SG2D
+ * @property {class} SG2D.Application - Сцена
+ * @property {class} SG2D.Clusters - Кластеры
+ * @property {class} SG2D.Cluster - Кластер
+ * @property {class} SG2D.Camera - Камера
+ * @property {class} SG2D.Pointer - Мышь/тач
+ * @property {class} SG2D.Tile - Тайл. Может содержать несколько спрайтов и анимаций
+ * @property {class} SG2D.TileBody - Тайл с физическим телом (*matterjs*)
+ * @property {class} SG2D.Sprite - Одиночный спрайт
+ * @property {class} SG2D.Effects - Графические эффекты, в т.ч. шейдеры
+ * @property {class} SG2D.Fonts - Графические шрифты
+ * @property {class} SG2D.Bounds - Границы
+ * @property {class} SG2D.Math - Математические функции
+ * @property {class} SG2D.Utils - Графические утилиты
+ * @property {class} SG2D.Consts - Константы
+ * @property {class} SG2D.Plugins - Загрузчик плагинов
+ * @property {class} SG2D.PluginBase - Базовый класс для плагинов
+ * @property {class} SG2D.Sound - Звуки и музыка. Поддержка 2D окружения
+ * @property {class} SG2D.MessageToast - Плавно исчезающее уведомление
+ * @property {object} SG2D.pixi - PIXI instance
+ * @property {object} SG2D.matter - MatterJS instance
+ * @property {string} SG2D.version - SG2D version
  */
 var SG2D = {
 	Model: SGModel,

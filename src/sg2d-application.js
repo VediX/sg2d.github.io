@@ -22,7 +22,6 @@ class SG2DApplication {
 	/**
 	 * Создает экземпляр сцены SG2D.Application
 	 * 
-	 * @this {SG2D.Application}
 	 * @param {object} config
 	 * @param {undefined|string}	[config.canvasId=void 0] По умолчанию ищется первый CANVAS
 	 * @param {number}			[config.cellsizepix=32]
@@ -130,7 +129,7 @@ class SG2DApplication {
 		let bContainerFixedExists = false;
 		for (var l in config.layers) {
 			var layer_cfg = config.layers[l];
-			if (layer_cfg.position === SG2D.LAYER_POSITION_FIXED) {
+			if (layer_cfg.position === SG2DConsts.LAYER_POSITION_FIXED) {
 				bContainerFixedExists = true;
 				break;
 			}
@@ -150,7 +149,7 @@ class SG2DApplication {
 		for (var l in config.layers) {
 			var layer_cfg = config.layers[l];
 			var layer = this.layers[l] = {
-				position: layer_cfg.position || SG2D.LAYER_POSITION_ABSOLUTE,
+				position: layer_cfg.position || SG2DConsts.LAYER_POSITION_ABSOLUTE,
 				zIndex: layer_cfg.zIndex || ++zIndex,
 				sortableChildren: layer_cfg.sortableChildren === void 0 ? true : layer_cfg.sortableChildren
 			};
@@ -158,7 +157,7 @@ class SG2DApplication {
 			if (layer.sortableChildren !== void 0) container.sortableChildren = layer.sortableChildren;
 			if (layer.zIndex !== void 0) container.zIndex = layer.zIndex;
 			if (l !== "main") {
-				if (layer.position === SG2D.LAYER_POSITION_FIXED) {
+				if (layer.position === SG2DConsts.LAYER_POSITION_FIXED) {
 					this.pixi.stage.addChild(container);
 				} else {
 					this.viewport.addChild(container);

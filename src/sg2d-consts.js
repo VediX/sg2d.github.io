@@ -1,10 +1,13 @@
-/**
- * SG2DConsts
- * https://github.com/VediX/sg2d.github.io
- */
-
 "use strict";
 
+/**
+ * Константы
+ * @property {number} [CELLSIZEPIX=32] - Размер ячейки в пикселях
+ * @property {number} [CELLSIZEPIX05=16] - 1/2 размера ячейки в пикселях
+ * @property {boolean} [DRAW_BODY_LINES=false] - Отрисовка границ тела
+ * @property {boolean} [ONLY_LOGIC=false] - Режим работы SG2D - с графикой или без неё
+ * @property {object} [CAMERA] - Параметры камеры
+ */
 let SG2DConsts = {
 	CELLSIZEPIX: 32,
 	CELLSIZEPIX05: 16,
@@ -33,7 +36,9 @@ let SG2DConsts = {
 	],
 	TILE_OVERRIDE: "sg2d/override",
 	TILE_404: "sg2d/404",
-	PIXI_TEXTURE_STRICT: false // If "true", then throws an exception if there is no texture
+	PIXI_TEXTURE_STRICT: false, // If "true", then throws an exception if there is no texture
+	LAYER_POSITION_ABSOLUTE: 0, // Флаг для обозначения позиционирования слоя как зависимый от положения камеры
+	LAYER_POSITION_FIXED: 1 // Флаг для обозначения позиционирования слоя как не зависимый от положения камеры
 };
 
 export default SG2DConsts;

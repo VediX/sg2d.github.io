@@ -21,4 +21,8 @@ fetch("/README.md").then(async function(response) {
 	});
 	
 	hljs.highlightAll(); // https://highlightjs.org/download/ (Custom package)
+	
+	if (location.hash.replace(/^#/, "")) {
+		location.href = location.href;
+	}
 });

@@ -1,4 +1,4 @@
-/**
+/*
  * SG2DClusters
  * https://github.com/VediX/sg2d.github.io
  * (c) Kalashnikov Ilya
@@ -10,6 +10,9 @@ import SG2DConsts from './sg2d-consts.js';
 import SG2DMath from './sg2d-math.js';
 import SG2DCluster from './sg2d-cluster.js';
 
+/**
+ * SG2D.Clusters
+ */
 export default class SG2DClusters {
 	
 	constructor(config, clusterClass = SG2DCluster) {
@@ -152,7 +155,12 @@ SG2DClusters.tiles = []; // all tiles (Array is faster than Set in Mozilla)
 SG2DClusters.tilesset = new Set(); // all tiles
 SG2DClusters.bodies = new Set(); // all colliding bodies
 
+/**
+ * Метод проекция на аналогичный метод singleton-экземпляра
+ * @static
+ */
 SG2DClusters.each = function(f) { return SG2DClusters.getInstance().each(f); }
+
 SG2DClusters.getCluster = function(x, y) { return SG2DClusters.getInstance().getCluster(x, y); }
 SG2DClusters.getClusterCXY = function(cxy) { return SG2DClusters.getInstance().getClusterCXY(cxy); }
 SG2DClusters.inArea = function(x, y) { return SG2DClusters.getInstance().inArea(x, y); }

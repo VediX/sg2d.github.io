@@ -1,7 +1,7 @@
 {
 	"name": "SG2D",
 	"version": "1.0.0",
-	"description": "a 2D graphics engine based on PixiJS and MatterJS, optimized for large maps through matrix tile clustering",
+	"description": "2D graphics engine based on PixiJS and MatterJS, optimized for large maps through matrix tile clustering",
 	"main": "./src/sg2d.js",
 	"repository": {
 		"type": "git",
@@ -31,7 +31,9 @@
 	},
 	"scripts": {
 		"build": "webpack --mode=production & webpack --mode=production --env MINIMIZE=true",
-		"nodemondoc": "nodemon --watch src --delay 100ms --exec \"npm run doc02\""
-	},
-	"dependencies": {}
+		"jsdocs_": "jsdoc src -d docs",
+		"jsdocs_nm_": "nodemon --watch src --delay 1000ms --exec \"npm run jsdocs\"",
+		"doc_": "documentation build test/** -f html -o docs --theme docjs-theme",
+		"doc_nm_": "nodemon --watch test --exec \"npm run doc\""
+	}
 }

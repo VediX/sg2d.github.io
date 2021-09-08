@@ -1,4 +1,4 @@
-/**
+/*
  * SG2DTile
  * https://github.com/VediX/sg2d.github.io
  * (c) Kalashnikov Ilya
@@ -18,8 +18,6 @@ import SG2DDebugging from './sg2d-debugging.js';
 
 /**
  * Tile class
- * @class SG2D.Tile
- * @extends Point
  */
 class SG2DTile extends SGModel {
 	
@@ -502,9 +500,10 @@ SG2DTile.zindex = 0;
 * @property {boolean} [running=false]
 * @property {boolean} [loop=false]
 * @property {function} [onComplete=void 0]
-*
-* @type {SG2DAnimationConfig}
-static animation = { start: 1, count: 8, sleep: 2, basetexture: "objects/tank_shot_", running: true }; // example
+* @example
+* ```js
+* static animation = { start: 1, count: 8, sleep: 2, basetexture: "objects/tank_shot_", running: true }; // example
+* ```
 */
 
 /**
@@ -516,14 +515,15 @@ static animation = { start: 1, count: 8, sleep: 2, basetexture: "objects/tank_sh
 * @property {(number|object)} [scale=1]
 * @property {number} [zindex=0]
 * @property {SG2DAnimationConfig} [animation]
-* 
-* @type {SG2DSpriteConfig[]}
-static sprites = { // example
-	tank_platform: { texture: "objects/tank-platform", zindex: 2 },
-	tank_turret: { texture: "objects/tank-turret", anchor: { x: 0.5, y: 0.2 }, zindex: 3 }
-	tank_track_left: { texture: "objects/tank-track", offset: { x: -40, y: 0 }, zindex: 1, basetexture: { count: 8, sleep: 2 } }
-	tank_track_right { texture: "objects/tank-track", offset: {x: 40, y: 0}, zindex: 1, basetexture: { count: 8, sleep: 2 } }
-};
+* @example
+* ```
+* static sprites = { // example
+*	tank_platform: { texture: "objects/tank-platform", zindex: 2 },
+*	tank_turret: { texture: "objects/tank-turret", anchor: { x: 0.5, y: 0.2 }, zindex: 3 }
+*	tank_track_left: { texture: "objects/tank-track", offset: { x: -40, y: 0 }, zindex: 1, basetexture: { count: 8, sleep: 2 } }
+*	tank_track_right { texture: "objects/tank-track", offset: {x: 40, y: 0}, zindex: 1, basetexture: { count: 8, sleep: 2 } }
+* };
+* ```
 */
 
 /**

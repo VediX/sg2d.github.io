@@ -1,4 +1,4 @@
-/**
+/*
  * SG2DCamera
  * https://github.com/VediX/sg2d.github.io
  * (c) Kalashnikov Ilya
