@@ -1,9 +1,3 @@
-/**
- * SG2DBody
- * https://github.com/VediX/sg2d.github.io
- * (c) Kalashnikov Ilya
- */
-
 "use strict";
 
 import SG2DConsts from "./sg2d-consts.js";
@@ -11,7 +5,11 @@ import SG2DUtils from "./sg2d-utils.js";
 import SG2DTile from "./sg2d-tile.js";
 import SG2DClusters from "./sg2d-clusters.js";
 
-export default class SG2DTileBody extends SG2DTile {
+/**
+ * Тайл с физическим телом
+ * @alias SG2D.TileBody
+ */
+class SG2DTileBody extends SG2DTile {
 	initialize(properties, thisProps, options) {
 		
 		this.body = this.bodyCreate(properties.position, properties.angle);
@@ -82,7 +80,7 @@ export default class SG2DTileBody extends SG2DTile {
 
 SG2DTileBody.isBody = true;
 
-/** default MatterJS parameters */
+/** Default MatterJS parameters */
 SG2DTileBody.MATTER = {
 	DENSITY: 1,
 	FRICTION: 0,
@@ -91,3 +89,5 @@ SG2DTileBody.MATTER = {
 	RESTITUTION: 0,
 	SLOP: 0.05
 };
+
+export default SG2DTileBody;

@@ -1,16 +1,18 @@
-/**
- * SGModel 1.0.3
- * A fast lightweight library (ES6) for structuring web applications using binding models and custom events. This is a faster and more simplified analogue of Backbone.js!
- * https://github.com/VediX/SGModel
- * (c) 2019-2021 Kalashnikov Ilya
- * SGModel may be freely distributed under the MIT license
- */
-
 "use strict";
 
-export default class SGModel {
+/**
+ * SGModel v1.0.3.
+ * Fast lightweight library (ES6) for structuring web applications using binding models and custom events. This is a faster and more simplified analogue of Backbone.js!
+ * @see https://github.com/VediX/SGModel
+ * @copyright 2019-2021 Kalashnikov Ilya
+ * @license SGModel may be freely distributed under the MIT license
+ */
+class SGModel {
 	
-	// overriden
+	/**
+	 * Sets the default property values. Overriden
+	 * @returns {object}
+	 */
 	defaults() {
 		return SGModel.clone(this.constructor.defaultProperties);
 	}
@@ -18,7 +20,7 @@ export default class SGModel {
 	/**
 	 * SGModel constructor
 	 * @param {object} [props={}] Properties
-	 * @param {object} [thisProps=void 0] Properties and methods passed to the "this" context of the created instance
+	 * @param {object} [thisProps=void 0] Properties and methods passed to the **this** context of the created instance
 	 * @param {object} [options=void 0] Custom settings
 	 */
 	constructor(properties = {}, thisProps = void 0, options = void 0) {
@@ -125,7 +127,7 @@ export default class SGModel {
 		this.initialize.call(this, properties, thisProps, options);
 	}
 	
-	// Called when an instance is created. Override in your classes.
+	/** Called when an instance is created. Override in your classes */
 	initialize() {}
 	
 	/**
@@ -135,8 +137,8 @@ export default class SGModel {
 	* @param {object}	[options=void 0]
 	* @param {number}		[options.precision] - Rounding precision
 	* @param {mixed}		[options.previous_value] - Use this value as the previous value
-	* @param {number}	[flags=0] - Valid flags: FLAG_OFF_MAY_BE | FLAG_PREV_VALUE_CLONE | FLAG_NO_CALLBACKS | FLAG_FORCE_CALLBACKS | FLAG_IGNORE_OWN_SETTER
-	* @return {boolean} If the value was changed will return true
+	* @param {number}	[flags=0] - Valid flags: **FLAG_OFF_MAY_BE** | **FLAG_PREV_VALUE_CLONE** | **FLAG_NO_CALLBACKS** | **FLAG_FORCE_CALLBACKS** | **FLAG_IGNORE_OWN_SETTER**
+	* @return {boolean} If the value was changed will return **true**
 	*/
 	set(name, value, options = void 0, flags = 0) {
 		
@@ -380,6 +382,7 @@ export default class SGModel {
 		return true;
 	}
 	
+	/** @private */
 	_runCallbacks(name, values, flags = 0) {
 		if (! (flags & SGModel.FLAG_NO_CALLBACKS)) {
 			var callbacks = this.onChangeCallbacks[name];
@@ -398,7 +401,8 @@ export default class SGModel {
 			}
 		}
 	}
-
+	
+	/** Get property value */
 	get(name) {
 		return this.properties[name];
 	}
@@ -407,10 +411,10 @@ export default class SGModel {
 	 * Set trigger for property change
 	 * @param {string|array} name
 	 * @param {function} func
-	 * @param {object} context If not specified, the "this" of the current object is passed
-	 * @param {mixed} data	If "data" is set, then this value (data) is passed in the first arguments [] callback
+	 * @param {object} context If not specified, the **this** of the current object is passed
+	 * @param {mixed} data	If **data** is set, then this value (data) is passed in the first arguments [] callback
 	 * @param {number} flags Valid flags:
-	 *		SGModel.FLAG_IMMEDIATELY - "func" will be executed once now
+	 *		**SGModel.FLAG_IMMEDIATELY** - **func** will be executed once now
 	 */
 	on(name, func, context, data, flags = 0) {
 		if (Array.isArray(name)) {
@@ -442,9 +446,7 @@ export default class SGModel {
 		}
 	}
 	
-	/**
-	 * Check if there is a property in the model
-	 */
+	/** Check if there is a property in the model */
 	has(name) {
 		return this.properties.hasOwnProperty(name);
 	}
@@ -453,7 +455,7 @@ export default class SGModel {
 	 * Set trigger to change any property
 	 * @param {function} func
 	 * @param {number} flags Valid flags:
-	 *		SGModel.FLAG_IMMEDIATELY - "func" will be executed once now
+	 *		**SGModel.FLAG_IMMEDIATELY** - **func** will be executed once now
 	 */
 	setOnAllCallback(func, flags = 0) {
 		this.onAllCallback = func;
@@ -502,7 +504,7 @@ export default class SGModel {
 	 * Execute callbacks that are executed when the property value changes
 	 * @param {string} name
 	 * @param {number} flags Valid flags:
-	 *		SGModel.FLAG_OFF_MAY_BE - if set can be .off(), then you need to pass this flag
+	 *		**SGModel.FLAG_OFF_MAY_BE** - if set can be **.off()**, then you need to pass this flag
 	 */
 	trigger(name, flags = 0) {
 		
@@ -520,9 +522,7 @@ export default class SGModel {
 		}
 	}
 	
-	/**
-	 * Save data to localStorage
-	 */
+	/** Save instance data to local storage */
 	save() {
 		if (! this.constructor.localStorageKey) { debugger; throw "Error 37722990!"; }
 		
@@ -555,6 +555,7 @@ export default class SGModel {
 		}
 	}
 	
+	/** Destroy the instance */
 	destroy() {
 		this.destroyed = true;
 		this.constructor._instance = null;
@@ -562,10 +563,11 @@ export default class SGModel {
 	}
 }
 
-// Property data types
-SGModel.typeProperties = {};
-	
-SGModel.defaultsProperties = {}; // override
+/** Property data types */
+SGModel.typeProperties = {}; // override
+
+/** Properties default values */
+SGModel.defaultProperties = {}; // override
 
 SGModel.TYPE_ANY = void 0;
 SGModel.TYPE_NUMBER = 1;
@@ -577,7 +579,10 @@ SGModel.TYPE_ARRAY_NUMBERS = 6;
 SGModel.TYPE_OBJECT_NUMBERS = 7;
 SGModel.TYPE_NUMBER_OR_XY = 8;
 
-// The flag passed in the .on(...) call to execute the callback
+/**
+ * The flag passed in the **.on(...)** call to execute the callback
+ * @constant {boolean}
+ */
 SGModel.FLAG_IMMEDIATELY = true;
 
 /** @private */
@@ -596,31 +601,34 @@ SGModel.OPTIONS_PRECISION_5 = Object.preventExtensions({ precision: 5 });
 
 /**
  * List of properties for which to use their own setters first
- * Better than .on(...) for speed of work with a large number of class instances.
+ * Better than **.on(...)** for speed of work with a large number of class instances.
  * Also used if there is a base class and a descendant class where specific behavior is needed when changing properties.
- * Example:
- *	...
- *	static ownSetters = Object.assign({
- *		state: true
- *	}, OurBaseModel.ownSetters);
- *	...
- *	setState(value, options = SGModel.OBJECT_EMPTY, flags = 0) {
- *		if (this.set("state", value, options, flags | SGModel.FLAG_IGNORE_OWN_SETTER)) {
- *			//some code...
- *		}
+ * @example
+ *...
+ *static ownSetters = Object.assign({
+ *	state: true
+ *}, OurBaseModel.ownSetters);
+ *...
+ *setState(value, options = SGModel.OBJECT_EMPTY, flags = 0) {
+ *	if (this.set("state", value, options, flags | SGModel.FLAG_IGNORE_OWN_SETTER)) {
+ *		//some code...
  *	}
+ *}
  */
 SGModel.ownSetters = {};
 
 /** @private */
 SGModel._uid = 0;
 
-/** @private */
 SGModel.uid = function() {
 	return ++SGModel._uid;
 };
 
-/** @public */
+/**
+ * If **dest** does not have a property from **sources**, then it is copied from **sources** to **dest** (composite objects are copied completely using recursion!)
+ * @param {object} dest
+ * @param {object} sources 
+ */
 SGModel.defaults = function(dest, ...sources) {
 	for (var i = sources.length; i--; ) {
 		var source = sources[i];
@@ -658,8 +666,10 @@ SGModel.clone = function(source) {
 };
 
 /**
- * Fill the values of the object / array dest with the values from the object / array source (with recursion)
- * @public
+ * Fill the values **dest** with the values from **source** (with recursion). If there is no property in **source**, then it is ignored for **dest**
+ * @param {object|array} dest
+ * @param {object|array} source
+ * @returns {dest}
  */
 SGModel.initObjectByObject = function(dest, source) {
 	if (Array.isArray(dest)) {
@@ -693,7 +703,12 @@ SGModel.upperFirstLetter = function(s) {
 	return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
-/** @public */
+/**
+ * Rounding to the required precision
+ * @param {Number} value
+ * @param {Number} precision
+ * @returns {Number}
+ */
 SGModel.roundTo = function(value, precision = 0) {
 	let m = 10 ** precision;
 	return Math.round(value * m) / m;
@@ -707,7 +722,9 @@ SGModel.toBoolean = function(value) {
 /** @private */
 SGModel._instance = null;
 
-/** @public */
+/**
+ * Enable singleton pattern for model
+ */
 SGModel.singleInstance = false;
 
 /** @public */
@@ -721,7 +738,9 @@ SGModel.getInstance = function(bIgnoreEmpty = false) {
 	return null;
 };
 
-/** @public */
+/**
+ * Method **save()** for single instance of a class
+ */
 SGModel.save = function() {
 	if (this._instance) {
 		if (this.singleInstance) {
@@ -736,16 +755,14 @@ SGModel.save = function() {
 };
 
 /**
- * Method get() for single instance of a class
- * @public
+ * Method **get()** for single instance of a class
  */
 SGModel.get = function(...args) {
 	return this._instance && this._instance.get(...args);
 };
 
 /**
- * Method set() for single instance of a class
- * @public
+ * Method **set()** for single instance of a class
  */
 SGModel.set = function(...args) {
 	return this._instance && this._instance.set(...args);
@@ -760,16 +777,14 @@ SGModel.on = function(...args) {
 };
 
 /**
- * Method off() for single instance of a class
- * @public
+ * Method *off()** for single instance of a class
  */
 SGModel.off = function(...args) {
 	return this._instance && this._instance.off(...args);
 };
 
 /**
- * Method getProperties() for single instance of a class
- * @public
+ * Method **getProperties()** for single instance of a class
  */
 SGModel.getProperties = function(...args) {
 	return this._instance && this._instance.properties;
@@ -777,7 +792,7 @@ SGModel.getProperties = function(...args) {
 
 /**
  * If a non-empty string value is specified, then the data is synchronized with the local storage.
- * Support for storing data as one instance of a class (single instance), and several instances: localStorageKey + "_" + id
+ * Support for storing data as one instance of a class (single instance), and several instances: **localStorageKey + "_" + id**
  */
 SGModel.localStorageKey = ""; // override
 
@@ -796,6 +811,10 @@ SGModel._prevValue = void 0;
 /** @private */
 SGModel._xy = {x: 0, y: 0};
 
+/**
+ * Library version (fixed in minified version)
+ * @readonly
+ */
 SGModel.version = typeof __SGMODEL_VERSION__ !== 'undefined' ? __SGMODEL_VERSION__ : '*';
 
 if (typeof exports === 'object' && typeof module === 'object') module.exports = SGModel;
@@ -803,3 +822,5 @@ else if (typeof define === 'function' && define.amd) define("SGModel", [], ()=>S
 else if (typeof exports === 'object') exports["SGModel"] = SGModel;
 else if (typeof window === 'object' && window.document) window["SGModel"] = SGModel;
 else this["SGModel"] = SGModel;
+
+export default SGModel;

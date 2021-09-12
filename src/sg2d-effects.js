@@ -9,7 +9,21 @@
 import SG2DConsts from "./sg2d-consts.js";
 import SG2DUtils from "./sg2d-utils.js";
 
-export default class SG2DEffects {
+/**
+ * Эффект
+ * @typedef SG2D.Effect
+ * @type {object}
+ * @property {Number} type - Тип фильтра: SG2D.Effects.TYPE_SHADOWS | SG2D.Effects.TYPE_BEVELS | SG2D.Effects.TYPE_DISPLACEMENT
+ * @property {string|Number} layer
+ * @property {PIXI.Filter} filter
+ * @property {object} options - Специфические настройки фильтра
+ */
+
+/**
+ * Эффекты, в том числе графические шейдеры
+ * @alias SG2D.Effects
+ */
+class SG2DEffects {
 	
 	constructor() {
 		this.effects = new Set();
@@ -50,6 +64,15 @@ export default class SG2DEffects {
 		}
 	}
 	
+	/**
+	 * Добавляет тени
+	 * @param {object} config
+	 * @param {string|Number} config.layer
+	 * @param {Number} [config.rotation=135]
+	 * @param {Number} [config.distance=8]
+	 * @param {Number} [config.alpha=0.6]
+	 * @return {SG2D.Effect}
+	 */
 	addShadowsToLayer(config) {
 		var container = this.sg2d.layers[config.layer].container;
 		container.filters = container.filters || [];
@@ -72,6 +95,16 @@ export default class SG2DEffects {
 		return effect;
 	}
 	
+	/**
+	 * Добавляет эффект приподнятости
+	 * @param {object} config
+	 * @param {string|Number} config.layer
+	 * @param {Number} [config.rotation=135]
+	 * @param {Number} [config.thickness=2]
+	 * @param {Number} [config.lightAlpha=0.8]
+	 * @param {Number} [config.shadowAlpha=0.8]
+	 * @return {SG2D.Effect}
+	 */
 	addBevelsToLayer(config) {
 		var container = this.sg2d.layers[config.layer].container;
 		container.filters = container.filters || [];
@@ -96,6 +129,16 @@ export default class SG2DEffects {
 		return effect;
 	}
 	
+	/**
+	 * Добавляет эффект искажения
+	 * @param {object} config
+	 * @param {string|Number} config.layer
+	 * @param {string|PIXI.Texture} config.texture
+	 * @param {Number} [config.scale=1]
+	 * @param {function} [config.iterate] - Колбэк, выполняемый в каждую итерацию (кадр)
+	 * @param {Number} [config.animationStep=1] - Параметр доступен в iterate() в this.options
+	 * @return {SG2D.Effect}
+	 */
 	addDisplacementToLayer(config) {
 		var container = this.sg2d.layers[config.layer].container;
 		container.filters = container.filters || [];
@@ -130,3 +173,5 @@ export default class SG2DEffects {
 SG2DEffects.TYPE_SHADOWS = 1;
 SG2DEffects.TYPE_BEVELS = 2;
 SG2DEffects.TYPE_DISPLACEMENT = 3;
+
+export default SG2DEffects;

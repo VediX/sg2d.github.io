@@ -31,8 +31,8 @@
 	},
 	"scripts": {
 		"build": "webpack --mode=production & webpack --mode=production --env MINIMIZE=true",
-		"jsdocs_": "jsdoc src -d docs",
-		"jsdocs_nm_": "nodemon --watch src --delay 1000ms --exec \"npm run jsdocs\"",
+		"jsdocs": "jsdoc src/ README.md src/libs/sg-model/ src/plugins/ -d docs -c jsdoc.json",
+		"jsdocs_nm": "nodemon --watch src/** --watch README.md --delay 100ms --exec \"npm run jsdocs\"",
 		"doc_": "documentation build test/** -f html -o docs --theme docjs-theme",
 		"doc_nm_": "nodemon --watch test --exec \"npm run doc\""
 	}

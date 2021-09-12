@@ -1,9 +1,3 @@
-/*
- * SG2DTile
- * https://github.com/VediX/sg2d.github.io
- * (c) Kalashnikov Ilya
- */
-
 "use strict";
 
 import SGModel from './libs/sg-model/sg-model.js';
@@ -17,13 +11,31 @@ import SG2DSound from './sg2d-sound.js';
 import SG2DDebugging from './sg2d-debugging.js';
 
 /**
- * Tile class
+ * Тайл со спрайтами. Базовый класс: {@link SGModel}
+ * @alias SG2D.Tile
  */
 class SG2DTile extends SGModel {
 	
+	/**
+	 * Конструктор
+	 * @param {object} properties
+	 * @param {object} [properties.texture] - Задаётся для основного спрайта
+	 * @param {object} [properties.angle=0] - Задаётся для основного спрайта
+	 * @param {object} [properties.anchor=0.5] - Задаётся для основного спрайта
+	 * @param {object} [properties.scale=1] - Задаётся для основного спрайта
+	 * @param {object} [properties.alpha=1] - Задаётся для основного спрайта
+	 * @param {object} [properties.visible=true] - Задаётся для основного спрайта
+	 * @param {object} [properties.zindex=0] - Задаётся для основного спрайта
+	 * @param {object} [properties.layer] - Задаётся для основного спрайта
+	 * @returns {SG2D.Tile}
+	 */
+	constructor(properties, thisProps, options) {
+		super(...arguments);
+	}
+	
 	initialize(properties, thisProps, options) {
 		
-		// Crutch, since in JS there is no way to execute the code in the child class at the time of extends of the parent class
+		// Костыль, поскольку в JS нет возможности выполнить код в дочернем классе во время наследования от родительского класса
 		this.constructor._prepareStaticConfigSprites();
 		
 		options = options || SGModel.OBJECT_EMPTY;
@@ -32,8 +44,8 @@ class SG2DTile extends SGModel {
 		this.boundsCXY = new SG2DBounds();
 		this.clusters = new Set();
 		this.centerCluster = null;
-		this.sprite = void 0; // one or main sprite
-		this.sprites = void 0; // list of sprites
+		this.sprite = void 0; // основной спрайт, м.б. не задан
+		this.sprites = void 0; // список спрайтов
 		this.hasAnimations = false;
 		
 		if (! this.constructor.sprites) throw "Error 82423704! this.constructor.sprites must be filled!";
@@ -57,7 +69,7 @@ class SG2DTile extends SGModel {
 				sprite.animation._sleep = 1;
 				if (sprite.animation.onComplete) sprite.animation.onComplete = sprite.animation.onComplete.bind(this);
 				this.hasAnimations = true;
-				this._animationIndex = 0; // tile can be in multiple clusters
+				this._animationIndex = 0; // плитка может быть в нескольких кластерах
 			}
 		});
 		
@@ -68,13 +80,19 @@ class SG2DTile extends SGModel {
 		this.drawUndraw();
 	}
 	
-	/** Own setter for texture property*/
+	/**
+	 * Own setter for texture property
+	 * @private
+	 */
 	setTexture(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
 		if (SG2DConsts.ONLY_LOGIC) return;
 		this._setTileProperty("texture", value, options, flags);
 	}
 	
-	/** Own setter for position property*/
+	/**
+	 * Own setter for position property
+	 * @private
+	 */
 	setPosition(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
 		if (this.set("position", value, options, flags | SGModel.FLAG_IGNORE_OWN_SETTER)) {
 			this.onGeometric();
@@ -82,7 +100,10 @@ class SG2DTile extends SGModel {
 		}
 	}
 	
-	/** Own setter for angle property*/
+	/**
+	 * Own setter for angle property
+	 * @private
+	 */
 	setAngle(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
 		if (value !== void 0) value = SG2DMath.normalize_a(value, SG2DUtils.ifUndefined(options.precision, 1));
 		if (this._setTileProperty("angle", value, options, flags)) {
@@ -90,27 +111,42 @@ class SG2DTile extends SGModel {
 		}
 	}
 	
-	/** Own setter for angle property*/
+	/**
+	 * Own setter for angle property
+	 * @private
+	 */
 	setAnchor(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
 		this._setTileProperty("anchor", value, options, flags);
 	}
 	
-	/** Own setter for scale property*/
+	/**
+	 * Own setter for scale property
+	 * @private
+	 */
 	setScale(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
 		this._setTileProperty("scale", value, options, flags);
 	}
 	
-	/** Own setter for visible property*/
+	/**
+	 * Own setter for visible property
+	 * @private
+	 */
 	setAlpha(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
 		this._setTileProperty("alpha", value, options, flags);
 	}
 	
-	/** Own setter for visible property*/
+	/**
+	 * Own setter for visible property
+	 * @private
+	 */
 	setVisible(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
 		this._setTileProperty("visible", value, options, flags);
 	}
 	
-	/** Own setter for visible property*/
+	/**
+	 * Own setter for visible property
+	 * @private
+	 */
 	setZindex(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
 		this._setTileProperty("zindex", value, options, flags);
 	}
@@ -142,7 +178,8 @@ class SG2DTile extends SGModel {
 	}
 	
 	/**
-	 * For moving sprites, checks if drawing is required when hitting the camera
+	 * Для движущихся спрайтов проверяет, требуется ли рисование при попадании в камеру.
+	 * @param {object} [sprite]
 	 */
 	drawUndraw(sprite = void 0) {
 		if (! SG2DConsts.ONLY_LOGIC && SG2DApplication._initialized) {
@@ -164,7 +201,10 @@ class SG2DTile extends SGModel {
 		return void 0;
 	}
 	
-	/** @public */
+	/**
+	 * Проверить находится ли тайл в камере
+	 * @returns {Boolean}
+	 */
 	isInCamera() {
 		if (! this.clusters) debugger; // TODO DEL DEBUG
 		for (var cluster of this.clusters) {
@@ -209,7 +249,10 @@ class SG2DTile extends SGModel {
 		}
 	}
 	
-	removeSprites() { // default (override if there is a complicated rendering or several pictures)
+	/**
+	 * @protected
+	 */
+	removeSprites() { // Переопределить, если есть сложный рендеринг
 		if (this.properties.drawed) {
 			for (var name in this.sprites) {
 				var sprite = this.sprites[name];
@@ -230,6 +273,10 @@ class SG2DTile extends SGModel {
 		}
 	}
 	
+	/**
+	 * Начать анимацию
+	 * @param {string|SG2D.Sprite} [name_or_sprite=void 0] Если не задано, то берётся спрайт по умолчанию (основной)
+	 */
 	startAnimation(name_or_sprite = void 0) {
 		let sprite = this._checkSpriteAnimation(name_or_sprite);
 		if (sprite) {
@@ -244,6 +291,10 @@ class SG2DTile extends SGModel {
 		}
 	}
 	
+	/**
+	 * Прервать анимацию
+	 * @param {string|SG2D.Sprite} [name_or_sprite=void 0] Если не задано, то берётся спрайт по умолчанию (основной)
+	 */
 	breakAnimation(name_or_sprite = void 0) {
 		let sprite = this._checkSpriteAnimation(name_or_sprite);
 		if (sprite) {
@@ -258,6 +309,12 @@ class SG2DTile extends SGModel {
 		}
 	}
 	
+	/**
+	 * Приостановить анимацию
+	 * @param {string|SG2D.Sprite} [name_or_sprite=void 0] Если не задано, то берётся спрайт по умолчанию (основной)
+	 * @param {object} [options=void 0]
+	 * @param {boolean}	[options.visible=void 0] Если значение задано, то спрайт отображается/скрывается
+	 */
 	stopAnimation(name_or_sprite = void 0, options = void 0) {
 		let sprite = this._checkSpriteAnimation(name_or_sprite);
 		if (sprite) {
@@ -266,6 +323,12 @@ class SG2DTile extends SGModel {
 		if (options && options.visible !== void 0) this.set("visible", options.visible, { sprite: sprite });
 	}
 	
+	/**
+	 * Возобновить анимацию
+	 * @param {string|SG2D.Sprite} [name_or_sprite=void 0] Если не задано, то берётся спрайт по умолчанию (основной)
+	 * @param {object} [options=void 0]
+	 * @param {boolean}	[options.visible=void 0] Если значение задано, то спрайт отображается/скрывается
+	 */
 	resumeAnimation(name_or_sprite = void 0, options = void 0) {
 		let sprite = this._checkSpriteAnimation(name_or_sprite);
 		if (sprite) {
@@ -274,6 +337,11 @@ class SG2DTile extends SGModel {
 		if (options && options.visible !== void 0) this.set("visible", options.visible, { sprite: sprite });
 	}
 	
+	/**
+	 * Одна итерация анимации
+	 * @param {string|SG2D.Sprite} [name_or_sprite=void 0] Если не задано, то берётся спрайт по умолчанию (основной)
+	 * @param {number} [count=1]
+	 */
 	stepAnimation(name_or_sprite = void 0, count = 1) {
 		let sprite = this._checkSpriteAnimation(name_or_sprite);
 		if (sprite) {
@@ -491,7 +559,7 @@ SG2DTile.visible = true;
  */
 SG2DTile.zindex = 0;
 
-/**
+/*
 * @typedef SG2DAnimationConfig
 * @type {object}
 * @property {number} [start=1]
@@ -501,12 +569,12 @@ SG2DTile.zindex = 0;
 * @property {boolean} [loop=false]
 * @property {function} [onComplete=void 0]
 * @example
-* ```js
+* 
 * static animation = { start: 1, count: 8, sleep: 2, basetexture: "objects/tank_shot_", running: true }; // example
-* ```
+* 
 */
 
-/**
+/*
 * @typedef SG2DSpriteConfig
 * @type {object}
 * @property {string} texture
@@ -516,14 +584,14 @@ SG2DTile.zindex = 0;
 * @property {number} [zindex=0]
 * @property {SG2DAnimationConfig} [animation]
 * @example
-* ```
+* 
 * static sprites = { // example
 *	tank_platform: { texture: "objects/tank-platform", zindex: 2 },
 *	tank_turret: { texture: "objects/tank-turret", anchor: { x: 0.5, y: 0.2 }, zindex: 3 }
 *	tank_track_left: { texture: "objects/tank-track", offset: { x: -40, y: 0 }, zindex: 1, basetexture: { count: 8, sleep: 2 } }
 *	tank_track_right { texture: "objects/tank-track", offset: {x: 40, y: 0}, zindex: 1, basetexture: { count: 8, sleep: 2 } }
 * };
-* ```
+* 
 */
 
 /**

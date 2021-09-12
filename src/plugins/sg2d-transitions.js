@@ -1,16 +1,15 @@
-/**
- * SG2DTransitions 1.0.0
- * Generator of smooth transitions between different types of terrain.
- * Tiles or their constructors can specify the layer index (0..31) and the transition type (TRANSITIONS_STANDARD, ...) where the transition is generated.
- * The plugin only processes tiles with the static property useTransition=true and uses the texture from the static property of the tile!
- * https://github.com/VediX/sg2d.github.io
- * SG2DTransitions may be freely distributed under the MIT license
- * (c) Kalashnikov Ilya
- */
-
 "use strict";
 
-export default class SG2DTransitions extends SG2D.PluginBase {
+/**
+ * SG2DTransitions v1.0.0.
+ * Генератор плавных переходов между разными типами местности.
+ * В тайлах или их конструкторе (класс тайла) можно задать индекс слоя (от 0 до 31) и тип перехода (TRANSITIONS_STANDARD, ...).
+ * Плагин обрабатывает плитки только со статическим свойством **useTransition=true** и использует текстуру из статического свойства плитки!
+ * @see https://github.com/VediX/sg2d.github.io
+ * @license SG2DTransitions may be freely distributed under the MIT license
+ * @copyright Kalashnikov Ilya
+ */
+class SG2DTransitions extends SG2D.PluginBase {
 		
 	static code = "transitions";
 	
@@ -18,7 +17,11 @@ export default class SG2DTransitions extends SG2D.PluginBase {
 	static TRANSITIONS_STRICT = 2;
 	
 	static K_STRICT = 1.1875;
-		
+	
+	/**
+	 * Конструктор выполняется автоматически движком SG2D при подключении плагина
+	 * @protected
+	 */
 	constructor(...args) {
 		
 		super(...args);
@@ -40,6 +43,10 @@ export default class SG2DTransitions extends SG2D.PluginBase {
 		//SG2DTransitions.failed("Test error: message error!");
 	}
 	
+	/**
+	 * Генерация графических масок
+	 * @protected
+	 */
 	static createMask() {
 		this.masks = [];
 		this.masks[this.TRANSITIONS_STANDARD] = SG2D.PluginBase.SG2DUtils.addMask({
@@ -80,6 +87,10 @@ export default class SG2DTransitions extends SG2D.PluginBase {
 	
 	static nsca = [[],[],[],[]]; // Nearest Sprites Class for 45 corners
 	
+	/**
+	 * Просканировать карту и создать переходные тайлы
+	 * @param {SG2D.Clusters} area
+	 */
 	static run(area) {
 		
 		this.area = area;
@@ -106,9 +117,9 @@ export default class SG2DTransitions extends SG2D.PluginBase {
 		var tiles = [];
 		this.area.each((cluster)=>{
 			for (layer in layers) {
-				cluster.getLayerTiles(layer, tiles);
+				cluster.getTilesInLayer(layer, tiles);
 				if (tiles.length === 0 && SG2D.PluginBase.SG2DClusters.nearestClusters45(cluster, (nc)=>{
-					nc.getLayerTiles(layer, tiles);
+					nc.getTilesInLayer(layer, tiles);
 					for (var i = 0; i < tiles.length; i++) {
 						if (tiles[i].constructor !== this.VirtualTransitionsTile) return true;
 					}
@@ -132,7 +143,7 @@ export default class SG2DTransitions extends SG2D.PluginBase {
 					nsc[2] = void 0;
 					for (var i = 0; i < 3; i++) {
 						if (nc = this.area.getCluster(cluster.x + this.transitionsCoord[a][i].dx, cluster.y + this.transitionsCoord[a][i].dy)) {
-							nc.getLayerTiles(layer, tiles);
+							nc.getTilesInLayer(layer, tiles);
 							for (var tile of tiles) {
 								if (tile.constructor.useTransitions) {
 									nsc[i] = tile.constructor;
@@ -189,6 +200,13 @@ export default class SG2DTransitions extends SG2D.PluginBase {
 	
 	static quarters = [[0.5,0],[0,0],[0,0.5],[0.5,0.5]];
 	
+	/**
+	 * Генератор переходных спрайтов
+	 * @param {SG2D.Tile} tileMain
+	 * @param {string} texture_name
+	 * @returns {PIXI.Texture}
+	 * @protected
+	 */
 	static genTransitions(tileMain, texture_name) {
 	
 		var mainClass = tileMain.constructor;
@@ -258,3 +276,5 @@ export default class SG2DTransitions extends SG2D.PluginBase {
 		return texture;
 	}
 }
+
+export default SG2DTransitions;

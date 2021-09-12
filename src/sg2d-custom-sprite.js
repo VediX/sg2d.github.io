@@ -1,38 +1,33 @@
-/**
- * SG2DSprite
- * https://github.com/VediX/sg2d.github.io
- * (c) Kalashnikov Ilya
- */
-
 "use strict";
 
 import SG2DApplication from './sg2d-application.js';
 
 /**
- * SG2DSprite - custom sprite, for example, an icon opposite the resource counter
+ * Кастомный спрайт, например иконка напротив счетчика ресурсов
+ * @alias SG2D.CustomSprite
  */
-export default class SG2DSprite {
+class SG2DCustomSprite {
 	/**
-	 * @param {string|object} texture
-	 * @param {object} options
-	 * @param {number}			[options.x=0]
-	 * @param {number}			[options.y=0]
-	 * @param {(number|object)}	[options.scale=1]
-	 * @param {(number|object)}	[options.anchor=1]
-	 * @param {number}			[options.angle=0]
-	 * @param {number}			[options.alpha=1]
-	 * @param {boolean}		[options.visible=true]
-	 * @param {boolean}		[options.interactive=false]
-	 * @param {boolean}		[options.buttonMode=false]
-	 * @param {function}		[options.pointerdown=void 0]
-	 * @param {function}		[options.pointerup=void 0]
-	 * @param {function}		[options.pointerupoutside=void 0]
-	 * @param {function}		[options.pointerover=void 0]
-	 * @param {function}		[options.pointerout=void 0]
-	 * @param {object} [data=void 0]  Object properties go to this context
+	 * @param {string|object}	texture - Имя текстуры или экземпляр PIXI.Texture
+	 * @param {object}			[options=void 0] - Опции
+	 * @param {number}				[options.x=0]
+	 * @param {number}				[options.y=0]
+	 * @param {(number|object)}		[options.scale=1]
+	 * @param {(number|object)}		[options.anchor=1]
+	 * @param {number}				[options.angle=0]
+	 * @param {number}				[options.alpha=1]
+	 * @param {boolean}			[options.visible=true]
+	 * @param {boolean}			[options.interactive=false]
+	 * @param {boolean}			[options.buttonMode=false]
+	 * @param {function}			[options.pointerdown=void 0]
+	 * @param {function}			[options.pointerup=void 0]
+	 * @param {function}			[options.pointerupoutside=void 0]
+	 * @param {function}			[options.pointerover=void 0]
+	 * @param {function}			[options.pointerout=void 0]
+	 * @param {object}			 [data=void 0]  Свойства объекта data попадают в this
 	 */
 	constructor(texture, options, data = void 0) {
-		options = options || SG2DSprite._options;
+		options = options || SG2DCustomSprite._options;
 		this.sprite = new PIXI.Sprite(typeof texture === "string" ? PIXI.Texture.from(texture) : texture);
 		this.sprite.x = options.x || 0;
 		this.sprite.y = options.y || 0;
@@ -59,8 +54,10 @@ export default class SG2DSprite {
 		container.addChild(this.sprite);
 		
 		if (typeof data === "object") Object.assign(this, data);
-		this.sprite.sg2dSprite = this;
+		this.sprite.SG2DCustomSprite = this;
 	}
 }
 
-SG2DSprite._options = {};
+SG2DCustomSprite._options = {};
+
+export default SG2DCustomSprite;

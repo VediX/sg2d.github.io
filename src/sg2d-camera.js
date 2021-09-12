@@ -1,9 +1,3 @@
-/*
- * SG2DCamera
- * https://github.com/VediX/sg2d.github.io
- * (c) Kalashnikov Ilya
- */
-
 "use strict";
 
 import SGModel from './libs/sg-model/sg-model.js';
@@ -11,11 +5,36 @@ import SG2DConsts from './sg2d-consts.js';
 import SG2DMath from './sg2d-math.js';
 import SG2DDebugging from './sg2d-debugging.js';
 
-export default class SG2DCamera extends SGModel {
-		
+/**
+ * Камера. Базовый класс: {@link SGModel}
+ * @alias SG2D.Camera
+ */
+class SG2DCamera extends SGModel {
+	
+	/**
+	 * Конструктор
+	 * @param {object} [properties=void 0] Параметры конфигурации камеры 
+	 * @param {boolean}	[properties.scale_wheel=true] Разрешить масштабирование камеры
+	 * @param {number}		[properties.scale=SG2D.Camera.SCALE_NORMAL] Стартовый масштаб. Значения: 16 -> 200%, ..., 9 -> 112%,  8 -> 100%, ..., 4 -> 50%, 3 -> 37.5%, 2 -> 25%, 1-> 12.5%
+	 * @param {number}		[properties.scale_min=SG2D.Camera.SCALE_MIN] Минимально допустимый масштаб
+	 * @param {number}		[properties.scale_max=SG2D.Camera.SCALE_MAX] Максимально допустимый масштаб
+	 * @param {boolean}	[properties.rotation=true] Разрешить вращение камеры
+	 * @param {number}		[properties.rotate=0] Стартовый угол поворота камеры в градусах
+	 * @param {object}		[properties.start_position={ x: 0, y: 0}] Стартовые координаты камеры
+	 * @param {number}		[properties.rotate_adjustment=0] Базовое смещение угла камеры в градусах (например, значение -90 для вида сверху)
+	 * @param {boolean}	[properties.movement_by_pointer=0] Разрешить свободное движение камеры правой кнопкой мыши
+	 * @param {object} [thisProps=void 0] - Свойства, которые можно записать в this экземпляра камеры, например, ссылка на внешний объект
+	 * @param {object} [options=void 0] - Дополнительные данные (настройки)
+	 * @returns {SG2D.Camera}
+	 */
+	constructor(properties, thisProps, options) {
+		super(...arguments);
+	}
+	
+	/** @protected */
 	defaults() {
 		return {
-			scale: SG2DCamera.SCALE_NORMAL, // Scaling, for example: 16 -> 128px (200%), ..., 9 -> 72px (112%),  8 -> 64px (100%), 7 -> 56px, 6 -> 48px, 5 -> 40px, 4 -> 32px, 3 -> 24px, 2 -> 16px, 1-> 8px (12.5%)
+			scale: SG2DCamera.SCALE_NORMAL,
 			rotation: false,
 			rotate: 0, // grad
 			position: {x: 0, y: 0}, // current camera position
@@ -35,17 +54,7 @@ export default class SG2DCamera extends SGModel {
 		};
 	}
 	
-	/**
-	 * Config parameters and default values:
-	 * @param {object} properties
-	 * @param {boolean}	[properties.scale_wheel=true] Allow camera zoom
-	 * @param {number}		[scale=8] Start scale
-	 * @param {boolean}	[rotation=true] Allow camera rotation
-	 * @param {number}		[rotate=0] Start camera rotation
-	 * @param {object}		[start_position={ x: 0, y: 0}] Start position
-	 * @param {number}		[rotate_adjustment=0] Basic offset of the camera angle in degrees
-	 * @param {boolean}	[movement_by_pointer=0] Allow free movement of the camera with the right mouse button
-	 */
+	/** @protected */
 	initialize(properties) {
 		
 		let config = properties || {};
@@ -133,7 +142,6 @@ export default class SG2DCamera extends SGModel {
 		this._followToTile = null;
 	}
 	
-	/** @private */
 	_sg2dconnect(sg2d) {
 		this.sg2d = sg2d;
 		this.onResize();
@@ -145,7 +153,7 @@ export default class SG2DCamera extends SGModel {
 		this._calc();
 	}
 	
-	/** Own setter for rotate property*/
+	/** @protected */
 	setRotate(newRotate, options, flags = 0) {
 		if (! this.properties.rotation && ! (flags & SGModel.FLAG_FORCE_CALLBACKS)) return; //?
 		newRotate = SG2DMath.normalize_a(newRotate, 1);
@@ -166,13 +174,14 @@ export default class SG2DCamera extends SGModel {
 	}
 	
 	/**
-	 * Set the starting position of the camera
+	 * Установить начальные координаты камеры
+	 * @param {object} position
 	 */
 	startPosition(position) {
 		this.moveTo(position, true);
 	}
 	
-	/** Own setter for position property*/
+	/** @protected */
 	setPosition(value, options = SGModel.OBJECT_EMPTY, flags = 0) {
 		value = value || this.positionPrev;
 		options = ! options ||  options === SGModel.OBJECT_EMPTY ? SGModel.OPTIONS_PRECISION_5 : options;
@@ -185,7 +194,6 @@ export default class SG2DCamera extends SGModel {
 		return true;
 	}
 	
-	/** @private */
 	_calc() {
 		
 		this.sg2d.viewport.x = (this.sg2d.pixi.screen.width  || 100) / 2;
@@ -386,24 +394,31 @@ export default class SG2DCamera extends SGModel {
 	}
 	
 	/**
-	 * Tile that the camera will follow
+	 * Тайл, за которым будет следовать камера
+	 * @param {SG2DTile} tile
 	 */
 	followTo(tile) {
 		this._followToTile = tile;
 	}
 	
+	/**
+	 * Прекратить следование за тайлом
+	 */
 	stopFollow() {
 		this._followToTile = null;
 	}
 	
+	/**
+	 * Получить тайл за которым следует камера
+	 */
 	getFollow() {
 		return this._followToTile;
 	}
 	
 	/**
-	 * Smoothly move the camera to position
+	 * Назначить точку притяжения камеры. Камера начнёт плавно к ней смещаться, если не задан флаг true
 	 * @param {object} point
-	 * @param {boolean} [flag=false] Move instantly (true) or smoothly (false)
+	 * @param {boolean} [flag=false] Переместить мгновенно (true) или плавно (false)
 	 */
 	moveTo() {
 		if (typeof arguments[0] === "object") {
@@ -420,7 +435,12 @@ export default class SG2DCamera extends SGModel {
 			}
 		}
 	}
-											
+	
+	/**
+	 * Сдвинуть камеру в заданном направлении на указанное расстояние
+	 * @param {number} [step=SG2D.Consts.CELLSIZEPIX] - Расстояние в пикселях
+	 * @param {number} [rotate=0] Направление (угол в градусах)
+	 */
 	moveOffset(step = SG2DConsts.CELLSIZEPIX, rotate = 0) {
 		let k = this.scales_k[this.properties.scale];
 		let d = step / k;
@@ -430,6 +450,7 @@ export default class SG2DCamera extends SGModel {
 		this.set("offset", SG2DCamera._point);
 	}
 	
+	/** @protected */
 	onResize() {
 		var browser_scale = window.devicePixelRatio ? window.devicePixelRatio : window.outerWidth/window.innerWidth; // ignoring browser scaling
 		var k = this.scales_k[this.properties.scale] * this.browser_scale_start / browser_scale;
@@ -459,20 +480,27 @@ export default class SG2DCamera extends SGModel {
 		}
 	}
 	
+	/** @private */
 	onPointerEnter(e) {
 		this.set("pointer_over_canvas", true);
 	}
 	
+	/** @private */
 	onPointerLeave(e) {
 		this.set("pointer_over_canvas", false);
 	}
 	
+	/** @private */
 	onWheelScale(e) {
 		if (! this.properties.pointer_over_canvas) return;
 		var delta = e.deltaY || e.detail || e.wheelDelta;
 		this.zoomInc(delta < 0 ? 1 : -1);
 	}
 	
+	/**
+	 * Установить масштабирование камеры
+	 * @param {number} [scale=SG2D.Camera.SCALE_NORMAL]
+	 */
 	zoom(scale = SG2DCamera.SCALE_NORMAL) {
 		scale = Math.max(this.properties.scale_min, scale);
 		scale = Math.min(this.properties.scale_max, scale);
@@ -480,6 +508,10 @@ export default class SG2DCamera extends SGModel {
 		this.onResize();
 	}
 	
+	/**
+	 * Приблизить/отдалить камеру
+	 * @param {number} [scaleIncrement=1]
+	 */
 	zoomInc(scaleIncrement = 1) {
 		var scale_next = this.properties.scale + scaleIncrement;
 		scale_next = Math.max(this.properties.scale_min, scale_next);
@@ -488,7 +520,7 @@ export default class SG2DCamera extends SGModel {
 		this.onResize();
 	}
 	
-	/** @public */
+	/** Получить текущее значения масштабирования */
 	getScale() {
 		return {
 			value: this.properties.scale,
@@ -497,7 +529,6 @@ export default class SG2DCamera extends SGModel {
 		};
 	}
 	
-	/** @private */
 	_addLinePoint(x, y) { // Used in Math.GetLinePoints (..) as a callback
 		var p = this.boundsPoint[++this.boundsPoint._length];
 		p.x = (x < 1 ? 1 : (x > SG2DConsts.AREASIZE ? SG2DConsts.AREASIZE : x));
@@ -522,6 +553,7 @@ export default class SG2DCamera extends SGModel {
 		e.removeEventListener("MozMousePixelScroll", fCallback);
 	}
 	
+	/** @protected */
 	destroy() {
 		this.sg2d.pixi.view.removeEventListener("pointerenter", this.onPointerEnter);
 		this.sg2d.pixi.view.removeEventListener("pointerleave", this.onPointerLeave);
@@ -548,8 +580,7 @@ SG2DCamera.STATE_MOVEMENT_WAITING_SHIFT = 1;
 SG2DCamera.STATE_MOVING = 2;
 
 /**
- * Camera smoothness factor
- * @public
+ * @property {number} [SMOOTHNESS_FACTOR=0.25] Плавность движения камеры к точке притяжения
  */
 SG2DCamera.SMOOTHNESS_FACTOR = 0.25;
 
@@ -581,14 +612,12 @@ SG2DCamera.scaling = function(params) {
 	}
 }
 
-/** @private */
 SG2DCamera._point = {x: void 0, y: void 0};
 
-/** @private */
 SG2DCamera._boundsPX = {};
 
-/** @private */
 SG2DCamera._boundsCluster = {};
 
-/** @private */
 SG2DCamera._moveToTarget = {x: 0, y: 0};
+
+export default SG2DCamera;

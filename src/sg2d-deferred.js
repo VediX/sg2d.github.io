@@ -1,11 +1,22 @@
-/**
- * SG2DDeferred
- * https://github.com/VediX/sg2d.github.io
- * (c) Kalashnikov Ilya
- */
-
 "use strict";
 
+/**
+ * Промис с возможностью вызывать resolve/reject извне
+ * @namespace SG2D
+ * @typedef SG2D.Promise
+ * @type {object}
+ * @property {function} resolve(value) - Завершает промис с успехом
+ * @property {function} reject(error) - Завершает промис с ошибкой
+ * @property {function} then(callback) - Добавляет колбэк в список вызовов при успешном завершении промиса
+ * @property {function} catch(callback) - Добавляет колбэк в список вызовов при аварийном завершении промиса
+ * @property {function} isCompleted - Возвращает статус промиса (**true** для успешно завершенного промиса, **false** для не завершенного промиса или завершенного аварийно)
+ */
+
+/**
+ * Создаёт экземпляр {@link SG2D.Promise}
+ * @function SG2D.Deferred
+ * @returns {SG2D.Promise}
+ */
 function SG2DDeferred() {
 	let thens = [];
 	let catches = [];

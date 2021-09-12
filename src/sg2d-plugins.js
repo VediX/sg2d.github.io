@@ -1,18 +1,31 @@
-/**
- * SG2DPlugins
- * https://github.com/VediX/sg2d.github.io
- * (c) Kalashnikov Ilya
- */
-
 "use strict";
 
-export default class SG2DPlugins {}
-	
+/**
+ * Загрузчик плагинов
+ * @alias SG2D.Plugins
+ */
+class SG2DPlugins {}
+
+/**
+ * Промисы загрузки плагинов
+ */
 SG2DPlugins.files = {};
+
+/**
+ * Классы плагинов
+ */
 SG2DPlugins.classes = {};
+
+/**
+ * Экземпляры плагинов
+ */
 SG2DPlugins.instances = {};
 
-/** @public */
+/**
+ * Подключить и выполнить скрипты плагинов. Возвращает промис, который выполняется когда все плагины подключены.
+ * @protected
+ * @return {Promise}
+ */
 SG2DPlugins.load = function(asPlugins) {
 	asPlugins = typeof asPlugins === "object"
 	? (Array.isArray(asPlugins)
@@ -42,3 +55,5 @@ SG2DPlugins.load = function(asPlugins) {
 
 	return Promise.all(promises);
 }
+
+export default SG2DPlugins;

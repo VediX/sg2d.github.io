@@ -1,19 +1,27 @@
-/**
- * SGModelView 1.0.3
- * Add-on over SGModel that allows you to bind data in JavaScript with visual elements of HTML document using MVVM pattern.
- * https://github.com/VediX/SGModel
- * (c) 2021 Kalashnikov Ilya
- * SGModelView may be freely distributed under the MIT license
- */
-
 "use strict";
 
 import SGModel from "./sg-model.js";
 
-export default class SGModelView extends SGModel {
+/**
+ * SGModelView 1.0.3
+ * Add-on over SGModel that allows you to bind data in JavaScript with visual elements of HTML document using MVVM pattern.
+ * @see https://github.com/VediX/SGModel
+ * @copyright 2019-2021 Kalashnikov Ilya
+ * @license SGModel may be freely distributed under the MIT license
+ * @extends SGModel
+ */
+class SGModelView extends SGModel {
 	
 	/**
-	 * Overriding the set method
+	 * Set property value. Overriding the **SGModel#set** method
+	 * @param {string}	name
+	 * @param {mixed}	 val
+	 * @param {object}	[options=void 0]
+	 * @param {number}		[options.precision] - Rounding precision
+	 * @param {mixed}		[options.previous_value] - Use this value as the previous value
+	 * @param {number}	[flags=0] - Valid flags: **FLAG_OFF_MAY_BE** | **FLAG_PREV_VALUE_CLONE** | **FLAG_NO_CALLBACKS** | **FLAG_FORCE_CALLBACKS** | **FLAG_IGNORE_OWN_SETTER**
+	 * @return {boolean} If the value was changed will return **true**
+	 * @override
 	 */
 	set(name, ...args) {
 		if (super.set.apply(this, arguments) && (this._binderInitialized)) {
@@ -23,7 +31,7 @@ export default class SGModelView extends SGModel {
 	
 	/**
 	 * Perform Data and View Binding (MVVM)
-	 * @param {string|HTMLElement} [root=void 0]
+	 * @param {string|HTMLElement} [root=void 0] Example "#my_div_id" or HTMLElement object
 	 */
 	bindHTML(root = void 0) {
 		
@@ -175,7 +183,9 @@ export default class SGModelView extends SGModel {
 				}
 				this.set(elem._sg_property, elem.checked);
 				break;
-			case "range": case "text": case "button": case "select-one": this.set(elem._sg_property, elem.value); break;
+			case "text": case "button": case "select-one": this.set(elem._sg_property, elem.value); break;
+			case "range":
+				this.set(elem._sg_property, elem.value); break;
 			case "select-multiple":
 				let result = [];
 				for (var i = 0; i < elem.selectedOptions.length; i++) {
@@ -214,3 +224,5 @@ else if (typeof define === 'function' && define.amd) define("SGModelView", [], (
 else if (typeof exports === 'object') exports["SGModelView"] = SGModelView;
 else if (typeof window === 'object' && window.document) window["SGModelView"] = SGModelView;
 else this["SGModelView"] = SGModelView;
+
+export default SGModelView;

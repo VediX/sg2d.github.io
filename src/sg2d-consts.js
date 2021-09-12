@@ -1,12 +1,13 @@
 "use strict";
 
-/**
+/*
  * Константы
  * @property {number} [CELLSIZEPIX=32] - Размер ячейки в пикселях
  * @property {number} [CELLSIZEPIX05=16] - 1/2 размера ячейки в пикселях
  * @property {boolean} [DRAW_BODY_LINES=false] - Отрисовка границ тела
  * @property {boolean} [ONLY_LOGIC=false] - Режим работы SG2D - с графикой или без неё
  * @property {object} [CAMERA] - Параметры камеры
+ * @alias SG2D.Consts
  */
 let SG2DConsts = {
 	CELLSIZEPIX: 32,

@@ -1,9 +1,3 @@
-/**
- * SG2DSound
- * https://github.com/VediX/sg2d.github.io
- * (c) Kalashnikov Ilya
- */
-
 "use strict";
 
 import SGModel from './libs/sg-model/sg-model.js';
@@ -11,8 +5,15 @@ import SG2DUtils from './sg2d-utils.js';
 import SG2DMath from './sg2d-math.js';
 import SG2DCamera from './sg2d-camera.js';
 
-/** @private */
-function _SG2DSound() {
+/**
+ * Звуки и музыка. Поддержка 2D окружения
+ * @class
+ * @alias SG2D.Sound
+ * @returns {SG2D.Sound}
+ */
+var SG2DSound = { EMPTY: true };
+
+function _SG2DSound() { /** @lends SG2D.Sound */
 	
 	Object.assign(this, new SGModel({
 		music: true,
@@ -23,6 +24,16 @@ function _SG2DSound() {
 		muteOnLossFocus: true,
 		volumeDecreaseDistance: 10, // Units changes in clusters. Distance at which the sound can no longer be heard. If value is 0, sound does not subside with increasing distance
 		environment2D: true,
+		
+		/* // TODO: **
+		 * Координаты относительно которых рассчитывается дистанция до источника звука
+		 * @example
+		 * ```js
+		 * player.on("position", (position)=>{ this.set("environment2DPosition", position); }); // Пример обновления координат в экземпляре SG2D.Sound
+		 * ```
+		 */
+		//environment2DPosition: { x: 0, y: 0 }, TODO
+		
 		view: "", // Current view code
 		_focusLoss: false // global mute when focus loss browser
 	}));
@@ -32,10 +43,9 @@ function _SG2DSound() {
 	this.music_views = {}; // Views and list music
 	this.music_view = null; // Current view object
 	
-	/** @protected */
+	// @protected
 	this.bass = void 0;
 	
-	/** @private */
 	this._options = {
 		config: void 0,
 		music_dir:  void 0,
@@ -43,28 +53,29 @@ function _SG2DSound() {
 		library_pathfile: void 0
 	};
 	
-	/** @private */
 	this._initializationRunned = false;
 	
-	/** @private */
 	this._gestureDetected = false;
 	
 	/**
-	 * Sound library loader and parameter setter
-	 * @param {object}		[options={}]
-	 * @param {object|string}	[options.config="./res/sound.json"]
-	 * @param {string}			[options.music_dir="./res/music/"]
-	 * @param {string}			[options.sounds_dir="./res/sounds/"]
-	 * @param {string}			[options.library_pathfile="./libs/pixi/pixi-sound.js"]
-	 * @param {object}		[properties={}]
-	 * @param {boolean}		[properties.sounds=true]
-	 * @param {boolean}		[properties.music=true]
-	 * @param {number}			[properties.musicVolume=100]
-	 * @param {number}			[properties.soundsVolume=100]
-	 * @param {boolean}		[properties.muteOnLossFocus=true]
-	 * @param {number}			[properties.volumeDecreaseDistance=0]
-	 * @param {boolean}		[properties.environment2D=true]
-	 * @param {boolean}		[properties.bass=false]
+	 * Загрузчик звуковой библиотеки и установщик параметров. SG2D.Sound.load() можно вызывать много раз для загрузки индивидуальной конфигурации, например, для каждого уровня игры.
+	 * @function SG2D.Sound#load
+	 * @param {object}		[options={}] - Настройки путей
+	 * @param {object|string}	[options.config="./res/sound.json"] - Объект конфигурации или путь к JSON-файлус конфигурацией
+	 * @param {string}			[options.music_dir="./res/music/"] - Основная директория с музыкой
+	 * @param {string}			[options.sounds_dir="./res/sounds/"] - Основная директория со звуками
+	 * @param {string}			[options.library_pathfile="./libs/pixi/pixi-sound.js"] - Путь к файлу библиотеки PIXI.Sound применяется только при первой передаче параметра
+	 * @param {object}		[properties={}] - Начальные параметры звука
+	 * @param {boolean}		[properties.sounds=true] - Включить звуки
+	 * @param {boolean}		[properties.music=true] - Включить музыку
+	 * @param {number}			[properties.musicVolume=100] - Громкость музыки от 0 до 100
+	 * @param {number}			[properties.soundsVolume=100] - Громкость звуков от 0 до 100
+	 * @param {boolean}		[properties.muteOnLossFocus=true] - Выключать звук при потере фокуса приложения
+	 * @param {number}			[properties.volumeDecreaseDistance=0] - Громкость звука зависит от расстояния до источника звука
+	 * @param {boolean}		[properties.environment2D=true] - Включить 2D звуковое окружение
+	 * @param {boolean}		[properties.bass=false] - Усиленные низкие частоты
+	 * @param {string}		[properties.view=void 0] - Текущий view
+	 * @return {Promise}
 	 */
 	this.load = (options = {}, properties = {})=>{
 		
@@ -122,7 +133,7 @@ function _SG2DSound() {
 			
 		} else if (this._options.config) {
 			promise = new Promise((resolve, reject)=>{
-				this.loadConfig(this._options.config, resolve, reject);
+				this._loadConfig(this._options.config, resolve, reject);
 			});
 		} else {
 			promise = Promise.resolve();
@@ -152,7 +163,7 @@ function _SG2DSound() {
 				];
 				
 				if (options.config) {
-					this.loadConfig(options.config, resolve, reject);
+					this._loadConfig(options.config, resolve, reject);
 				} else {
 					resolve();
 				}
@@ -168,12 +179,11 @@ function _SG2DSound() {
 		return promise;
 	};
 	
-	/** @private */
 	this._sg2dconnect = (sg2d)=>{
 		this.sg2d = sg2d;
 	};
 	
-	this.loadConfig = (config, resolve, reject)=>{
+	this._loadConfig = (config, resolve, reject)=>{
 		if (typeof config === "object") {
 			this._parseConfig(config);
 			resolve();
@@ -196,7 +206,6 @@ function _SG2DSound() {
 		}
 	};
 	
-	/** @private */
 	this._parseConfig = (json)=>{
 		var temp, sound;
 		if (json.sounds) {
@@ -271,10 +280,12 @@ function _SG2DSound() {
 	};
 	
 	/**
-	 * Play music
-	 * @param {string|bool}	[viewcode=true] - Page code or true value. If true, then the current music starts playing if it is not playing yet
-	 * @param {object}		[options={}] - Options passed to the play() method, for example, sound volume, playback speed, start and end times
-	 * @param {boolean}	[strict=false] - If the melody is not loaded, then the console will display an error
+	 * Запуск проигрывания музыки
+	 * @function SG2D.Sound#musicPlay
+	 * @param {string|bool}	[viewcode=true] - Код страницы или true. Если true, то воспроизводится текущая музыка.
+	 * @param {object}		[options={}] - Параметры переданные в метод play(), например громкость звука, скорость воспроизведения, время начала и окончания.
+	 * @param {boolean}	[strict=false] - При true если мелодия не загружена, то консоль выдаст ошибку.
+	 * @return {boolean} true, если успешно
 	 */
 	this.musicPlay = (viewcode = true, options = {}, strict = false)=>{
 		
@@ -359,16 +370,18 @@ function _SG2DSound() {
 		this.musicPlay();
 	};
 	
-	/** @private */
+	
 	this._sound = { file: "" };
-	/** @private */
+	
 	this._config = {};
 	
 	/**
 	 * Play sound
+	 * @function SG2D.Sound#play
 	 * @param {string|object} Sound name or base sound object from sounds.json
 	 * @param {object} config_or_tile Sound settings overriding basic sounds.json or Tile instance
 	 * @param {object} tile If a tile is specified, then position is taken from it to calculate the distance and sound volume
+	 * @return {object} Экземпляр звука PIXI Sound
 	 */
 	this.play = (sound, config_or_tile = void 0, tile = void 0)=>{
 		
@@ -441,8 +454,6 @@ function _SG2DSound() {
 		document.removeEventListener("visibilitychange", this.visibilityChange);
 	};
 }
-
-var SG2DSound = { EMPTY: true };
 
 if (typeof window !== "undefined" && window.document) {
 	let fKeyDown = event=>{

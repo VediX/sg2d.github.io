@@ -1,9 +1,3 @@
-/*
- * SG2DClusters
- * https://github.com/VediX/sg2d.github.io
- * (c) Kalashnikov Ilya
- */
-
 "use strict";
 
 import SG2DConsts from './sg2d-consts.js';
@@ -11,10 +5,18 @@ import SG2DMath from './sg2d-math.js';
 import SG2DCluster from './sg2d-cluster.js';
 
 /**
- * SG2D.Clusters
+ * Матрица кластеров
+ * @alias SG2D.Clusters
  */
-export default class SG2DClusters {
-	
+class SG2DClusters {
+
+	/**
+	 * Конструктор
+	 * @param {object}		[config=void 0] - Конфигурация
+	 * @param {number}			[config.areasize=128]
+	 * @param {SG2DCluster}	[clusterClass=SG2D.Cluster] - Класс кластера
+	 * @returns {SG2DClusters}
+	 */
 	constructor(config, clusterClass = SG2DCluster) {
 	
 		if (SG2DClusters._instance) { debugger; throw "SG2DClusters Error! There is an instance of the class! You must execute .destroy() on the previous instance!"; }
@@ -104,7 +106,7 @@ export default class SG2DClusters {
 	}
 	
 	/**
-	 * If the condition-function "checker" is fulfilled for at least one neighboring cluster, it will return "TRUE".
+	 * Если функция checker выполняется хотя бы для одного соседнего кластера, то возвращается true, иначе false
 	 */
 	nearestClusters90(cluster, checker) {
 		var nearestCluster;
@@ -116,6 +118,9 @@ export default class SG2DClusters {
 		return false;
 	}
 	
+	/**
+	 * Если функция checker выполняется хотя бы для одного соседнего кластера, то возвращается true, иначе false
+	 */
 	nearestClusters45(cluster, checker) {
 		var nearestCluster;
 		for (var i = 0; i < 8; i++) {
@@ -126,12 +131,14 @@ export default class SG2DClusters {
 		return false;
 	}
 	
+	/** @protected */
 	clear() {
 		SG2DClusters.tiles.length = 0;
 		SG2DClusters.tilesset.clear();
 		SG2DClusters.bodies.clear();
 	}
 	
+	/** @protected */
 	destroy() {
 		this.clear();
 		SG2DClusters._instance = null;
@@ -167,3 +174,5 @@ SG2DClusters.inArea = function(x, y) { return SG2DClusters.getInstance().inArea(
 SG2DClusters.outArea = function(x, y) { return SG2DClusters.getInstance().outArea(x, y); }
 SG2DClusters.nearestClusters90 = function(cluster, checker) { return SG2DClusters.getInstance().nearestClusters90(cluster, checker); }
 SG2DClusters.nearestClusters45 = function(cluster, checker) { return SG2DClusters.getInstance().nearestClusters45(cluster, checker); }
+
+export default SG2DClusters;

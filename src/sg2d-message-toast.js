@@ -1,21 +1,29 @@
-/**
- * SG2DMessageToast
- * https://github.com/VediX/sg2d.github.io
- * (c) Kalashnikov Ilya
- */
-
 "use strict";
 
-// Popup notification for a while, and then fade out
+/**
+ * Всплывающее на некоторое время уведомление, которое затем плавно исчезает
+ * @namespace SG2D.MessageToast
+ */
 let SG2DMessageToast = {
 	
 	process: { state: 0, t: void 0, opacity: 1 },
 	eDiv: void 0,
 	eMessage: void 0,
 	
+	/**
+	 * Задержка перед началом исчезновения в мс
+	 * @memberof SG2D.MessageToast
+	 * @var {Number} holdInterval=500
+	 */
 	holdInterval: 500,
 	
+	/**
+	 * Время за которое текст меняет прозрачность с 0 до 100%
+	 * @memberof SG2D.MessageToast
+	 * @var {Number} fadeOutInterval=1000
+	 */
 	fadeOutInterval: 1000,
+	
 	fadeOutSteps: 20,
 	fadeOutIntervalStep: void 0,
 	opacityStep: void 0,
@@ -24,7 +32,7 @@ let SG2DMessageToast = {
 	STATE_HOLD: 1,
 	STATE_FADEOUT: 2,
 	
-	initialize: function() {
+	_initialize: function() {
 		if (! this.eDiv) {
 			this.eDiv = document.querySelector("#message_toast");
 			if (! this.eDiv) {
@@ -47,9 +55,18 @@ let SG2DMessageToast = {
 		this.fadeOut = this.fadeOut.bind(this);
 	},
 	
+	/**
+	 * Показать текстовое уведомление
+	 * @memberof SG2D.MessageToast
+	 * @method show
+	 * @param {object} config
+	 * @param {string} config.text
+	 * @example
+	 * SG2D.MessageToast.show({ text: "Scale: " + camera.getScale().percent + "%" });
+	 */
 	show: function(config) {
 		
-		this.initialize();
+		this._initialize();
 		
 		if (this.process.state) {
 			clearInterval(this.process.t);
@@ -64,10 +81,12 @@ let SG2DMessageToast = {
 		this.eDiv.style.opacity = 0.99;
 	},
 	
+	/** @private */
 	startFadeOut: function() {
 		this.process.t = setInterval(this.fadeOut, this.fadeOutIntervalStep);
 	},
 	
+	/** @private */
 	fadeOut: function() {
 		this.eDiv.style.opacity -= this.opacityStep;
 		if (this.eDiv.style.opacity <= 0) {

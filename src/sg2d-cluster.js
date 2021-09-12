@@ -1,15 +1,21 @@
-/**
- * SG2DCluster
- * https://github.com/VediX/sg2d.github.io
- * (c) Kalashnikov Ilya
- */
-
 "use strict";
 
 import SG2DConsts from './sg2d-consts.js';
 
-export default class SG2DCluster {
+/**
+ * Кластер
+ * @alias SG2D.Cluster
+ */
+class SG2DCluster {
 	
+	/**
+	 * Конструктор
+	 * @param {object} cfg
+	 * @param {number}	cfg.i
+	 * @param {number}	cfg.x
+	 * @param {number}	cfg.y
+	 * @returns {SG2DCluster}
+	 */
 	constructor(cfg) {
 		this.i = cfg.i;
 		this.x = cfg.x;
@@ -25,6 +31,9 @@ export default class SG2DCluster {
 		this.lighting_frame = 0; // see sg2d-camera.js
 	}
 	
+	/**
+	 * Отрисовка спрайтов тайлов, которые находятся в кластере (в том числе частично)
+	 */
 	inCamera() {
 		this.drawed = true;
 		for (var tile of this.tiles) {
@@ -32,6 +41,9 @@ export default class SG2DCluster {
 		}
 	}
 	
+	/**
+	 * Удаление спрайтов тайлов, которые находятся в кластере кроме тех, которые расположены в других видимых кластерах
+	 */
 	outCamera() {
 		this.drawed = false;
 		
@@ -43,7 +55,13 @@ export default class SG2DCluster {
 		}
 	}
 	
-	getLayerTiles(layer, aResult = null) {
+	/**
+	 * Получить список тайлов в слое
+	 * @param {string} layer - Код слоя
+	 * @param {Array} [aResult=void 0]
+	 * @returns {SG2D.Tile[]}
+	 */
+	getTilesInLayer(layer, aResult = void 0) {
 		if (aResult) {
 			aResult.length = 0;
 			for (var tile of this.tiles) {
@@ -63,6 +81,12 @@ export default class SG2DCluster {
 		}
 	}
 	
+	/**
+	 * Вернёт тайл, у которого текстура установлена в заданную или у которого заданный класс тайла.
+	 * @param {string|SG2D.Tile} tileClassOrTexture - Имя текстуры или класс тайла.
+	 * @returns {SG2D.Tile|false}
+	 * @deprecated Используется при генерации карты. Начиная с версии 2.0 будет удалён!
+	 */
 	tileInCluster(tileClassOrTexture) {
 		if (typeof tileClassOrTexture === "function") {
 			for (var tile of this.tiles) {
@@ -84,3 +108,5 @@ export default class SG2DCluster {
 
 /** @private */
 SG2DCluster._tiles = [];
+
+export default SG2DCluster;

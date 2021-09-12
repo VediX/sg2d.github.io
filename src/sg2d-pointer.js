@@ -1,10 +1,3 @@
-/**
- * SG2DPointer
- * https://github.com/VediX/sg2d.github.io
- * (c) Kalashnikov Ilya
- * TODO: To prevent the browser from creating a new request every time you change cursor url, you need to display cursor using PixiJS
- */
-
 "use strict";
 
 import SGModel from './libs/sg-model/sg-model.js';
@@ -13,7 +6,12 @@ import SG2DUtils from './sg2d-utils.js';
 import SG2DMath from "./sg2d-math.js";
 import SG2DCamera from './sg2d-camera.js';
 
-export default class SG2DPointer extends SGModel {
+/**
+ * Класс для управления указателем (мышь, тачпад)
+ * @TODO To prevent the browser from creating a new request every time you change cursor url, you need to display cursor using PixiJS
+ * @alias SG2D.Pointer
+ */
+class SG2DPointer extends SGModel {
 	
 	initialize(properties, thisProps, options) {
 		
@@ -231,3 +229,5 @@ SG2DPointer._startPoint = { x: 0, y: 0 };
 
 /** @private */
 SG2DPointer._startPointPXY = { x: 0, y: 0 };
+
+export default SG2DPointer;

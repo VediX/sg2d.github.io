@@ -9,12 +9,26 @@
 import SG2DConsts from './sg2d-consts.js';
 import SG2DMath from './sg2d-math.js';
 
+/**
+ * @namespace SG2D.Utils
+ */
 var SG2DUtils = {
+	
 	DEFAULT_WIDTH: 32,
 	DEFAULT_HEIGHT: 32,
 	
+	/**
+	 * Флаг добавления прозрачной границы в спрайте.
+	 * @see SG2D.Utils.createInBetweenTextures
+	 * @memberof SG2D.Utils
+	 */
 	FLAG_ADD_BORDER_ALPHA: 0b00000001,
-
+	
+	/**
+	 * Получить время с точностью до мс. Распознаёт браузер и платформу NodeJS
+	 * @memberof SG2D.Utils
+	 * @returns {Number}
+	 */
 	getTime: function() {
 		var sResult;
 		if (typeof process !== "undefined" && process.hrtime) {
@@ -29,6 +43,13 @@ var SG2DUtils = {
 		return +sResult;
 	},
 	
+	/**
+	 * Динамическая загрузка и выполнение скриптов
+	 * @memberof SG2D.Utils
+	 * @param {string} src - Путь
+	 * @param {function} [onload] - Вызывается после загрузки скрипта, но перед его выполнением
+	 * @return {Promise}
+	 */
 	loadJS: function(src, onload = void 0) {
 		return new Promise((resolve, reject)=>{
 			var script = document.createElement('script');
@@ -41,7 +62,13 @@ var SG2DUtils = {
 			document.head.append(script);
 		});
 	},
-
+	
+	/**
+	 * Получить текстуру в виде отдельного CANVAS с нарисованной в нём текстурой. При повторном вызове возвращается созданный ранее CANVAS для текстуры
+	 * @memberof SG2D.Utils
+	 * @param {string|PIXI.Texture} mTexture
+	 * @return {HTMLCanvasElement}
+	 */
 	getTextureAsCanvas: function(mTexture) {
 
 		var texture = typeof mTexture === "object" ? mTexture : PIXI.Texture.from(mTexture);
@@ -57,7 +84,14 @@ var SG2DUtils = {
 
 		return canvas;
 	},
-
+	
+	/**
+	 * Получить текстуру как blob-объект
+	 * @memberof SG2D.Utils
+	 * @async
+	 * @param {string|PIXI.Texture} mTexture
+	 * @return {Promise<Blob>}
+	 */
 	getTextureAsBlob: async function(mTexture) {
 
 		if (typeof mTexture === "string" && ! PIXI.utils.TextureCache[mTexture]) {
@@ -81,8 +115,16 @@ var SG2DUtils = {
 
 		return texture.blob;
 	},
-
-	getTextureUrl: async function(mTexture, flagOpenWindow) {
+	
+	/**
+	 * Получить URL текстуры с base64 кодированием
+	 * @memberof SG2D.Utils
+	 * @async
+	 * @param {string|PIXI.Texture} mTexture
+	 * @param {boolean} [flagOpenWindow=false] - Если **true**, то ссылка откроется в новом окне
+	 * @return {Promise<string>|false}
+	 */
+	getTextureUrl: async function(mTexture, flagOpenWindow = false) {
 		if (! mTexture) return null;
 		var blob = await SG2DUtils.getTextureAsBlob(mTexture);
 		if (blob) {
@@ -102,6 +144,15 @@ var SG2DUtils = {
 	/** @private */
 	_options: {x: void 0, y: void 0},
 	
+	/**
+	 * Отрисовка текстуры в произвольный канвас
+	 * @memberof SG2D.Utils
+	 * @param {string|PIXI.Texture} texture
+	 * @param {HTMLElementCanvas} canvas
+	 * @param {object} options
+	 * @param {Number} [options.x=0]
+	 * @param {Number} [options.y=0]
+	 */
 	drawTextureToCanvas: function(texture, canvas, options) {
 		options = options || this._options;
 		var ctx = canvas.getContext("2d");
@@ -109,6 +160,16 @@ var SG2DUtils = {
 		ctx.drawImage(canvas, options.x === void 0 ? 0 : options.x, options.y === void 0 ? 0 : options.y);
 	},
 
+	/**
+	 * Создать спрайт-маску
+	 * @memberof SG2D.Utils
+	 * @param {object} config
+	 * @param {Number} [config.width=SG2D.Utils.DEFAULT_WIDTH]
+	 * @param {Number} [config.height=SG2D.Utils.DEFAULT_HEIGHT]
+	 * @param {function} config.iterate - Итератор
+	 * @param {function} config.name - Имя текстуры
+	 * @return {HTMLCanvasElement}
+	 */
 	addMask: function(config) {
 		var w = config.width || SG2DUtils.DEFAULT_WIDTH;
 		var h = config.height || SG2DUtils.DEFAULT_HEIGHT;
@@ -146,11 +207,12 @@ var SG2DUtils = {
 	_optionsBAT: {},
 
 	/**
-	 * Make the border of the sprites semi-transparent (to eliminate artifacts in the form of stripes at the edges of terrain tiles)
+	 * Сделать границу спрайтов полупрозрачной (чтобы исключить артефакты в виде полос по краям тайлов ландшафта)
+	 * @memberof SG2D.Utils
 	 * @param {object} options
-	 * @param {array}		[options.textures=void 0] Array of textures
-	 * @param {number}		[options.alpha=0.995] Transparency for the outermost border (1 pixel from the edge)
-	 * @param {number}		[options.alpha2=1] Transparency for the border 2 pixels from the edge
+	 * @param {string[]|PIXI.Texture[]} [options.textures=void 0] Список текстур. Если не задан, то берутся все текстуры с флагом _isFinalTexture=true
+	 * @param {number} [options.alpha=0.995] Прозрачность самой внешней границы (1 пиксель от края)
+	 * @param {number} [options.alpha2=1] Прозрачность границы 2 пикселя от края
 	 */
 	setBorderAlphaTextures: function(options={}) {
 		options.textures = options.textures || [];
@@ -171,11 +233,12 @@ var SG2DUtils = {
 	},
 
 	/**
-	 * Make the border of the sprite semi-transparent (to eliminate artifacts in the form of stripes at the edges of terrain tiles)
+	 * Сделать границу заданного спрайта полупрозрачной (чтобы исключить артефакты в виде полос по краям тайлов ландшафта)
+	 * @memberof SG2D.Utils
 	 * @param {object} options
-	 * @param {PIXI.Texture|string}	options.texture
-	 * @param {number}				[options.alpha=0.995] Transparency for the outermost border (1 pixel from the edge)
-	 * @param {number}				[options.alpha2=1] Transparency for the border 2 pixels from the edge
+	 * @param {PIXI.Texture|string} options.texture
+	 * @param {number} [options.alpha=0.995] Прозрачность самой внешней границы (1 пиксель от края)
+	 * @param {number} [options.alpha2=1] Прозрачность границы 2 пикселя от края
 	 */
 	setBorderAlphaTexture: function(options={}) {
 
@@ -214,11 +277,11 @@ var SG2DUtils = {
 	},
 
 	/**
-	 * Adds a transparent border to a 1 pixel sprite so that PIXI smooths the edges of the sprite when rotated.
+	 * Добавляет прозрачную границу к спрайту в 1 пиксель, благодаря чему PIXI сглаживает края спрайта при его вращении. Ширина и высота спрайта увеличиваются на 2 пикселя!
+	 * @memberof SG2D.Utils
 	 * @param {object} options
-	 * @param {array}		[options.textures=void 0]
-	 * @param {boolean}	[options.all=false] If TRUE then a transparent border is added if the sprite has opaque pixels on the border
-	 * @param {number}		[options.qborder=1] Maximum permissible transparent frame thickness
+	 * @param {string[]|PIXI.Texture[]} [options.textures=void 0] - Список текстур. Если не задан, то берутся все текстуры с флагом _isFinalTexture=true
+	 * @param {number} [options.qborder=1] Ограничитель допустимой толщины прозрачной рамки
 	 */
 	addBorderAlphaTextures: function(options) {
 		options.textures = options.textures || [];
@@ -281,8 +344,14 @@ var SG2DUtils = {
 	_ibt: [],
 
 	/**
-	 * Generate intermediate textures to gradually transform one texture to another (without using alpha)
+	 * Создание промежуточных текстур для постепенного перехода одной текстуры в другую (без использования альфа-канала)
+	 * @memberof SG2D.Utils
 	 * @param {object} config
+	 * @param {PIXI.Texture|string} config.start
+	 * @param {PIXI.Texture|string} config.end
+	 * @param {string} config.name - Имя промежуточной текстуры с подстановкой индекса вместо "%"
+	 * @param {Number} [config.count=2]
+	 * @param {Number} [config.flags] Флаги: {@link SG2D.Utils.FLAG_ADD_BORDER_ALPHA}
 	 */
 	createInBetweenTextures: function(config) {
 		if (! config.start) throw "Error 7020181!";
@@ -397,6 +466,11 @@ var SG2DUtils = {
 		}
 	},
 
+	/**
+	 * Текстуры, в названии которых указан размер по шаблону "_%x%", автоматически распиливаются на составные текстуры с добавлением индекса.
+	 * @memberof SG2D.Utils
+	 * @param {object} resources - Объект, выдаваемый движком PIXI при загрузке ресурсов (см. PIXI.Loader.load(loader, resources)=>{...})
+	 */
 	parseTexturePack: function(resources) {
 		for (var r in resources) {
 			if (r.substr(-6, 6) === "_image") continue;
@@ -475,8 +549,11 @@ var SG2DUtils = {
 	FLAG_CANVAS_ELEMENT: 1,
 
 	/**
-	 * Create a new canvas
-	 * @param {number} flag FLAG_CANVAS_OFFSCREEN или FLAG_CANVAS_ELEMENT
+	 * Создаёт новый канвас. По умолчанию создаёт OffscreenCanvas
+	 * @memberof SG2D.Utils
+	 * @param {Number} [width=SG2D.Utils.DEFAULT_WIDTH]
+	 * @param {Number} [height=SG2D.Utils.DEFAULT_HEIGHT]
+	 * @param {Number} [flag=0] **SG2D.Utils.FLAG_CANVAS_OFFSCREEN** | **SG2D.Utils.FLAG_CANVAS_ELEMENT**
 	 */
 	createCanvas: function(width = void 0, height = void 0, flag = 0) {
 		//flag = this.FLAG_CANVAS_ELEMENT; // FOR DEBUGGING
@@ -499,12 +576,23 @@ var SG2DUtils = {
 		SG2D.Application.drawSprite(graphics);
 	},
 
-	/** @public */
+	/**
+	 * Преобразовать пиксели в кластеры (единица измерения)
+	 * @memberof SG2D.Utils
+	 * @param {Number} x_or_y
+	 * @returns {Number}
+	 */
 	PXtoCX: function(x_or_y) {
 		return 1 + (x_or_y >> SG2DConsts.CELLSIZELOG2);
 	},
 
-	/** @public */
+	/**
+	 * Вернёт функцию, которая выполнится только после истечения заданного промежутка времени за который не было обращений к ней
+	 * @memberof SG2D.Utils
+	 * @param {function} func
+	 * @param {Number} delay
+	 * @returns {function}
+	 */
 	debounce: function(func, delay) {
 		let clearTimer;
 		return function() {
@@ -515,7 +603,14 @@ var SG2DUtils = {
 		}
 	},
 
-	/** @public */
+	/**
+	 * Вернёт функцию, которая будет выполнятся не чаще одного раза в заданный промежуток времени
+	 * @memberof SG2D.Utils
+	 * @param {function} func
+	 * @param {type} limit - Время задержки
+	 * @param {object} [_context=this]
+	 * @returns {function}
+	 */
 	throttle: function(func, limit, _context) {
 		let lastFunc;
 		let lastRan;
@@ -540,27 +635,50 @@ var SG2DUtils = {
 	/** @private */
 	_p: void 0,
 
-	/** @public */
+	/**
+	 * Проверить - объект пустой или нет
+	 * @memberof SG2D.Utils
+	 * @param {object} o
+	 * @returns {Boolean}
+	 */
 	isEmpty: function(o) {
 		for (this._p in o) return false;
 		return true;
 	},
 
-	/** @public */
-	objectForEach: function(o, f, c = this) {
-		for (var name in o) {
-			if (f.call(c, o[name])===false) break;
+	/**
+	 * forEach для объекта
+	 * @memberof SG2D.Utils
+	 * @param {object} obj
+	 * @param {function} callback
+	 * @param {object} context
+	 * @returns {undefined}
+	 */
+	objectForEach: function(obj, callback, context = this) {
+		for (var name in obj) {
+			if (callback.call(context, obj[name])===false) break;
 		}
 	},
 	
-	/** @public */
+	/**
+	 * Количество собственных свойст в объекте
+	 * @memberof SG2D.Utils
+	 * @param {object} o
+	 * @returns {Number}
+	 */
 	propertiesCount: function(o) {
 		let q = 0;
 		for (var p in o) q++;
 		return q;
 	},
 
-	/** @public */
+	/**
+	 * Вернёт valueIfUndefined, если value===undefined
+	 * @memberof SG2D.Utils
+	 * @param {mixed} value
+	 * @param {mixed} valueIfUndefined
+	 * @returns {value|valueIfUndefined}
+	 */
 	ifUndefined: function(value, valueIfUndefined) {
 		return (value === void 0 ? valueIfUndefined : value);
 	}

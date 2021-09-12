@@ -15,57 +15,35 @@ import SG2DSound from './sg2d-sound.js';
 import SG2DDebugging from './sg2d-debugging.js';
 
 /**
- * SG2DApplication - Сцена
+ * Сцена
+ * @alias SG2D.Application
  */
 class SG2DApplication {
 	
 	/**
-	 * Создает экземпляр сцены SG2D.Application
-	 * 
-	 * @param {object} config
-	 * @param {undefined|string}	[config.canvasId=void 0] По умолчанию ищется первый CANVAS
-	 * @param {number}			[config.cellsizepix=32]
-	 * @param {object}			[config.camera=void 0] - Config or instanceof SG2DCamera
-	 * @param {boolean}			[config.camera.rotation=true]
-	 * @param {number}				[config.camera.rotate=0]
-	 * @param {object}				[config.camera.position={x: 0, y: 0}]
-	 * @param {number}				[config.camera.scale_min=1]
-	 * @param {number}				[config.camera.scale_max=16]
-	 * @param {flag}				[config.camera.movement_by_pointer=0]
-	 * @param {number}				[config.camera.rotate_adjustment=0
-	 * @param {object}			[config.clusters=void 0] - Config or instanceof SG2DClusters
-	 * @param {number}				[config.clusters.areasize=128]
-	 * @param {object}			[config.pointer=void 0] - Config or instanceof SG2DPointer
-	 * @param {function}		[config.iterate=void 0]
-	 * @param {function}		[config.resize=void 0]
-	 * @param {object}			[config.layers={main: {}}]
-	 * @param {object}			[config.pixi] - Config for PIXI.Application constructor
-	 * @param {HTMLElement}		[config.pixi.resizeTo=canvas.parentElement]
-	 * @param {number}				[config.pixi.backgroundColor=0x000000]
-	 * @param {boolean}			[config.pixi.antialias=false]
-	 * @param {boolean}			[config.pixi.autoStart=true]
-	 * @param {number}				[config.pixi.width=100]
-	 * @param {number}				[config.pixi.height=100]
-	 * @param {object}	[config.matter=void 0] - Config for Matter.Engine constructor. For MatterJS to connect, you need to transfer at least an empty object or true value!
-	 * @param {object}		[config.matter.gravity=void 0] - Example for setting gravity
-	 * @param {array}	[config.plugins=void 0] - Array of string, example: ["sg2d-transitions", ...]
-	 * @param {object|string}	[config.sound=void 0] - Sound config file path or sound settings
-	 * @param {object}				[config.sound.options={}]
-	 * @param {object|string}			[config.sound.options.config=void 0] - File path to sound config or object sound config
-	 * @param {undefined|string}			[config.sound.options.music_dir=void 0] - Music directory
-	 * @param {undefined|string}			[config.sound.options.sounds_dir=void 0] - Sounds directory
-	 * @param {undefined|string}			[config.sound.options.library_pathfile=void 0] - Path to the PIXI.Sound library file is applied only the first time the parameter is passed
-	 * @param {object}				[config.sound.properties={}]
-	 * @param {boolean}				[config.sound.properties.sounds=true]
-	 * @param {boolean}				[config.sound.properties.music=true]
-	 * @param {number}					[config.sound.properties.musicVolume=100]
-	 * @param {number}					[config.sound.properties.soundsVolume=100]
-	 * @param {boolean}				[config.sound.properties.muteOnLossFocus=true]
-	 * @param {number}					[config.sound.properties.volumeDecreaseDistance=0]
-	 * @param {boolean}				[config.sound.properties.environment2D=true]
-	 * @param {boolean}				[config.sound.properties.bass=false]
-	 * @param {undefined|string}			[config.sound.properties.view=void 0]
-	 * @param {object}			[config.deferred=SG2D.Deferred()] - Promise that will be executed when the scene is created and run
+	 * Создает экземпляр сцены
+	 * @param {object}			config
+	 * @param {string}			[config.canvasId] По умолчанию ищется первый CANVAS
+	 * @param {number}				[config.cellsizepix=32] - Ширина (и длина) кластера в пикселях
+	 * @param {object|SG2D.Camera}	[config.camera] - Конфиг камеры или созданный отдельно экземпляр на основе {@link SG2D.Camera}
+	 * @param {object|SG2D.Clusters}	[config.clusters] - Конфиг карты или созданный отдельно экземпляр на основе {@link SG2D.Clusters}
+	 * @param {object|SG2D.Pointer}	[config.pointer] - Конфиг мыши/тача или созданный отдельно экземпляр на основе {@link SG2D.Pointer}
+	 * @param {function}			[config.iterate] - Пользовательский итератор, запускается в каждый кадр отрисовки
+	 * @param {function}			[config.resize] - Пользовательский обработчки события resize
+	 * @param {object}				[config.layers={main: {}}] - Список графический слоёв (например, слой для ландшафта, слой для зданий, слой для движущихся объектов и анимаций и т.п.)
+	 * @param {object}				[config.pixi] - Конфигурация для PIXI при выполнении: new PIXI.Application(config.pixi)
+	 * @param {HTMLElement}			[config.pixi.resizeTo=canvas.parentElement]
+	 * @param {number}					[config.pixi.backgroundColor=0x000000]
+	 * @param {boolean}				[config.pixi.antialias=false]
+	 * @param {boolean}				[config.pixi.autoStart=true]
+	 * @param {number}					[config.pixi.width=100]
+	 * @param {number}					[config.pixi.height=100]
+	 * @param {object}			[config.matter] - Конфиг для конструктора Matter.Engine. Чтобы MatterJS подключился, нужно передать хотя бы пустой объект или true!
+	 * @param {object}				[config.matter.gravity] - Значение гравитации для MatterJS (пример передачи параметра)
+	 * @param {object|SG2D.Effects} [config.effects] - Конфиг эффектов или созданный отдельно экземпляр {@link SG2D.Effects}
+	 * @param {String[]}		[config.plugins] - Список подключаемых плагинов, например: ["sg2d-transitions"]
+	 * @param {object|string}	[config.sound] - Путь к json-файлу с настройками звука или сам конфиг. Описание параметров см. здесь: {@link SG2D.Sound#load}
+	 * @param {object}			[config.deferred=SG2D.Deferred()] - Промис, который будет выполнен после создания и запуска сцены
 	 */
 	constructor(config) {
 		
@@ -397,19 +375,14 @@ SG2DApplication.getInstance = function(bIgnoreEmpty) {
 	return null;
 }
 
-/** @public */
 SG2DApplication.STATE_IDLE = 0;
-/** @public */
 SG2DApplication.STATE_RUN = 1;
-/** @public */
 SG2DApplication.STATE_PAUSE = 2;
-/** @public */
 SG2DApplication.STATE_DESTROY = 1<<31; // leftmost bit
 
 /** @private */
 SG2DApplication._uid = 0;
 
-/** @public */
 SG2DApplication.plugins = null;
 
 /** @private */
@@ -436,7 +409,10 @@ SG2DApplication._initialize = function() {
 	});
 }
 
-/** @readonly */
+/**
+ * Количество обрабатываемых спрайтов
+ * @readonly
+ */
 SG2DApplication.spritesCount = 0;
 
 /** @private */
@@ -461,7 +437,10 @@ SG2DApplication._removeSprite = function(sprite) {
 	if (SG2DConsts.DRAW_BODY_LINES) SG2DDebugging.undrawSG2DBodyLines(sprite.tile);
 }
 
-/** @public */
+/**
+ * Задать размер кластера в пикселях (ширина и длина)
+ * @param {number} v
+ */
 SG2DApplication.setCellSizePix = function(v) {
 	SG2DConsts.CELLSIZEPIX = +v;
 	SG2DConsts.CELLSIZEPIX05 = (+v)>>1;

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: sg2d-clusters.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: sg2d-clusters.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
+
+import SG2DConsts from './sg2d-consts.js';
+import SG2DMath from './sg2d-math.js';
+import SG2DCluster from './sg2d-cluster.js';
+
+/**
+ * Матрица кластеров
+ * @alias SG2D.Clusters
+ */
+class SG2DClusters {
+
+	/**
+	 * Конструктор
+	 * @param {object}		[config=void 0] - Конфигурация
+	 * @param {number}			[config.areasize=128]
+	 * @param {SG2DCluster}	[clusterClass=SG2D.Cluster] - Класс кластера
+	 * @returns {SG2DClusters}
+	 */
+	constructor(config, clusterClass = SG2DCluster) {
+	
+		if (SG2DClusters._instance) { debugger; throw "SG2DClusters Error! There is an instance of the class! You must execute .destroy() on the previous instance!"; }
+		SG2DClusters._instance = this;
+		
+		config = config ? config : {};
+		
+		if (config.areasize !== void 0) {
+			SG2DConsts.AREASIZE = config.areasize;
+			SG2DConsts.AREASQUARE = config.areasize * config.areasize;
+			SG2DConsts.AREASIZELOG2 = Math.ceil(Math.log2(config.areasize));
+		}
+	
+		if (SG2DClusters.permissible_sizes.indexOf(SG2DConsts.AREASIZE) === -1) throw "Side of map size cannot differ from " + SG2DClusters.permissible_sizes.join(",") + "! Now SG2DConsts.AREASIZE=" + SG2DConsts.AREASIZE;
+
+		this.areasize = this.width = this.height = SG2DConsts.AREASIZE;
+		this.areasizepix = this.areasize * SG2DConsts.CELLSIZEPIX;
+
+		this.clusters = [];
+		this.tiles = SG2DClusters.tiles;
+		this.tilesset = SG2DClusters.tilesset;
+		this.bodies = SG2DClusters.bodies;
+		this.clear();
+		
+		var x, y;
+		for (var i = 0; i &lt; SG2DConsts.AREASQUARE; i++) {
+			[x,y] = this.getXYbyIndex(i);
+			this.clusters[i] = new clusterClass({x: x, y: y, i: i});
+		}
+	}
+	
+	getXYbyIndex(index) {
+		SG2DCluster._y = index >> SG2DConsts.AREASIZELOG2;
+		return [1 + (index - (SG2DCluster._y &lt;&lt; SG2DConsts.AREASIZELOG2)), 1 + SG2DCluster._y];
+	}
+	
+	getClusterByIndex(index) {
+		SG2DCluster._y = index >> SG2DConsts.AREASIZELOG2;
+		SG2DCluster._x = index - (SG2DCluster._y &lt;&lt; SG2DConsts.AREASIZELOG2);
+		return this.getCluster0(SG2DCluster._x, SG2DCluster._y);
+	}
+
+	getCluster0(x, y) {
+		if (this.outArea0(x, y)) {
+			return false;
+		} else {
+			return this.clusters[(y &lt;&lt; SG2DConsts.AREASIZELOG2) + x];
+		}
+	}
+	
+	getCluster(x, y) {
+		if (this.outArea(x, y)) {
+			return false;
+		} else {
+			return this.clusters[((y - 1) &lt;&lt; SG2DConsts.AREASIZELOG2) + (x - 1)];
+		}
+	}
+	
+	getClusterCXY(cxy) {
+		if (this.outArea(cxy.x, cxy.y)) {
+			return false;
+		} else {
+			return this.clusters[((cxy.y - 1) &lt;&lt; SG2DConsts.AREASIZELOG2) + (cxy.x - 1)];
+		}
+	}
+
+	outArea0(x, y) {
+		return (x &lt; 0 ||  x >= this.width || y &lt; 0 || y >= this.height);
+	}
+	
+	outArea(x, y) {
+		return (x &lt; 1 ||  x > this.width || y &lt; 1 || y > this.height);
+	}
+
+	inArea0(x, y) {
+		return ! this.outArea0(x, y);
+	}
+	
+	inArea(x, y) {
+		return ! this.outArea(x, y);
+	}
+	
+	each(f) {
+		for (var i = 0; i &lt; SG2DConsts.AREASQUARE; i++) {
+			f(this.clusters[i]);
+		}
+	}
+	
+	/**
+	 * Если функция checker выполняется хотя бы для одного соседнего кластера, то возвращается true, иначе false
+	 */
+	nearestClusters90(cluster, checker) {
+		var nearestCluster;
+		for (var i = 0; i &lt; 4; i++) {
+			if (nearestCluster = this.getCluster(cluster.x + SG2DMath.vectors90[i].dx, cluster.y + SG2DMath.vectors90[i].dy)) {
+				if (checker(nearestCluster, Math.round(i * 90)) === true) return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Если функция checker выполняется хотя бы для одного соседнего кластера, то возвращается true, иначе false
+	 */
+	nearestClusters45(cluster, checker) {
+		var nearestCluster;
+		for (var i = 0; i &lt; 8; i++) {
+			if (nearestCluster = this.getCluster(cluster.x + SG2DMath.vectors45[i].dx, cluster.y + SG2DMath.vectors45[i].dy)) {
+				if (checker(nearestCluster, Math.round(i * 45)) === true) return true;
+			}
+		}
+		return false;
+	}
+	
+	/** @protected */
+	clear() {
+		SG2DClusters.tiles.length = 0;
+		SG2DClusters.tilesset.clear();
+		SG2DClusters.bodies.clear();
+	}
+	
+	/** @protected */
+	destroy() {
+		this.clear();
+		SG2DClusters._instance = null;
+	}
+}
+
+SG2DClusters.permissible_sizes = [8,16,32,64,128,256,512,1024];
+SG2DClusters._x = 0;
+SG2DClusters._y = 0;
+
+SG2DClusters._instance = null;
+SG2DClusters.getInstance = function() {
+	if (this._instance) {
+		return this._instance;
+	} else {
+		throw "Error! SG2DClusters._instance is empty!";
+	}
+}
+
+SG2DClusters.tiles = []; // all tiles (Array is faster than Set in Mozilla)
+SG2DClusters.tilesset = new Set(); // all tiles
+SG2DClusters.bodies = new Set(); // all colliding bodies
+
+/**
+ * Метод проекция на аналогичный метод singleton-экземпляра
+ * @static
+ */
+SG2DClusters.each = function(f) { return SG2DClusters.getInstance().each(f); }
+
+SG2DClusters.getCluster = function(x, y) { return SG2DClusters.getInstance().getCluster(x, y); }
+SG2DClusters.getClusterCXY = function(cxy) { return SG2DClusters.getInstance().getClusterCXY(cxy); }
+SG2DClusters.inArea = function(x, y) { return SG2DClusters.getInstance().inArea(x, y); }
+SG2DClusters.outArea = function(x, y) { return SG2DClusters.getInstance().outArea(x, y); }
+SG2DClusters.nearestClusters90 = function(cluster, checker) { return SG2DClusters.getInstance().nearestClusters90(cluster, checker); }
+SG2DClusters.nearestClusters45 = function(cluster, checker) { return SG2DClusters.getInstance().nearestClusters45(cluster, checker); }
+
+export default SG2DClusters;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="SG2D.html">SG2D</a></li><li><a href="SG2D.Fonts.html">Fonts</a></li><li><a href="SG2D.MessageToast.html">MessageToast</a></li><li><a href="SG2D.Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="SG2D.Application.html">Application</a></li><li><a href="SG2D.Bounds.html">Bounds</a></li><li><a href="SG2D.Camera.html">Camera</a></li><li><a href="SG2D.Cluster.html">Cluster</a></li><li><a href="SG2D.Clusters.html">Clusters</a></li><li><a href="SG2D.CustomSprite.html">CustomSprite</a></li><li><a href="SG2D.Effects.html">Effects</a></li><li><a href="SG2D.Label.html">Label</a></li><li><a href="SG2D.LabelCanvas.html">LabelCanvas</a></li><li><a href="SG2D.PluginBase.html">PluginBase</a></li><li><a href="SG2D.Plugins.html">Plugins</a></li><li><a href="SG2D.Pointer.html">Pointer</a></li><li><a href="SG2D.Sound.html">Sound</a></li><li><a href="SG2D.Tile.html">Tile</a></li><li><a href="SG2D.TileBody.html">TileBody</a></li><li><a href="SG2DTransitions.html">SG2DTransitions</a></li><li><a href="SGModel.html">SGModel</a></li><li><a href="SGModelView.html">SGModelView</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Tue Sep 14 2021 20:39:17 GMT+0200 (Восточная Европа, стандартное время)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
