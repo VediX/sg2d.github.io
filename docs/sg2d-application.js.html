@@ -52,26 +52,19 @@ class SG2DApplication {
 	 * Создает экземпляр сцены
 	 * @param {object}			config
 	 * @param {string}			[config.canvasId] По умолчанию ищется первый CANVAS
-	 * @param {number}				[config.cellsizepix=32] - Ширина (и длина) кластера в пикселях
+	 * @param {number}				[config.cellsizepix] - Ширина (и длина) кластера в пикселях. По умолчанию равны 32.
 	 * @param {object|SG2D.Camera}	[config.camera] - Конфиг камеры или созданный отдельно экземпляр на основе {@link SG2D.Camera}
 	 * @param {object|SG2D.Clusters}	[config.clusters] - Конфиг карты или созданный отдельно экземпляр на основе {@link SG2D.Clusters}
 	 * @param {object|SG2D.Pointer}	[config.pointer] - Конфиг мыши/тача или созданный отдельно экземпляр на основе {@link SG2D.Pointer}
 	 * @param {function}			[config.iterate] - Пользовательский итератор, запускается в каждый кадр отрисовки
 	 * @param {function}			[config.resize] - Пользовательский обработчки события resize
-	 * @param {object}				[config.layers={main: {}}] - Список графический слоёв (например, слой для ландшафта, слой для зданий, слой для движущихся объектов и анимаций и т.п.)
-	 * @param {object}				[config.pixi] - Конфигурация для PIXI при выполнении: new PIXI.Application(config.pixi)
-	 * @param {HTMLElement}			[config.pixi.resizeTo=canvas.parentElement]
-	 * @param {number}					[config.pixi.backgroundColor=0x000000]
-	 * @param {boolean}				[config.pixi.antialias=false]
-	 * @param {boolean}				[config.pixi.autoStart=true]
-	 * @param {number}					[config.pixi.width=100]
-	 * @param {number}					[config.pixi.height=100]
-	 * @param {object}			[config.matter] - Конфиг для конструктора Matter.Engine. Чтобы MatterJS подключился, нужно передать хотя бы пустой объект или true!
-	 * @param {object}				[config.matter.gravity] - Значение гравитации для MatterJS (пример передачи параметра)
+	 * @param {object}				[config.layers] - Список графический слоёв (например, слой для ландшафта, слой для зданий, слой для движущихся объектов и анимаций и т.п.)
+	 * @param {object}				[config.pixi] - Конфигурация для PIXI при выполнении: new PIXI.Application(config.pixi). Пример параметров, которые можно передать: resizeTo, backgroundColor, antialias, autoStart, width, height
+	 * @param {object}				[config.matter] - Конфиг для конструктора Matter.Engine. Чтобы MatterJS подключился, нужно передать хотя бы пустой объект или true! Пример параметров, которые можно передать:  gravity: { x: 0, y: 0 }, broadphase: { bucketWidth: 64, bucketHeight: 64 }
 	 * @param {object|SG2D.Effects} [config.effects] - Конфиг эффектов или созданный отдельно экземпляр {@link SG2D.Effects}
 	 * @param {String[]}		[config.plugins] - Список подключаемых плагинов, например: ["sg2d-transitions"]
 	 * @param {object|string}	[config.sound] - Путь к json-файлу с настройками звука или сам конфиг. Описание параметров см. здесь: {@link SG2D.Sound#load}
-	 * @param {object}			[config.deferred=SG2D.Deferred()] - Промис, который будет выполнен после создания и запуска сцены
+	 * @param {object}			[config.promise] - Промис, который будет выполнен после создания и запуска сцены
 	 */
 	constructor(config) {
 		
@@ -201,10 +194,15 @@ class SG2DApplication {
 		}
 		SG2DSound._sg2dconnect(this);
 		
-		if (config.deferred) {
-			this.deferred = config.deferred;
+		if (config.promise) {
+			this.promise = config.promise;
 		} else {
-			this.deferred = SG2D.Deferred();
+			this.promise = new Promise((resolve, reject)=>{
+				this._resolve = resolve;
+				this._reject = reject;
+			});
+			if (! this.promise.resolve) this.promise.resolve = this._resolve;
+			if (! this.promise.reject) this.promise.reject = this._reject;
 		}
 		
 		this.state = SG2DApplication.STATE_IDLE;
@@ -220,7 +218,7 @@ class SG2DApplication {
 			SG2DApplication._pluginsPromise,
 			SG2DApplication._soundConfigPromise
 		]).then(()=>{
-			this.deferred.resolve(this);
+			this.promise.resolve(this);
 			window.dispatchEvent(new Event('resize'));
 			this._initClustersInCamera();
 			this.pixi.start();
@@ -485,13 +483,13 @@ export default SG2DApplication;</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="SG2D.html">SG2D</a></li><li><a href="SG2D.Fonts.html">Fonts</a></li><li><a href="SG2D.MessageToast.html">MessageToast</a></li><li><a href="SG2D.Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="SG2D.Application.html">Application</a></li><li><a href="SG2D.Bounds.html">Bounds</a></li><li><a href="SG2D.Camera.html">Camera</a></li><li><a href="SG2D.Cluster.html">Cluster</a></li><li><a href="SG2D.Clusters.html">Clusters</a></li><li><a href="SG2D.CustomSprite.html">CustomSprite</a></li><li><a href="SG2D.Effects.html">Effects</a></li><li><a href="SG2D.Label.html">Label</a></li><li><a href="SG2D.LabelCanvas.html">LabelCanvas</a></li><li><a href="SG2D.PluginBase.html">PluginBase</a></li><li><a href="SG2D.Plugins.html">Plugins</a></li><li><a href="SG2D.Pointer.html">Pointer</a></li><li><a href="SG2D.Sound.html">Sound</a></li><li><a href="SG2D.Tile.html">Tile</a></li><li><a href="SG2D.TileBody.html">TileBody</a></li><li><a href="SG2DTransitions.html">SG2DTransitions</a></li><li><a href="SGModel.html">SGModel</a></li><li><a href="SGModelView.html">SGModelView</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="SG2D.html">SG2D</a></li><li><a href="SG2D.Consts.html">Consts</a></li><li><a href="SG2D.Fonts.html">Fonts</a></li><li><a href="SG2D.MessageToast.html">MessageToast</a></li><li><a href="SG2D.Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="SG2D.Application.html">Application</a></li><li><a href="SG2D.Bounds.html">Bounds</a></li><li><a href="SG2D.Camera.html">Camera</a></li><li><a href="SG2D.Cluster.html">Cluster</a></li><li><a href="SG2D.Clusters.html">Clusters</a></li><li><a href="SG2D.CustomSprite.html">CustomSprite</a></li><li><a href="SG2D.Deferred.html">Deferred</a></li><li><a href="SG2D.Effects.html">Effects</a></li><li><a href="SG2D.Label.html">Label</a></li><li><a href="SG2D.LabelCanvas.html">LabelCanvas</a></li><li><a href="SG2D.Math.html">Math</a></li><li><a href="SG2D.PluginBase.html">PluginBase</a></li><li><a href="SG2D.Plugins.html">Plugins</a></li><li><a href="SG2D.Pointer.html">Pointer</a></li><li><a href="SG2D.Sound.html">Sound</a></li><li><a href="SG2D.Tile.html">Tile</a></li><li><a href="SG2D.TileBody.html">TileBody</a></li><li><a href="SG2DTransitions.html">SG2DTransitions</a></li><li><a href="SGModel.html">SGModel</a></li><li><a href="SGModelView.html">SGModelView</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Tue Sep 14 2021 20:39:17 GMT+0200 (Восточная Европа, стандартное время)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Mon Oct 18 2021 11:05:56 GMT+0300 (Москва, стандартное время)
 </footer>
 
 <script> prettyPrint(); </script>

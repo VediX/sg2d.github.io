@@ -558,6 +558,10 @@
 
 
 
+<div class="description">
+    <p>Прозрачность основного спрайта.</p>
+</div>
+
 
 
     <h5>Type:</h5>
@@ -603,7 +607,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line551">line 551</a>
+        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line592">line 592</a>
     </li></ul></dd>
     
 
@@ -626,6 +630,10 @@
 
 
 
+<div class="description">
+    <p>Смещение основного спрайта.</p>
+</div>
+
 
 
     <h5>Type:</h5>
@@ -671,7 +679,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line545">line 545</a>
+        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line582">line 582</a>
     </li></ul></dd>
     
 
@@ -694,6 +702,10 @@
 
 
 
+<div class="description">
+    <p>Угол поворота основного спрайта.</p>
+</div>
+
 
 
     <h5>Type:</h5>
@@ -739,7 +751,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line542">line 542</a>
+        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line577">line 577</a>
     </li></ul></dd>
     
 
@@ -757,13 +769,123 @@
 
         
             
+<h4 class="name" id=".animation"><span class="type-signature">(static) </span>animation<span class="type-signature"> :<a href="SG2D.Tile.html#.AnimationConfig">SG2D.Tile.AnimationConfig</a></span></h4>
+
+
+
+
+<div class="description">
+    <p>Описание анимации для основного спрайта</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a href="SG2D.Tile.html#.AnimationConfig">SG2D.Tile.AnimationConfig</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line778">line 778</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>// Пример описания анимации для основного спрайта
+export class Medikit extends SG2D.Tile {
+	static texture = "objects/medikit100_1";
+	static layer = "bodies";
+	static animation = {
+		count: 8,
+		sleep: 3,
+		running: false,
+		basetexture: "objects/medikit100_",
+		onComplete: function(sprite) {
+			sprite.visible = true; // После выполнения анимации оставляем её видимой
+		},
+		loop: false
+	};
+	
+	initialize(...args) {
+		super.initialize(...args);
+		this.scaleDir = 1;
+	}
+	
+	iterateAnimations(...args) {
+		this.set("angle", this.properties.angle + 1);
+		this.set("scale", this.properties.scale +0.002 * this.scaleDir);
+		if (this.properties.scale &lt;= 0.6) this.scaleDir = 1;
+		if (this.properties.scale >= 0.8) this.scaleDir = -1;
+		
+		if (! this.sprite.animation.running &amp;&amp; Math.random() &lt; 0.01) {
+			this.startAnimation();
+		}
+		
+		super.iterateAnimations(...args);
+	}
+}</code></pre>
+
+
+
+        
+            
 <h4 class="name" id=".FLAG_ONLY_OPTIONS_SPRITE"><span class="type-signature">(static) </span>FLAG_ONLY_OPTIONS_SPRITE<span class="type-signature"></span></h4>
 
 
 
 
 <div class="description">
-    <p>Ignore common sprite property setters (without options.&lt;sprite|sprites&gt;)</p>
+    <p>Флаг для игнорирования спрайтом сеттера без указания спрайта в <em>options.&lt;sprite|sprites&gt;</em>. Флаг актуален для тайлов состоящих из нескольких спрайтов.
+Например, для спрайта <em>this.sprites.platform</em> сеттер <em>this.set(&quot;angle&quot;, 125)</em> не применится, а <em>this.set(&quot;angle&quot;, 125, { sprite: this.sprites.platform })</em> применится!</p>
 </div>
 
 
@@ -801,7 +923,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line610">line 610</a>
+        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line796">line 796</a>
     </li></ul></dd>
     
 
@@ -869,7 +991,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line604">line 604</a>
+        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line787">line 787</a>
     </li></ul></dd>
     
 
@@ -937,7 +1059,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line601">line 601</a>
+        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line784">line 784</a>
     </li></ul></dd>
     
 
@@ -955,10 +1077,14 @@
 
         
             
-<h4 class="name" id=".layer"><span class="type-signature">(static) </span>layer<span class="type-signature"> :undefined|string</span></h4>
+<h4 class="name" id=".layer"><span class="type-signature">(static) </span>layer<span class="type-signature"> :string</span></h4>
 
 
 
+
+<div class="description">
+    <p>Слой, в котором идёт отрисовка основного спрайта. Если равно undefined, используется слой по умолчанию (PIXI.Container).</p>
+</div>
 
 
 
@@ -966,9 +1092,6 @@
     <ul>
         <li>
             
-<span class="param-type">undefined</span>
-|
-
 <span class="param-type">string</span>
 
 
@@ -1008,7 +1131,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line536">line 536</a>
+        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line547">line 547</a>
     </li></ul></dd>
     
 
@@ -1076,7 +1199,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line607">line 607</a>
+        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line790">line 790</a>
     </li></ul></dd>
     
 
@@ -1099,212 +1222,8 @@
 
 
 
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">number</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line548">line 548</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id=".texture"><span class="type-signature">(static) </span>texture<span class="type-signature"> :string</span></h4>
-
-
-
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">string</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line539">line 539</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id=".visible"><span class="type-signature">(static) </span>visible<span class="type-signature"> :boolean</span></h4>
-
-
-
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">boolean</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line554">line 554</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id=".zindex"><span class="type-signature">(static) </span>zindex<span class="type-signature"> :number</span></h4>
-
-
-
-
 <div class="description">
-    <p>Main zindex is added to zindex of sprites, except for sprite with name=&quot;main&quot;</p>
+    <p>Масштабирование основного спрайта.</p>
 </div>
 
 
@@ -1352,7 +1271,417 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line560">line 560</a>
+        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line587">line 587</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".sprites"><span class="type-signature">(static) </span>sprites<span class="type-signature"> :Object.&lt;string, <a href="SG2D.Tile.html#.SpriteConfig">SG2D.Tile.SpriteConfig</a>></span></h4>
+
+
+
+
+<div class="description">
+    <p>Описание спрайтов и анимаций в тайле в виде дерева.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object.&lt;string, <a href="SG2D.Tile.html#.SpriteConfig">SG2D.Tile.SpriteConfig</a>></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line736">line 736</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>// Базовый класс для тайлов с lifeband-полоской
+export default class ObjectBaseLifeBand extends SG2D.TileBody {
+	static layer = "bodies";
+	static sprites = {
+		lifeband_base: {
+			texture: "ui/lifeband_base",
+			anchor: { x: 0.5, y: -5 },
+			zindex: 10,
+			angle: 90,
+			layer: "animations",
+			setter_flag: SG2D.Tile.FLAG_ONLY_OPTIONS_SPRITE
+		},
+		lifeband_value: {
+			textures: { friend: "ui/lifeband_green", enemy: "ui/lifeband_red" },
+			texture: "ui/lifeband_green",
+			scale: { x: 1, y: 1 },
+			anchor: { x: 0.5, y: -5 },
+			zindex: 11,
+			angle: 90,
+			layer: "animations",
+			setter_flag: SG2D.Tile.FLAG_ONLY_OPTIONS_SPRITE
+		}
+	}
+	//...
+}
+
+// Базовый класс для игроков
+export default class Player extends ObjectBaseLifeBand {
+	static sprites = SG2D.Model.defaults({
+		platform: {
+			texture: "objects/player-platform",
+			zindex: 0,
+			sprites: {
+				turret: {
+					texture: "objects/player-turret",
+					anchor: { x: 0.15, y: 0.5 },
+					zindex: 2,
+					sprites: {
+						smoke_shot: {
+							texture: "objects/player-smoke-shot_1",
+							layer: "animations",
+							anchor: { x: -3.4, y: 0.5 },
+							zindex: 1,
+							visible: false,
+							animation: {
+								count: 6,
+								sleep: 3,
+								running: false,
+								basetexture: "objects/player-smoke-shot_"
+							},
+							setter_flag: SG2D.Tile.FLAG_ONLY_OPTIONS_SPRITE
+						}
+					}
+				}
+			}
+		},
+		accelerator: {
+			texture: "animations/accelerator_1",
+			layer: "animations",
+			anchor: { x: 2.7, y: 0.45 },
+			zindex: 0,
+			visible: false,
+			animation: {
+				count: 3,
+				sleep: 3,
+				running: false,
+				basetexture: "animations/accelerator_"
+			}
+		},
+		track_left: {
+			texture: "objects/player-track_1",
+			anchor: { x: -4, y: 2.7 },
+			zindex: 1,
+			animation: {
+				count: 8,
+				sleep: 2,
+				running: false,
+				basetexture: "objects/player-track_",
+				loop: true
+			}
+		},
+		track_right: {
+			texture: "objects/player-track_1",
+			anchor: { x: -4, y: -1.6 },
+			zindex: 1,
+			animation: {
+				count: 8,
+				sleep: 2,
+				running: false,
+				basetexture: "objects/player-track_",
+				loop: true
+			}
+		}
+	}, ObjectBaseLifeBand.sprites);
+	//...
+ }</code></pre>
+
+
+
+        
+            
+<h4 class="name" id=".texture"><span class="type-signature">(static) </span>texture<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    <p>Текстура основного спрайта.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">string</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line572">line 572</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>// Пример описания простейшего тайла, где будет только один спрайт (основной), задействована только одна текстура и не будет анимаций
+export class BlockSteel extends SG2D.TileBody {
+	static texture = "elements/block-steel";
+	static layer = "bodies";
+	static zindex = 20;
+}
+
+// Пример описание тайла, где будет один спрайт (основной), но текстура задаётся при инициализации
+export class Tree extends SG2D.Tile {
+	static texture = "elements/trees/tree_";
+	static layer = "trees";
+	static zindex = 20;
+	initialize(...args) {
+		super.initialize(...args);
+		let n = Math.floor(1 + Math.random() * 41);
+		this.set("texture", Tree.texture + (n&lt;10?"0":"") + n);
+	}
+}</code></pre>
+
+
+
+        
+            
+<h4 class="name" id=".visible"><span class="type-signature">(static) </span>visible<span class="type-signature"> :boolean</span></h4>
+
+
+
+
+<div class="description">
+    <p>Видимость основного спрайта.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">boolean</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line597">line 597</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".zindex"><span class="type-signature">(static) </span>zindex<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    <p>Основной z-index добавляется к z-index спрайтов, кроме спрайта с именем = &quot;main&quot;</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line603">line 603</a>
     </li></ul></dd>
     
 
@@ -2382,6 +2711,143 @@
     
 
     
+    <h4 class="name" id="sound"><span class="type-signature"></span>sound<span class="signature">(code)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Проиграть звук к тайлу, учитывается 2D-окружение и расстояние</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>code</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line508">line 508</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="startAnimation"><span class="type-signature"></span>startAnimation<span class="signature">(name_or_sprite<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
     
 
@@ -3109,6 +3575,802 @@
     
 
     
+        <h3 class="subsection-title">Type Definitions</h3>
+
+        
+                
+<h4 class="name" id=".AnimationConfig">AnimationConfig</h4>
+
+
+
+
+<div class="description">
+    <p>Конфиг анимации для спрайта.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>basetexture</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>start</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    1
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>count</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sleep</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    1
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>running</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>loop</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onComplete</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    void 0
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line620">line 620</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id=".SpriteConfig">SpriteConfig</h4>
+
+
+
+
+<div class="description">
+    <p>Конфиг спрайта в тайле.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>texture</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>anchor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+|
+
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    0.5
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>angle</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    0
+                
+                </td>
+            
+
+            <td class="description last"><p>В градусах</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>scale</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+|
+
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    1
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>zindex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    0
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>visible</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>layer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Код слоя</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>animation</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="SG2D.Tile.html#.AnimationConfig">SG2D.Tile.AnimationConfig</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>setter_flag</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    0
+                
+                </td>
+            
+
+            <td class="description last"><p>Флаг. Если задано SG2D.Tile.FLAG_ONLY_OPTIONS_SPRITE, то нужно передавать в options код или сам объект спрайта, например: this.set(&quot;angle&quot;, a, { sprite: this.sprites.smoke_shot });</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sg2d-tile.js.html">sg2d-tile.js</a>, <a href="sg2d-tile.js.html#line605">line 605</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+    
 
     
 </article>
@@ -3121,13 +4383,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="SG2D.html">SG2D</a></li><li><a href="SG2D.Fonts.html">Fonts</a></li><li><a href="SG2D.MessageToast.html">MessageToast</a></li><li><a href="SG2D.Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="SG2D.Application.html">Application</a></li><li><a href="SG2D.Bounds.html">Bounds</a></li><li><a href="SG2D.Camera.html">Camera</a></li><li><a href="SG2D.Cluster.html">Cluster</a></li><li><a href="SG2D.Clusters.html">Clusters</a></li><li><a href="SG2D.CustomSprite.html">CustomSprite</a></li><li><a href="SG2D.Effects.html">Effects</a></li><li><a href="SG2D.Label.html">Label</a></li><li><a href="SG2D.LabelCanvas.html">LabelCanvas</a></li><li><a href="SG2D.PluginBase.html">PluginBase</a></li><li><a href="SG2D.Plugins.html">Plugins</a></li><li><a href="SG2D.Pointer.html">Pointer</a></li><li><a href="SG2D.Sound.html">Sound</a></li><li><a href="SG2D.Tile.html">Tile</a></li><li><a href="SG2D.TileBody.html">TileBody</a></li><li><a href="SG2DTransitions.html">SG2DTransitions</a></li><li><a href="SGModel.html">SGModel</a></li><li><a href="SGModelView.html">SGModelView</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="SG2D.html">SG2D</a></li><li><a href="SG2D.Consts.html">Consts</a></li><li><a href="SG2D.Fonts.html">Fonts</a></li><li><a href="SG2D.MessageToast.html">MessageToast</a></li><li><a href="SG2D.Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="SG2D.Application.html">Application</a></li><li><a href="SG2D.Bounds.html">Bounds</a></li><li><a href="SG2D.Camera.html">Camera</a></li><li><a href="SG2D.Cluster.html">Cluster</a></li><li><a href="SG2D.Clusters.html">Clusters</a></li><li><a href="SG2D.CustomSprite.html">CustomSprite</a></li><li><a href="SG2D.Deferred.html">Deferred</a></li><li><a href="SG2D.Effects.html">Effects</a></li><li><a href="SG2D.Label.html">Label</a></li><li><a href="SG2D.LabelCanvas.html">LabelCanvas</a></li><li><a href="SG2D.Math.html">Math</a></li><li><a href="SG2D.PluginBase.html">PluginBase</a></li><li><a href="SG2D.Plugins.html">Plugins</a></li><li><a href="SG2D.Pointer.html">Pointer</a></li><li><a href="SG2D.Sound.html">Sound</a></li><li><a href="SG2D.Tile.html">Tile</a></li><li><a href="SG2D.TileBody.html">TileBody</a></li><li><a href="SG2DTransitions.html">SG2DTransitions</a></li><li><a href="SGModel.html">SGModel</a></li><li><a href="SGModelView.html">SGModelView</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Tue Sep 14 2021 20:39:18 GMT+0200 (Восточная Европа, стандартное время)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Mon Oct 18 2021 11:05:56 GMT+0300 (Москва, стандартное время)
 </footer>
 
 <script> prettyPrint(); </script>

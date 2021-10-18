@@ -47,7 +47,7 @@ class SGModel {
 			switch (this.constructor.typeProperties[p]) {
 				case SGModel.TYPE_ANY: case SGModel.TYPE_ARRAY: break;
 				case SGModel.TYPE_NUMBER: properties[p] = (value === void 0 ? void 0 : +value); break;
-				case SGModel.TYPE_NUMBER_OR_XY: {
+				case SGModel.TYPE_VECTOR: {
 					if (typeof value === "object") {
 						value.x = (value.x === void 0 ? void 0 : +value.x);
 						value.y = (value.y === void 0 ? void 0 : +value.y);
@@ -161,7 +161,7 @@ class SGModel {
 					}
 					break;
 				}
-				case SGModel.TYPE_NUMBER_OR_XY: return this._setNumberOrXY.apply(this, arguments);
+				case SGModel.TYPE_VECTOR: return this._setNumberOrXY.apply(this, arguments);
 				case SGModel.TYPE_ARRAY: case SGModel.TYPE_ARRAY_NUMBERS: return this._setArray.apply(this, arguments);
 				case SGModel.TYPE_OBJECT: case SGModel.TYPE_OBJECT_NUMBERS: return this._setObject.apply(this, arguments);
 				case SGModel.TYPE_STRING: value = ''+value; break;
@@ -577,7 +577,7 @@ SGModel.TYPE_OBJECT = 4;
 SGModel.TYPE_ARRAY = 5;
 SGModel.TYPE_ARRAY_NUMBERS = 6;
 SGModel.TYPE_OBJECT_NUMBERS = 7;
-SGModel.TYPE_NUMBER_OR_XY = 8;
+SGModel.TYPE_VECTOR = 8;
 
 /**
  * The flag passed in the **.on(...)** call to execute the callback

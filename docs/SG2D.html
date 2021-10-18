@@ -230,13 +230,13 @@
 
         <tr>
             
-                <td class="name"><code>SG2D.Sprite</code></td>
+                <td class="name"><code>SG2D.CustomSprite</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">SG2D.Sprite</span>
+<span class="param-type"><a href="SG2D.CustomSprite.html">SG2D.CustomSprite</a></span>
 
 
             
@@ -246,7 +246,7 @@
 
             
 
-            <td class="description last"><p>Одиночный спрайт</p></td>
+            <td class="description last"><p>Кастомный одиночный спрайт</p></td>
         </tr>
 
     
@@ -328,7 +328,7 @@
             <td class="type">
             
                 
-<span class="param-type">SG2D.Math</span>
+<span class="param-type"><a href="SG2D.Math.html">SG2D.Math</a></span>
 
 
             
@@ -374,7 +374,7 @@
             <td class="type">
             
                 
-<span class="param-type">SG2D.Consts</span>
+<span class="param-type"><a href="SG2D.Consts.html">SG2D.Consts</a></span>
 
 
             
@@ -626,6 +626,9 @@
             <dt><a href="SG2D.CustomSprite.html">CustomSprite</a></dt>
             <dd></dd>
         
+            <dt><a href="SG2D.Deferred.html">Deferred</a></dt>
+            <dd></dd>
+        
             <dt><a href="SG2D.Effects.html">Effects</a></dt>
             <dd></dd>
         
@@ -633,6 +636,9 @@
             <dd></dd>
         
             <dt><a href="SG2D.LabelCanvas.html">LabelCanvas</a></dt>
+            <dd></dd>
+        
+            <dt><a href="SG2D.Math.html">Math</a></dt>
             <dd></dd>
         
             <dt><a href="SG2D.PluginBase.html">PluginBase</a></dt>
@@ -663,6 +669,9 @@
         <h3 class="subsection-title">Namespaces</h3>
 
         <dl>
+            <dt><a href="SG2D.Consts.html">Consts</a></dt>
+            <dd></dd>
+        
             <dt><a href="SG2D.Fonts.html">Fonts</a></dt>
             <dd></dd>
         
@@ -677,533 +686,7 @@
     
 
     
-        <h3 class="subsection-title">Methods</h3>
 
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".Deferred"><span class="type-signature">(static) </span>Deferred<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="SG2D.html#.Promise">SG2D.Promise</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Создаёт экземпляр <a href="SG2D.html#.Promise">SG2D.Promise</a></p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-deferred.js.html">sg2d-deferred.js</a>, <a href="sg2d-deferred.js.html#line15">line 15</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="SG2D.html#.Promise">SG2D.Promise</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-    
-
-    
-        <h3 class="subsection-title">Type Definitions</h3>
-
-        
-                
-<h4 class="name" id=".Effect">Effect</h4>
-
-
-
-
-<div class="description">
-    <p>Эффект</p>
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">object</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>type</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Тип фильтра: SG2D.Effects.TYPE_SHADOWS | SG2D.Effects.TYPE_BEVELS | SG2D.Effects.TYPE_DISPLACEMENT</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>layer</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-|
-
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>filter</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">PIXI.Filter</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Специфические настройки фильтра</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-effects.js.html">sg2d-effects.js</a>, <a href="sg2d-effects.js.html#line12">line 12</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-            
-                
-<h4 class="name" id=".Promise">Promise</h4>
-
-
-
-
-<div class="description">
-    <p>Промис с возможностью вызывать resolve/reject извне</p>
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">object</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>resolve(value)</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Завершает промис с успехом</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>reject(error)</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Завершает промис с ошибкой</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>then(callback)</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Добавляет колбэк в список вызовов при успешном завершении промиса</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>catch(callback)</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Добавляет колбэк в список вызовов при аварийном завершении промиса</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>isCompleted</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Возвращает статус промиса (<strong>true</strong> для успешно завершенного промиса, <strong>false</strong> для не завершенного промиса или завершенного аварийно)</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-deferred.js.html">sg2d-deferred.js</a>, <a href="sg2d-deferred.js.html#line3">line 3</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-            
     
 
     
@@ -1217,13 +700,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="SG2D.html">SG2D</a></li><li><a href="SG2D.Fonts.html">Fonts</a></li><li><a href="SG2D.MessageToast.html">MessageToast</a></li><li><a href="SG2D.Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="SG2D.Application.html">Application</a></li><li><a href="SG2D.Bounds.html">Bounds</a></li><li><a href="SG2D.Camera.html">Camera</a></li><li><a href="SG2D.Cluster.html">Cluster</a></li><li><a href="SG2D.Clusters.html">Clusters</a></li><li><a href="SG2D.CustomSprite.html">CustomSprite</a></li><li><a href="SG2D.Effects.html">Effects</a></li><li><a href="SG2D.Label.html">Label</a></li><li><a href="SG2D.LabelCanvas.html">LabelCanvas</a></li><li><a href="SG2D.PluginBase.html">PluginBase</a></li><li><a href="SG2D.Plugins.html">Plugins</a></li><li><a href="SG2D.Pointer.html">Pointer</a></li><li><a href="SG2D.Sound.html">Sound</a></li><li><a href="SG2D.Tile.html">Tile</a></li><li><a href="SG2D.TileBody.html">TileBody</a></li><li><a href="SG2DTransitions.html">SG2DTransitions</a></li><li><a href="SGModel.html">SGModel</a></li><li><a href="SGModelView.html">SGModelView</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="SG2D.html">SG2D</a></li><li><a href="SG2D.Consts.html">Consts</a></li><li><a href="SG2D.Fonts.html">Fonts</a></li><li><a href="SG2D.MessageToast.html">MessageToast</a></li><li><a href="SG2D.Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="SG2D.Application.html">Application</a></li><li><a href="SG2D.Bounds.html">Bounds</a></li><li><a href="SG2D.Camera.html">Camera</a></li><li><a href="SG2D.Cluster.html">Cluster</a></li><li><a href="SG2D.Clusters.html">Clusters</a></li><li><a href="SG2D.CustomSprite.html">CustomSprite</a></li><li><a href="SG2D.Deferred.html">Deferred</a></li><li><a href="SG2D.Effects.html">Effects</a></li><li><a href="SG2D.Label.html">Label</a></li><li><a href="SG2D.LabelCanvas.html">LabelCanvas</a></li><li><a href="SG2D.Math.html">Math</a></li><li><a href="SG2D.PluginBase.html">PluginBase</a></li><li><a href="SG2D.Plugins.html">Plugins</a></li><li><a href="SG2D.Pointer.html">Pointer</a></li><li><a href="SG2D.Sound.html">Sound</a></li><li><a href="SG2D.Tile.html">Tile</a></li><li><a href="SG2D.TileBody.html">TileBody</a></li><li><a href="SG2DTransitions.html">SG2DTransitions</a></li><li><a href="SGModel.html">SGModel</a></li><li><a href="SGModelView.html">SGModelView</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Tue Sep 14 2021 20:39:17 GMT+0200 (Восточная Европа, стандартное время)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Mon Oct 18 2021 11:05:56 GMT+0300 (Москва, стандартное время)
 </footer>
 
 <script> prettyPrint(); </script>

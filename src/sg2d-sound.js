@@ -13,7 +13,7 @@ import SG2DCamera from './sg2d-camera.js';
  */
 var SG2DSound = { EMPTY: true };
 
-function _SG2DSound() { /** @lends SG2D.Sound */
+function _SG2DSound() {
 	
 	Object.assign(this, new SGModel({
 		music: true,
@@ -142,10 +142,8 @@ function _SG2DSound() { /** @lends SG2D.Sound */
 		return promise;
 	};
 	
-	/** @private */
 	this._libraryLoaded = false;
 	
-	/** @private */
 	this._libraryLoad = (options = {}, resolve, reject)=>{
 		
 		let promise;
@@ -349,7 +347,6 @@ function _SG2DSound() { /** @lends SG2D.Sound */
 		return true;
 	};
 	
-	/** @private */
 	this._onEndMusic = (instance)=>{
 		this.music_view.current_index++;
 		if (this.music_view.current_index >= this.music_view.list.length) this.music_view.current_index = 0;

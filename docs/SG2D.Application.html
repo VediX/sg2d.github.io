@@ -124,8 +124,6 @@
         
 
         
-        <th>Default</th>
-        
 
         <th class="last">Description</th>
     </tr>
@@ -161,10 +159,6 @@
             
 
             
-                <td class="default">
-                
-                </td>
-            
 
             <td class="description last"><p>По умолчанию ищется первый CANVAS</p></td>
         </tr>
@@ -198,14 +192,8 @@
             
 
             
-                <td class="default">
-                
-                    32
-                
-                </td>
-            
 
-            <td class="description last"><p>Ширина (и длина) кластера в пикселях</p></td>
+            <td class="description last"><p>Ширина (и длина) кластера в пикселях. По умолчанию равны 32.</p></td>
         </tr>
 
     
@@ -239,10 +227,6 @@
                 </td>
             
 
-            
-                <td class="default">
-                
-                </td>
             
 
             <td class="description last"><p>Конфиг камеры или созданный отдельно экземпляр на основе <a href="SG2D.Camera.html">SG2D.Camera</a></p></td>
@@ -280,10 +264,6 @@
             
 
             
-                <td class="default">
-                
-                </td>
-            
 
             <td class="description last"><p>Конфиг карты или созданный отдельно экземпляр на основе <a href="SG2D.Clusters.html">SG2D.Clusters</a></p></td>
         </tr>
@@ -320,10 +300,6 @@
             
 
             
-                <td class="default">
-                
-                </td>
-            
 
             <td class="description last"><p>Конфиг мыши/тача или созданный отдельно экземпляр на основе <a href="SG2D.Pointer.html">SG2D.Pointer</a></p></td>
         </tr>
@@ -356,10 +332,6 @@
                 </td>
             
 
-            
-                <td class="default">
-                
-                </td>
             
 
             <td class="description last"><p>Пользовательский итератор, запускается в каждый кадр отрисовки</p></td>
@@ -394,10 +366,6 @@
             
 
             
-                <td class="default">
-                
-                </td>
-            
 
             <td class="description last"><p>Пользовательский обработчки события resize</p></td>
         </tr>
@@ -430,12 +398,6 @@
                 </td>
             
 
-            
-                <td class="default">
-                
-                    {main: {}}
-                
-                </td>
             
 
             <td class="description last"><p>Список графический слоёв (например, слой для ландшафта, слой для зданий, слой для движущихся объектов и анимаций и т.п.)</p></td>
@@ -470,276 +432,8 @@
             
 
             
-                <td class="default">
-                
-                </td>
-            
 
-            <td class="description last"><p>Конфигурация для PIXI при выполнении: new PIXI.Application(config.pixi)</p>
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-        <th>Default</th>
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>resizeTo</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">HTMLElement</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    canvas.parentElement
-                
-                </td>
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>backgroundColor</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    0x000000
-                
-                </td>
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>antialias</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    false
-                
-                </td>
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>autoStart</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    true
-                
-                </td>
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>width</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    100
-                
-                </td>
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>height</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    100
-                
-                </td>
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
+            <td class="description last"><p>Конфигурация для PIXI при выполнении: new PIXI.Application(config.pixi). Пример параметров, которые можно передать: resizeTo, backgroundColor, antialias, autoStart, width, height</p></td>
         </tr>
 
     
@@ -771,73 +465,8 @@
             
 
             
-                <td class="default">
-                
-                </td>
-            
 
-            <td class="description last"><p>Конфиг для конструктора Matter.Engine. Чтобы MatterJS подключился, нужно передать хотя бы пустой объект или true!</p>
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>gravity</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Значение гравитации для MatterJS (пример передачи параметра)</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
+            <td class="description last"><p>Конфиг для конструктора Matter.Engine. Чтобы MatterJS подключился, нужно передать хотя бы пустой объект или true! Пример параметров, которые можно передать:  gravity: { x: 0, y: 0 }, broadphase: { bucketWidth: 64, bucketHeight: 64 }</p></td>
         </tr>
 
     
@@ -872,10 +501,6 @@
             
 
             
-                <td class="default">
-                
-                </td>
-            
 
             <td class="description last"><p>Конфиг эффектов или созданный отдельно экземпляр <a href="SG2D.Effects.html">SG2D.Effects</a></p></td>
         </tr>
@@ -908,10 +533,6 @@
                 </td>
             
 
-            
-                <td class="default">
-                
-                </td>
             
 
             <td class="description last"><p>Список подключаемых плагинов, например: [&quot;sg2d-transitions&quot;]</p></td>
@@ -949,10 +570,6 @@
             
 
             
-                <td class="default">
-                
-                </td>
-            
 
             <td class="description last"><p>Путь к json-файлу с настройками звука или сам конфиг. Описание параметров см. здесь: <a href="SG2D.Sound.html#load">SG2D.Sound#load</a></p></td>
         </tr>
@@ -961,7 +578,7 @@
 
         <tr>
             
-                <td class="name"><code>deferred</code></td>
+                <td class="name"><code>promise</code></td>
             
 
             <td class="type">
@@ -985,12 +602,6 @@
                 </td>
             
 
-            
-                <td class="default">
-                
-                    SG2D.Deferred()
-                
-                </td>
             
 
             <td class="description last"><p>Промис, который будет выполнен после создания и запуска сцены</p></td>
@@ -1135,7 +746,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line416">line 416</a>
+        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line414">line 414</a>
     </li></ul></dd>
     
 
@@ -1284,7 +895,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line369">line 369</a>
+        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line367">line 367</a>
     </li></ul></dd>
     
 
@@ -1439,7 +1050,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line444">line 444</a>
+        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line442">line 442</a>
     </li></ul></dd>
     
 
@@ -1527,7 +1138,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line312">line 312</a>
+        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line310">line 310</a>
     </li></ul></dd>
     
 
@@ -1615,7 +1226,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line217">line 217</a>
+        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line215">line 215</a>
     </li></ul></dd>
     
 
@@ -1703,7 +1314,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line260">line 260</a>
+        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line258">line 258</a>
     </li></ul></dd>
     
 
@@ -1791,7 +1402,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line304">line 304</a>
+        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line302">line 302</a>
     </li></ul></dd>
     
 
@@ -1879,7 +1490,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line351">line 351</a>
+        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line349">line 349</a>
     </li></ul></dd>
     
 
@@ -1967,7 +1578,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line189">line 189</a>
+        <a href="sg2d-application.js.html">sg2d-application.js</a>, <a href="sg2d-application.js.html#line187">line 187</a>
     </li></ul></dd>
     
 
@@ -2013,13 +1624,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="SG2D.html">SG2D</a></li><li><a href="SG2D.Fonts.html">Fonts</a></li><li><a href="SG2D.MessageToast.html">MessageToast</a></li><li><a href="SG2D.Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="SG2D.Application.html">Application</a></li><li><a href="SG2D.Bounds.html">Bounds</a></li><li><a href="SG2D.Camera.html">Camera</a></li><li><a href="SG2D.Cluster.html">Cluster</a></li><li><a href="SG2D.Clusters.html">Clusters</a></li><li><a href="SG2D.CustomSprite.html">CustomSprite</a></li><li><a href="SG2D.Effects.html">Effects</a></li><li><a href="SG2D.Label.html">Label</a></li><li><a href="SG2D.LabelCanvas.html">LabelCanvas</a></li><li><a href="SG2D.PluginBase.html">PluginBase</a></li><li><a href="SG2D.Plugins.html">Plugins</a></li><li><a href="SG2D.Pointer.html">Pointer</a></li><li><a href="SG2D.Sound.html">Sound</a></li><li><a href="SG2D.Tile.html">Tile</a></li><li><a href="SG2D.TileBody.html">TileBody</a></li><li><a href="SG2DTransitions.html">SG2DTransitions</a></li><li><a href="SGModel.html">SGModel</a></li><li><a href="SGModelView.html">SGModelView</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="SG2D.html">SG2D</a></li><li><a href="SG2D.Consts.html">Consts</a></li><li><a href="SG2D.Fonts.html">Fonts</a></li><li><a href="SG2D.MessageToast.html">MessageToast</a></li><li><a href="SG2D.Utils.html">Utils</a></li></ul><h3>Classes</h3><ul><li><a href="SG2D.Application.html">Application</a></li><li><a href="SG2D.Bounds.html">Bounds</a></li><li><a href="SG2D.Camera.html">Camera</a></li><li><a href="SG2D.Cluster.html">Cluster</a></li><li><a href="SG2D.Clusters.html">Clusters</a></li><li><a href="SG2D.CustomSprite.html">CustomSprite</a></li><li><a href="SG2D.Deferred.html">Deferred</a></li><li><a href="SG2D.Effects.html">Effects</a></li><li><a href="SG2D.Label.html">Label</a></li><li><a href="SG2D.LabelCanvas.html">LabelCanvas</a></li><li><a href="SG2D.Math.html">Math</a></li><li><a href="SG2D.PluginBase.html">PluginBase</a></li><li><a href="SG2D.Plugins.html">Plugins</a></li><li><a href="SG2D.Pointer.html">Pointer</a></li><li><a href="SG2D.Sound.html">Sound</a></li><li><a href="SG2D.Tile.html">Tile</a></li><li><a href="SG2D.TileBody.html">TileBody</a></li><li><a href="SG2DTransitions.html">SG2DTransitions</a></li><li><a href="SGModel.html">SGModel</a></li><li><a href="SGModelView.html">SGModelView</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Tue Sep 14 2021 20:39:17 GMT+0200 (Восточная Европа, стандартное время)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Mon Oct 18 2021 11:05:56 GMT+0300 (Москва, стандартное время)
 </footer>
 
 <script> prettyPrint(); </script>

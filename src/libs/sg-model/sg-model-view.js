@@ -38,24 +38,54 @@ class SGModelView extends SGModel {
 		if (! this._binderInitialized) {
 			if (typeof document === "undefined") throw "Error! document is undefined!";
 			this._onChangeDOMElementValue = this._onChangeDOMElementValue.bind(this);
-			this._elementsHTML = {};
+			this._propertyElementLinks = {};
+			this._eventsCounter = -1;
+			this._elementsEvents = [];
 			this._binderInitialized = true;
 		}
 		
 		if (! root) root = document.body;
 		if (typeof root === "string") root = document.querySelector(root);
-		for (var name in this._elementsHTML) {
-			this._elementsHTML[name].removeEventListener("change", this._onChangeDOMElementValue);
-			this._elementsHTML[name].removeEventListener("input", this._onChangeDOMElementValue);
-			delete this._elementsHTML[name];
+		for (var name in this._propertyElementLinks) {
+			var propertyElementLink = this._propertyElementLinks[name];
+			if (propertyElementLink.type === SGModelView._LINKTYPE_VALUE) {
+				propertyElementLink.element.removeEventListener("change", this._onChangeDOMElementValue);
+				propertyElementLink.element.removeEventListener("input", this._onChangeDOMElementValue);
+			}
+			delete this._propertyElementLinks[name];
 		}
+		let item;
+		while (item = this._elementsEvents.pop()) {
+			item.element.removeEventListener(item.event, item.callback);
+		}
+		
+		this._reProps = {};
+		for (var name in this.properties) {
+			this._reProps[name] = {
+				re: new RegExp("[^\\w\\-]"+name+"[^\\w\\-]|^"+name+"[^\\w\\-]|[^\\w\\-]"+name+"$|^"+name+"$", "g"),
+				to: "this.properties." + name
+			};
+		}
+		this._sysThis = ["constructor", "initialize"];
+		this._reThis = {};
+		let thisNames = Object.getOwnPropertyNames(this.__proto__);
+		for (var i = 0; i < thisNames.length; i++) {
+			var name = thisNames[i];
+			if (this._sysThis.indexOf(name) === -1 && ! /^_/.test(name)) {
+				this._reThis[name] = {
+					re: new RegExp("[^\\w\\-]"+name+"[^\\w\\-]|^"+name+"[^\\w\\-]|[^\\w\\-]"+name+"$|^"+name+"$", "g"),
+					to: "this." + name
+				};
+			}
+		}
+		
 		this._bindElements([root]);
 	}
 	
 	/** @private */
 	_bindElements(elements) {
-		for (var i = 0; i < elements.length; i++) {
-			var element = elements[i];
+		for (var e = 0; e < elements.length; e++) {
+			var element = elements[e];
 			
 			if (element.nodeType !== 1) continue;
 			
@@ -64,19 +94,16 @@ class SGModelView extends SGModel {
 			var sgFormat = element.getAttribute("sg-format");
 			//var sgAttributes = element.getAttribute("sg-attributes"); // TODO
 			var sgCSS = element.getAttribute("sg-css");
+			//var sgStyle = element.getAttribute("sg-style"); // TODO
+			var sgClick = element.getAttribute("sg-click");
+			//var sgEvents = element.getAttribute("sg-events"); // TODO
 			
-			if (this.has(sgProperty)) {
-				this._elementsHTML[sgProperty] = element;
+			var bRefresh = false;
+			
+			if (sgProperty && this.has(sgProperty)) {
+				this._regPropertyElementLink(sgProperty, element, SGModelView._LINKTYPE_VALUE);
 				element._sg_property = sgProperty;
 				element._sg_type = sgType;
-				if (sgCSS) {
-					for (var p in this.properties) {
-						var re = new RegExp("^"+p+"$|^"+p+"\\W|\\W"+p+"$|\\W"+p+"\\W", "g");
-						sgCSS = sgCSS.replace(re, "this.properties."+p);
-					}
-					element._sg_css = (new Function("return " + sgCSS)).bind(this);
-					element._sg_css_static_classes = [...element.classList];
-				}
 				element._sg_format = this[sgFormat];
 				switch (sgType) {
 					case "dropdown":
@@ -99,72 +126,134 @@ class SGModelView extends SGModel {
 						}
 					}
 				}
+				bRefresh = true;
+			}
+			
+			if (sgCSS) {
+				for (var name in this._reProps) {
+					var l = sgCSS.length;
+					sgCSS = sgCSS.replace(this._reProps[name].re, this._reProps[name].to);
+					if (l !== sgCSS.length) {
+						this._regPropertyElementLink(name, element, SGModelView._LINKTYPE_CSS);
+						bRefresh = true;
+					}
+				}
+				for (var name in this._reThis) {
+					sgCSS = sgCSS.replace(this._reThis[name].re, this._reThis[name].to);
+				}
+				element._sg_css = (new Function("return " + sgCSS)).bind(this);
+				element._sg_css_static_classes = [...element.classList];
+			}
+			
+			if (sgClick) {
+				let callback = this[sgClick];
+				if (typeof callback === "function") {
+					callback = callback.bind(this);
+					element.addEventListener("click", callback);
+					let index = this._eventsCounter++;
+					this._elementsEvents[index] = {
+						callback: callback,
+						element: element,
+						event: "click"
+					}
+				}
+			}
+			
+			if (bRefresh) {
 				this._refreshElement(sgProperty);
 			}
+			
 			this._bindElements(element.children);
 		}
 	}
 	
 	/** @private */
-	_refreshElement(name) {
+	_regPropertyElementLink(property, element, type) {
+		var item = this._propertyElementLinks[property];
+		if (! item) {
+			item = this._propertyElementLinks[property] = [];
+		}
+		if (item.indexOf(element) === -1) {
+			item.push({element: element, type: type});
+		}
+	}
+	
+	/** @private */
+	_refreshElement(property) {
 		
-		var element = this._elementsHTML[name];
-		if (! element) return;
+		//if (name === "initialized") debugger;
 		
-		var value = this.properties[name];
+		if (! this._propertyElementLinks[property]) return false;
 		
-		switch (element._sg_type) {
-			case "dropdown":
-				var eItems = document.querySelectorAll("[sg-dropdown=" + name + "]");
-				for (var i = 0; i < eItems.length; i++) {
-					var sgValue = eItems[i].getAttribute("sg-value");
-					if (sgValue == value) {
-						element.value = value;
-						element.innerHTML = eItems[i].innerHTML;
-						break;
-					}
-				}
-				break;
-			default: {
-				if (element.type) {
-					switch (element.type) {
-						case "radio": case "checkbox": element.checked = value; break;
-						case "range": case "text": case "button": case "select-one": element.value = value; break;
-						case "select-multiple": {
-							if (! Array.isArray(value)) { debugger; break; }
-							for (var i = 0; i < element.options.length; i++) {
-								let selected = false;
-								for (var j = 0; j < value.length; j++) {
-									if (element.options[i].value == value[j]) {
-										selected = true;
-										break;
-									}
-								}
-								element.options[i].selected = selected;
+		for (var j = 0; j < this._propertyElementLinks[property].length; j++) {
+			
+			var propertyElementLink = this._propertyElementLinks[property][j];
+			
+			var element = propertyElementLink.element;
+			if (! element) return false;
+			
+			if (propertyElementLink.type===SGModelView._LINKTYPE_VALUE) {
+				
+				var value = this.properties[property];
+
+				switch (element._sg_type) {
+					case "dropdown":
+						var eItems = document.querySelectorAll("[sg-dropdown=" + property + "]");
+						for (var i = 0; i < eItems.length; i++) {
+							var sgValue = eItems[i].getAttribute("sg-value");
+							if (sgValue == value) {
+								element.value = value;
+								element.innerHTML = eItems[i].innerHTML;
+								break;
 							}
-							break;
+						}
+						break;
+					default: {
+						if (element.type) {
+							switch (element.type) {
+								case "radio": case "checkbox": element.checked = value; break;
+								case "range": case "text": case "button": case "select-one": element.value = value; break;
+								case "select-multiple": {
+									if (! Array.isArray(value)) { debugger; break; }
+									for (var i = 0; i < element.options.length; i++) {
+										let selected = false;
+										for (var j = 0; j < value.length; j++) {
+											if (element.options[i].value == value[j]) {
+												selected = true;
+												break;
+											}
+										}
+										element.options[i].selected = selected;
+									}
+									break;
+								}
+							}
+						} else {
+							element.innerHTML = (element._sg_format ? element._sg_format(value) : value);
 						}
 					}
-				} else {
-					element.innerHTML = (element._sg_format ? element._sg_format(value) : value);
+				}
+			}
+
+			if (element._sg_css) {
+				for (var i = 0; i < element.classList.length; i++) {
+					if (element._sg_css_static_classes.indexOf(element.classList[i]) === -1) {
+						element.classList.remove(element.classList[i]);
+					}
+				}
+				let result = element._sg_css();
+				if (typeof result === "function") {
+					result = result.call(this, property);
+				}
+				if (! Array.isArray(result)) {
+					result = result.split(" ");
+				}
+				for (var i = 0; i < result.length; i++) {
+					element.classList.add(result[i]);
 				}
 			}
 		}
-		
-		if (element._sg_css) {
-			let result = element._sg_css();
-			for (var i = 0; i < element.classList.length; i++) {
-				if (element._sg_css_static_classes.indexOf(element.classList[i]) === -1) {
-					element.classList.remove(element.classList[i]);
-				}
-			}
-			if (! Array.isArray(result)) {
-				result = result.split(" ");
-			}
-			for (var i = 0; i < result.length; i++) {
-				element.classList.add(result[i]);
-			}
-		}
+		return true;
 	}
 	
 	/** @private */
@@ -218,6 +307,9 @@ class SGModelView extends SGModel {
 		}
 	}
 }
+
+SGModelView._LINKTYPE_VALUE = 1;
+SGModelView._LINKTYPE_CSS = 2;
 
 if (typeof exports === 'object' && typeof module === 'object') module.exports = SGModelView;
 else if (typeof define === 'function' && define.amd) define("SGModelView", [], ()=>SGModelView);

@@ -41,7 +41,7 @@ import SG2DSound from './sg2d-sound.js';
  * @property {SG2D.Pointer} SG2D.Pointer - Мышь/тач
  * @property {SG2D.Tile} SG2D.Tile - Тайл. Может содержать несколько спрайтов и анимаций
  * @property {SG2D.TileBody} SG2D.TileBody - Тайл с физическим телом (MatterJS)
- * @property {SG2D.Sprite} SG2D.Sprite - Одиночный спрайт
+ * @property {SG2D.CustomSprite} SG2D.CustomSprite - Кастомный одиночный спрайт
  * @property {SG2D.Effects} SG2D.Effects - Графические эффекты, в т.ч. шейдеры
  * @property {SG2D.Fonts} SG2D.Fonts - Графические шрифты
  * @property {SG2D.Bounds} SG2D.Bounds - Границы

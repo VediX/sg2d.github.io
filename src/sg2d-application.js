@@ -24,26 +24,19 @@ class SG2DApplication {
 	 * Создает экземпляр сцены
 	 * @param {object}			config
 	 * @param {string}			[config.canvasId] По умолчанию ищется первый CANVAS
-	 * @param {number}				[config.cellsizepix=32] - Ширина (и длина) кластера в пикселях
+	 * @param {number}				[config.cellsizepix] - Ширина (и длина) кластера в пикселях. По умолчанию равны 32.
 	 * @param {object|SG2D.Camera}	[config.camera] - Конфиг камеры или созданный отдельно экземпляр на основе {@link SG2D.Camera}
 	 * @param {object|SG2D.Clusters}	[config.clusters] - Конфиг карты или созданный отдельно экземпляр на основе {@link SG2D.Clusters}
 	 * @param {object|SG2D.Pointer}	[config.pointer] - Конфиг мыши/тача или созданный отдельно экземпляр на основе {@link SG2D.Pointer}
 	 * @param {function}			[config.iterate] - Пользовательский итератор, запускается в каждый кадр отрисовки
 	 * @param {function}			[config.resize] - Пользовательский обработчки события resize
-	 * @param {object}				[config.layers={main: {}}] - Список графический слоёв (например, слой для ландшафта, слой для зданий, слой для движущихся объектов и анимаций и т.п.)
-	 * @param {object}				[config.pixi] - Конфигурация для PIXI при выполнении: new PIXI.Application(config.pixi)
-	 * @param {HTMLElement}			[config.pixi.resizeTo=canvas.parentElement]
-	 * @param {number}					[config.pixi.backgroundColor=0x000000]
-	 * @param {boolean}				[config.pixi.antialias=false]
-	 * @param {boolean}				[config.pixi.autoStart=true]
-	 * @param {number}					[config.pixi.width=100]
-	 * @param {number}					[config.pixi.height=100]
-	 * @param {object}			[config.matter] - Конфиг для конструктора Matter.Engine. Чтобы MatterJS подключился, нужно передать хотя бы пустой объект или true!
-	 * @param {object}				[config.matter.gravity] - Значение гравитации для MatterJS (пример передачи параметра)
+	 * @param {object}				[config.layers] - Список графический слоёв (например, слой для ландшафта, слой для зданий, слой для движущихся объектов и анимаций и т.п.)
+	 * @param {object}				[config.pixi] - Конфигурация для PIXI при выполнении: new PIXI.Application(config.pixi). Пример параметров, которые можно передать: resizeTo, backgroundColor, antialias, autoStart, width, height
+	 * @param {object}				[config.matter] - Конфиг для конструктора Matter.Engine. Чтобы MatterJS подключился, нужно передать хотя бы пустой объект или true! Пример параметров, которые можно передать:  gravity: { x: 0, y: 0 }, broadphase: { bucketWidth: 64, bucketHeight: 64 }
 	 * @param {object|SG2D.Effects} [config.effects] - Конфиг эффектов или созданный отдельно экземпляр {@link SG2D.Effects}
 	 * @param {String[]}		[config.plugins] - Список подключаемых плагинов, например: ["sg2d-transitions"]
 	 * @param {object|string}	[config.sound] - Путь к json-файлу с настройками звука или сам конфиг. Описание параметров см. здесь: {@link SG2D.Sound#load}
-	 * @param {object}			[config.deferred=SG2D.Deferred()] - Промис, который будет выполнен после создания и запуска сцены
+	 * @param {object}			[config.promise] - Промис, который будет выполнен после создания и запуска сцены
 	 */
 	constructor(config) {
 		
@@ -173,10 +166,15 @@ class SG2DApplication {
 		}
 		SG2DSound._sg2dconnect(this);
 		
-		if (config.deferred) {
-			this.deferred = config.deferred;
+		if (config.promise) {
+			this.promise = config.promise;
 		} else {
-			this.deferred = SG2D.Deferred();
+			this.promise = new Promise((resolve, reject)=>{
+				this._resolve = resolve;
+				this._reject = reject;
+			});
+			if (! this.promise.resolve) this.promise.resolve = this._resolve;
+			if (! this.promise.reject) this.promise.reject = this._reject;
 		}
 		
 		this.state = SG2DApplication.STATE_IDLE;
@@ -192,7 +190,7 @@ class SG2DApplication {
 			SG2DApplication._pluginsPromise,
 			SG2DApplication._soundConfigPromise
 		]).then(()=>{
-			this.deferred.resolve(this);
+			this.promise.resolve(this);
 			window.dispatchEvent(new Event('resize'));
 			this._initClustersInCamera();
 			this.pixi.start();

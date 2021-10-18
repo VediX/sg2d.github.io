@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Namespace: Fonts</title>
+    <title>JSDoc: Class: Deferred</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Namespace: Fonts</h1>
+    <h1 class="page-title">Class: Deferred</h1>
 
     
 
@@ -28,8 +28,8 @@
 
 <header>
     
-        <h2>
-            <span class="ancestors"><a href="SG2D.html">SG2D</a>.</span>Fonts</h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>
+            <span class="ancestors"><a href="SG2D.html">SG2D</a>.</span>Deferred<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="SG2D.Deferred.html#.Promise">SG2D.Deferred.Promise</a>}</span></h2>
         
     
 </header>
@@ -38,10 +38,31 @@
     <div class="container-overview">
     
         
-            <div class="description"><p>Работа с графическими шрифтами</p></div>
-        
 
-        
+    
+
+    
+    <h4 class="name" id="Deferred"><span class="type-signature"></span>new Deferred<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="SG2D.Deferred.html#.Promise">SG2D.Deferred.Promise</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Создаёт экземпляр <a href="SG2D.Deferred.html#.Promise">SG2D.Deferred.Promise</a></p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
 
 
 <dl class="details">
@@ -73,7 +94,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-fonts.js.html">sg2d-fonts.js</a>, <a href="sg2d-fonts.js.html#line7">line 7</a>
+        <a href="sg2d-deferred.js.html">sg2d-deferred.js</a>, <a href="sg2d-deferred.js.html#line14">line 14</a>
     </li></ul></dd>
     
 
@@ -85,7 +106,42 @@
 </dl>
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
         
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="SG2D.Deferred.html#.Promise">SG2D.Deferred.Promise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
     
     </div>
 
@@ -104,79 +160,42 @@
     
 
     
-        <h3 class="subsection-title">Methods</h3>
+
+    
+        <h3 class="subsection-title">Type Definitions</h3>
 
         
-            
+                
+<h4 class="name" id=".Promise">Promise</h4>
 
-    
-
-    
-    <h4 class="name" id=".addFont"><span class="type-signature">(static) </span>addFont<span class="signature">(options)</span><span class="type-signature"></span></h4>
-    
-
-    
 
 
 
 <div class="description">
-    <p>Регистрирует шрифт. Как правило добавление шрифтов выполняется после парсинга графических ресурсов (см. <a href="SG2D.Utils.html#.parseTexturePack">SG2D.Utils.parseTexturePack</a>)</p>
+    <p>Промис с возможностью вызывать resolve/reject извне</p>
 </div>
 
 
 
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
+    <h5>Type:</h5>
+    <ul>
+        <li>
             
-                <td class="name"><code>options</code></td>
-            
-
-            <td class="type">
-            
-                
 <span class="param-type">object</span>
 
 
-            
-            </td>
+        </li>
+    </ul>
 
-            
 
-            
 
-            <td class="description last">
-                <h6>Properties</h6>
-                
 
-<table class="params">
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
     <thead>
     <tr>
         
@@ -198,13 +217,13 @@
 
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>resolve(value)</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">function</span>
 
 
             
@@ -214,20 +233,20 @@
 
             
 
-            <td class="description last"><p>Имя для регистрируемого шрифта</p></td>
+            <td class="description last"><p>Завершает промис с успехом</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>schema</code></td>
+                <td class="name"><code>reject(error)</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">function</span>
 
 
             
@@ -237,20 +256,20 @@
 
             
 
-            <td class="description last"><p>Набор символов в порядке следования в ассете</p></td>
+            <td class="description last"><p>Завершает промис с ошибкой</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>texture</code></td>
+                <td class="name"><code>then(callback)</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">function</span>
 
 
             
@@ -260,21 +279,58 @@
 
             
 
-            <td class="description last"><p>Имя базовой текстуры из которой собирается набор графических символов, например, &quot;metal_yellow_big_48x50h&quot;. Размер букв определяется из имени текстуры (48x50).</p></td>
+            <td class="description last"><p>Добавляет колбэк в список вызовов при успешном завершении промиса</p></td>
         </tr>
 
     
-    </tbody>
-</table>
 
+        <tr>
+            
+                <td class="name"><code>catch(callback)</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
             </td>
+
+            
+
+            
+
+            <td class="description last"><p>Добавляет колбэк в список вызовов при аварийном завершении промиса</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>isCompleted</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Возвращает статус промиса (<strong>true</strong> для успешно завершенного промиса, <strong>false</strong> для не завершенного промиса или завершенного аварийно)</p></td>
         </tr>
 
     
     </tbody>
 </table>
-
-
 
 
 
@@ -308,7 +364,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="sg2d-fonts.js.html">sg2d-fonts.js</a>, <a href="sg2d-fonts.js.html#line28">line 28</a>
+        <a href="sg2d-deferred.js.html">sg2d-deferred.js</a>, <a href="sg2d-deferred.js.html#line3">line 3</a>
     </li></ul></dd>
     
 
@@ -324,28 +380,7 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>SG2D.Fonts.addFont({	name: "metal_yellow_big",	texture: "fonts/metal_yellow_big_48x50h",	schema: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789?!().:"});</code></pre>
-
-
-
-        
-    
-
+            
     
 
     

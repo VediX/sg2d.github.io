@@ -2,8 +2,7 @@
 
 /**
  * Промис с возможностью вызывать resolve/reject извне
- * @namespace SG2D
- * @typedef SG2D.Promise
+ * @typedef SG2D.Deferred.Promise
  * @type {object}
  * @property {function} resolve(value) - Завершает промис с успехом
  * @property {function} reject(error) - Завершает промис с ошибкой
@@ -13,9 +12,9 @@
  */
 
 /**
- * Создаёт экземпляр {@link SG2D.Promise}
- * @function SG2D.Deferred
- * @returns {SG2D.Promise}
+ * Создаёт экземпляр {@link SG2D.Deferred.Promise}
+ * @class SG2D.Deferred
+ * @return {SG2D.Deferred.Promise}
  */
 function SG2DDeferred() {
 	let thens = [];

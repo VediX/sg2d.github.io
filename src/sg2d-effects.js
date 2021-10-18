@@ -1,9 +1,3 @@
-/**
- * SG2DEffects
- * https://github.com/VediX/sg2d.github.io
- * (c) Kalashnikov Ilya
- */
-
 "use strict";
 
 import SG2DConsts from "./sg2d-consts.js";
@@ -11,7 +5,7 @@ import SG2DUtils from "./sg2d-utils.js";
 
 /**
  * Эффект
- * @typedef SG2D.Effect
+ * @typedef SG2D.Effects.Effect
  * @type {object}
  * @property {Number} type - Тип фильтра: SG2D.Effects.TYPE_SHADOWS | SG2D.Effects.TYPE_BEVELS | SG2D.Effects.TYPE_DISPLACEMENT
  * @property {string|Number} layer
@@ -71,7 +65,7 @@ class SG2DEffects {
 	 * @param {Number} [config.rotation=135]
 	 * @param {Number} [config.distance=8]
 	 * @param {Number} [config.alpha=0.6]
-	 * @return {SG2D.Effect}
+	 * @return {SG2D.Effects.Effect}
 	 */
 	addShadowsToLayer(config) {
 		var container = this.sg2d.layers[config.layer].container;
@@ -103,7 +97,7 @@ class SG2DEffects {
 	 * @param {Number} [config.thickness=2]
 	 * @param {Number} [config.lightAlpha=0.8]
 	 * @param {Number} [config.shadowAlpha=0.8]
-	 * @return {SG2D.Effect}
+	 * @return {SG2D.Effects.Effect}
 	 */
 	addBevelsToLayer(config) {
 		var container = this.sg2d.layers[config.layer].container;
@@ -137,7 +131,7 @@ class SG2DEffects {
 	 * @param {Number} [config.scale=1]
 	 * @param {function} [config.iterate] - Колбэк, выполняемый в каждую итерацию (кадр)
 	 * @param {Number} [config.animationStep=1] - Параметр доступен в iterate() в this.options
-	 * @return {SG2D.Effect}
+	 * @return {SG2D.Effects.Effect}
 	 */
 	addDisplacementToLayer(config) {
 		var container = this.sg2d.layers[config.layer].container;

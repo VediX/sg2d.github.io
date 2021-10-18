@@ -44,7 +44,7 @@ class SG2DTile extends SGModel {
 		this.boundsCXY = new SG2DBounds();
 		this.clusters = new Set();
 		this.centerCluster = null;
-		this.sprite = void 0; // основной спрайт, м.б. не задан
+		this.sprite = void 0; // основной спрайт, может быть не задан!
 		this.sprites = void 0; // список спрайтов
 		this.hasAnimations = false;
 		
@@ -76,7 +76,7 @@ class SG2DTile extends SGModel {
 		SG2DClusters.tiles[this.properties.id] = this;
 		SG2DClusters.tilesset.add(this);
 		
-		this.onGeometric();
+		this._onGeometric();
 		this.drawUndraw();
 	}
 	
@@ -95,7 +95,7 @@ class SG2DTile extends SGModel {
 	 */
 	setPosition(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
 		if (this.set("position", value, options, flags | SGModel.FLAG_IGNORE_OWN_SETTER)) {
-			this.onGeometric();
+			this._onGeometric();
 			this.drawUndraw();
 		}
 	}
@@ -107,7 +107,7 @@ class SG2DTile extends SGModel {
 	setAngle(value = void 0, options = SGModel.OBJECT_EMPTY, flags = 0) {
 		if (value !== void 0) value = SG2DMath.normalize_a(value, SG2DUtils.ifUndefined(options.precision, 1));
 		if (this._setTileProperty("angle", value, options, flags)) {
-			//this.onGeometric();
+			//this._onGeometric();
 		}
 	}
 	
@@ -213,7 +213,7 @@ class SG2DTile extends SGModel {
 		return false;
 	}
 	
-	// To handle a click on a tile instance, set this method
+	// Чтобы обработать щелчок по экземпляру тайла, задайте этот метод
 	// click(target, options) {...}
 	
 	/** @private */
@@ -445,13 +445,15 @@ class SG2DTile extends SGModel {
 		}
 	}
 	
-	onGeometric() { // override for special cases
-		this.calcBoundsPX();
-		this.calcCXY();
-		this.calcClustersBody();
+	/** @private */
+	_onGeometric() {
+		this._calcBoundsPX();
+		this._calcCXY();
+		this._calcClustersBody();
 	}
 	
-	calcBoundsPX() { // override for special cases
+	/** @private */
+	_calcBoundsPX() {
 		this.bounds.set(
 			this.properties.position.x - SG2DConsts.CELLSIZEPIX05 + 0.5,
 			this.properties.position.y - SG2DConsts.CELLSIZEPIX05 + 0.5,
@@ -460,7 +462,8 @@ class SG2DTile extends SGModel {
 		);
 	}
 	
-	calcCXY() {
+	/** @private */
+	_calcCXY() {
 		
 		SG2DTile._point.x = SG2DUtils.PXtoCX(this.properties.position.x);
 		SG2DTile._point.y = SG2DUtils.PXtoCX(this.properties.position.y);
@@ -476,9 +479,10 @@ class SG2DTile extends SGModel {
 		);
 	}
 	
-	calcClustersBody() {
+	/** @private */
+	_calcClustersBody() {
 		var cluster;
-		// TODO: учесть то что объект может быть повернут и тогда в некоторых кластерах (угловых) по факту тело объекта не будет присутствовать
+		// TODO: учесть то что объект может быть повернут и тогда некоторые кластера (угловые) можно выкинуть из расчетов, т.к. тело объекта не будет присутствовать там!
 		for (cluster of this.clusters) {
 			if (cluster.x < this.boundsCXY.min.x || cluster.x > this.boundsCXY.max.x || cluster.y < this.boundsCXY.min.y || cluster.y > this.boundsCXY.max.y) {
 				this.clusters.delete(cluster);
@@ -488,7 +492,7 @@ class SG2DTile extends SGModel {
 		}
 		for (var y = this.boundsCXY.min.y; y <= this.boundsCXY.max.y; y++) {
 			for (var x = this.boundsCXY.min.x; x <= this.boundsCXY.max.x; x++) {
-				if (cluster = SG2DClusters.getCluster(x, y)) { // MatterJS allows objects to be micro-felled into each other, i.e. on the border of the map it can be!
+				if (cluster = SG2DClusters.getCluster(x, y)) { // MatterJS позволяет микропроваливание объектов друг в друга, т.е. на границе карты объекты могут быть!
 					this.clusters.add(cluster);
 					cluster.tiles.add(this);
 					if (this.constructor.isBody) cluster.bodies.add(this);
@@ -497,6 +501,10 @@ class SG2DTile extends SGModel {
 		}
 	}
 	
+	/**
+	 * Проиграть звук к тайлу, учитывается 2D-окружение и расстояние
+	 * @param {string} code
+	 */
 	sound(code) {
 		SG2DSound.play(code, this);
 	}
@@ -524,75 +532,250 @@ SG2DTile.typeProperties = { // overriden with Object.assign(...)
 	texture: SGModel.TYPE_STRING,
 	position: SGModel.TYPE_OBJECT_NUMBERS,
 	angle: SGModel.TYPE_NUMBER,
-	anchor: SGModel.TYPE_NUMBER_OR_XY,
-	scale: SGModel.TYPE_NUMBER_OR_XY,
+	anchor: SGModel.TYPE_VECTOR,
+	scale: SGModel.TYPE_VECTOR,
 	alpha: SGModel.TYPE_NUMBER,
 	visible: SGModel.TYPE_BOOLEAN,
 	zindex: SGModel.TYPE_NUMBER,
 	cxy: SGModel.TYPE_OBJECT_NUMBERS
 };
 
-/**@type {(undefined|string)} */
-SG2DTile.layer = void 0; // if equal to void 0, the default layer is used (PIXI.Container)
+/**
+ * Слой, в котором идёт отрисовка основного спрайта. Если равно undefined, используется слой по умолчанию (PIXI.Container).
+ * @type {string}
+ */
+SG2DTile.layer = void 0;
 
-/**@type {string} */
+/**
+ * Текстура основного спрайта.
+ * @type {string}
+ * @example
+// Пример описания простейшего тайла, где будет только один спрайт (основной), задействована только одна текстура и не будет анимаций
+export class BlockSteel extends SG2D.TileBody {
+	static texture = "elements/block-steel";
+	static layer = "bodies";
+	static zindex = 20;
+}
+
+// Пример описание тайла, где будет один спрайт (основной), но текстура задаётся при инициализации
+export class Tree extends SG2D.Tile {
+	static texture = "elements/trees/tree_";
+	static layer = "trees";
+	static zindex = 20;
+	initialize(...args) {
+		super.initialize(...args);
+		let n = Math.floor(1 + Math.random() * 41);
+		this.set("texture", Tree.texture + (n<10?"0":"") + n);
+	}
+}
+ */
 SG2DTile.texture = SG2DConsts.TILE_OVERRIDE; // overriden 
 
-/**@type {number} */
+/**
+ * Угол поворота основного спрайта.
+ * @type {number} */
 SG2DTile.angle = 0;
 
-/**@type {number} */
+/**
+ * Смещение основного спрайта.
+ * @type {number} */
 SG2DTile.anchor = 0.5;
 
-/**@type {number} */
+/**
+ * Масштабирование основного спрайта.
+ * @type {number} */
 SG2DTile.scale = 1;
 
-/**@type {number} */
+/**
+ * Прозрачность основного спрайта.
+ * @type {number} */
 SG2DTile.alpha = 1;
 
-/**@type {boolean} */
+/**
+ * Видимость основного спрайта.
+ * @type {boolean} */
 SG2DTile.visible = true;
 
 /**
- * Main zindex is added to zindex of sprites, except for sprite with name="main"
+ * Основной z-index добавляется к z-index спрайтов, кроме спрайта с именем = "main"
  * @type {number}
  */
 SG2DTile.zindex = 0;
 
-/*
-* @typedef SG2DAnimationConfig
+/**
+ * Конфиг спрайта в тайле.
+* @typedef SG2D.Tile.SpriteConfig
 * @type {object}
+* @property {string} texture
+* @property {(number|object)} [anchor=0.5]
+* @property {number} [angle=0] - В градусах
+* @property {(number|object)} [scale=1]
+* @property {number} [zindex=0]
+* @property {boolean} [visible=true]
+* @property {string} [layer] - Код слоя
+* @property {SG2D.Tile.AnimationConfig} [animation]
+* @property {number} [setter_flag=0] - Флаг. Если задано SG2D.Tile.FLAG_ONLY_OPTIONS_SPRITE, то нужно передавать в options код или сам объект спрайта, например: this.set("angle", a, { sprite: this.sprites.smoke_shot });
+*/
+
+/**
+ * Конфиг анимации для спрайта.
+* @typedef SG2D.Tile.AnimationConfig
+* @type {object}
+* @property {string} basetexture
 * @property {number} [start=1]
 * @property {number} count
 * @property {number} [sleep=1]
 * @property {boolean} [running=false]
 * @property {boolean} [loop=false]
 * @property {function} [onComplete=void 0]
-* @example
-* 
-* static animation = { start: 1, count: 8, sleep: 2, basetexture: "objects/tank_shot_", running: true }; // example
-* 
 */
 
-/*
-* @typedef SG2DSpriteConfig
-* @type {object}
-* @property {string} texture
-* @property {(number|object)} [anchor=0.5]
-* @property {number} [angle=0] - in degrees
-* @property {(number|object)} [scale=1]
-* @property {number} [zindex=0]
-* @property {SG2DAnimationConfig} [animation]
-* @example
-* 
-* static sprites = { // example
-*	tank_platform: { texture: "objects/tank-platform", zindex: 2 },
-*	tank_turret: { texture: "objects/tank-turret", anchor: { x: 0.5, y: 0.2 }, zindex: 3 }
-*	tank_track_left: { texture: "objects/tank-track", offset: { x: -40, y: 0 }, zindex: 1, basetexture: { count: 8, sleep: 2 } }
-*	tank_track_right { texture: "objects/tank-track", offset: {x: 40, y: 0}, zindex: 1, basetexture: { count: 8, sleep: 2 } }
-* };
-* 
-*/
+/**
+ * Описание спрайтов и анимаций в тайле в виде дерева.
+ * @alias SG2D.Tile.sprites
+ * @static
+ * @type {Object.<string, SG2D.Tile.SpriteConfig>}
+ * @example
+// Базовый класс для тайлов с lifeband-полоской
+export default class ObjectBaseLifeBand extends SG2D.TileBody {
+	static layer = "bodies";
+	static sprites = {
+		lifeband_base: {
+			texture: "ui/lifeband_base",
+			anchor: { x: 0.5, y: -5 },
+			zindex: 10,
+			angle: 90,
+			layer: "animations",
+			setter_flag: SG2D.Tile.FLAG_ONLY_OPTIONS_SPRITE
+		},
+		lifeband_value: {
+			textures: { friend: "ui/lifeband_green", enemy: "ui/lifeband_red" },
+			texture: "ui/lifeband_green",
+			scale: { x: 1, y: 1 },
+			anchor: { x: 0.5, y: -5 },
+			zindex: 11,
+			angle: 90,
+			layer: "animations",
+			setter_flag: SG2D.Tile.FLAG_ONLY_OPTIONS_SPRITE
+		}
+	}
+	//...
+}
+
+// Базовый класс для игроков
+export default class Player extends ObjectBaseLifeBand {
+	static sprites = SG2D.Model.defaults({
+		platform: {
+			texture: "objects/player-platform",
+			zindex: 0,
+			sprites: {
+				turret: {
+					texture: "objects/player-turret",
+					anchor: { x: 0.15, y: 0.5 },
+					zindex: 2,
+					sprites: {
+						smoke_shot: {
+							texture: "objects/player-smoke-shot_1",
+							layer: "animations",
+							anchor: { x: -3.4, y: 0.5 },
+							zindex: 1,
+							visible: false,
+							animation: {
+								count: 6,
+								sleep: 3,
+								running: false,
+								basetexture: "objects/player-smoke-shot_"
+							},
+							setter_flag: SG2D.Tile.FLAG_ONLY_OPTIONS_SPRITE
+						}
+					}
+				}
+			}
+		},
+		accelerator: {
+			texture: "animations/accelerator_1",
+			layer: "animations",
+			anchor: { x: 2.7, y: 0.45 },
+			zindex: 0,
+			visible: false,
+			animation: {
+				count: 3,
+				sleep: 3,
+				running: false,
+				basetexture: "animations/accelerator_"
+			}
+		},
+		track_left: {
+			texture: "objects/player-track_1",
+			anchor: { x: -4, y: 2.7 },
+			zindex: 1,
+			animation: {
+				count: 8,
+				sleep: 2,
+				running: false,
+				basetexture: "objects/player-track_",
+				loop: true
+			}
+		},
+		track_right: {
+			texture: "objects/player-track_1",
+			anchor: { x: -4, y: -1.6 },
+			zindex: 1,
+			animation: {
+				count: 8,
+				sleep: 2,
+				running: false,
+				basetexture: "objects/player-track_",
+				loop: true
+			}
+		}
+	}, ObjectBaseLifeBand.sprites);
+	//...
+ }
+ */
+let SG2DTile_sprites = {};
+
+/**
+ * Описание анимации для основного спрайта
+ * @alias SG2D.Tile.animation
+ * @static
+ * @type {SG2D.Tile.AnimationConfig}
+ * @example
+// Пример описания анимации для основного спрайта
+export class Medikit extends SG2D.Tile {
+	static texture = "objects/medikit100_1";
+	static layer = "bodies";
+	static animation = {
+		count: 8,
+		sleep: 3,
+		running: false,
+		basetexture: "objects/medikit100_",
+		onComplete: function(sprite) {
+			sprite.visible = true; // После выполнения анимации оставляем её видимой
+		},
+		loop: false
+	};
+	
+	initialize(...args) {
+		super.initialize(...args);
+		this.scaleDir = 1;
+	}
+	
+	iterateAnimations(...args) {
+		this.set("angle", this.properties.angle + 1);
+		this.set("scale", this.properties.scale +0.002 * this.scaleDir);
+		if (this.properties.scale <= 0.6) this.scaleDir = 1;
+		if (this.properties.scale >= 0.8) this.scaleDir = -1;
+		
+		if (! this.sprite.animation.running && Math.random() < 0.01) {
+			this.startAnimation();
+		}
+		
+		super.iterateAnimations(...args);
+	}
+}
+ */
+let SG2DTile_animation = {};
 
 /**
  * @type {boolean}
@@ -606,16 +789,17 @@ SG2DTile.isBody = false;
 /** @type {boolean} */
 SG2DTile.noDraw = false;
 
-/** Ignore common sprite property setters (without options.<sprite|sprites>) */
+/**
+ * Флаг для игнорирования спрайтом сеттера без указания спрайта в *options.<sprite|sprites>*. Флаг актуален для тайлов состоящих из нескольких спрайтов.
+ * Например, для спрайта *this.sprites.platform* сеттер *this.set("angle", 125)* не применится, а *this.set("angle", 125, { sprite: this.sprites.platform })* применится!
+ */
 SG2DTile.FLAG_ONLY_OPTIONS_SPRITE = true;
 
-// To handle a click on a tile class, define this method in the tile class
+// Чтобы обработать щелчок по тайлу, определите этот метод в классе тайла
 // SG2DTile.click(target, options) {...}
 
-/** @private */
 SG2DTile._initPrevPosition = {x: -1, y: -1};
 
-/** @private */
 SG2DTile._point = {x: void 0, y: void 0};
 
 SG2DTile.ownSetters = { // overriden with Object.assign(...)
@@ -643,7 +827,6 @@ SG2DTile.defaultProperties = {
 	drawed: false
 }
 
-/** @private */
 SG2DTile._defaultSpriteValues = {
 	angle: 0,
 	anchor: 0.5,
@@ -653,7 +836,6 @@ SG2DTile._defaultSpriteValues = {
 	zindex: 0
 };
 
-/** @private */
 SG2DTile._prepareStaticConfigSprites = function() {
 
 	if (this.hasOwnProperty("_spritesPrepared")) {
@@ -662,10 +844,10 @@ SG2DTile._prepareStaticConfigSprites = function() {
 		this._spritesPrepared = true;
 	}
 
-	if (! this.hasOwnProperty("sprites")) {
-		this.sprites = { main: this._prepareSpriteProperties({ name: "main" }, this) }
-	} else {
+	if (this.hasOwnProperty("sprites")) {
 		this.sprites = this._prepareMultipleSprites(this.sprites);
+	} else {
+		this.sprites = { main: this._prepareSpriteProperties({ name: "main" }, this) };
 	}
 
 	if (this.sprites.main) this.sprite = this.sprites.main;
@@ -684,7 +866,6 @@ SG2DTile._prepareStaticConfigSprites = function() {
 	}
 }
 
-/** @private */
 SG2DTile. _prepareMultipleSprites = function(sprites, parentSprite = void 0) {
 	for (var name in sprites) {
 		const sprite = sprites[name];
@@ -701,7 +882,6 @@ SG2DTile. _prepareMultipleSprites = function(sprites, parentSprite = void 0) {
 	return sprites;
 }
 
-/** @private */
 SG2DTile._prepareSpriteProperties = function(dest, src = void 0) {
 	if (! src) src = dest;
 	dest.texture = typeof src.texture !== void 0 ? src.texture : SG2DConsts.TILE_OVERRIDE;
@@ -712,10 +892,8 @@ SG2DTile._prepareSpriteProperties = function(dest, src = void 0) {
 	return dest;
 }
 
-/** @private */
 SG2DTile._textures_not_founded = [];
 
-/** @private */
 SG2DTile._spritesFromOptions = new Set();
 
 export default SG2DTile;

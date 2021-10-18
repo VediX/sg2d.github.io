@@ -1,9 +1,3 @@
-/**
- * SG2DFonts
- * https://github.com/VediX/sg2d.github.io
- * (c) Kalashnikov Ilya
- */
-
 "use strict";
 
 import SG2DUtils from "./sg2d-utils.js";

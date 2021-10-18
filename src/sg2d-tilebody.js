@@ -26,7 +26,11 @@ class SG2DTileBody extends SG2DTile {
 		SG2D.Clusters.bodies.add(this);
 	}
 	
-	// default creator
+	/**
+	 * Конструктор физического тела по умолчанию (квадрат). Можно переопределить.
+	 * @param {object} [position={ x: 0, y: 0 }] - Координаты тела в пикселях
+	 * @param {object} [angle=0] - Поворот тела в градусах
+	 */
 	bodyCreate(position = { x: 0, y: 0 }, angle = 0) {
 		
 		this.body = Matter.Bodies.rectangle(position.x, position.y, SG2D.Consts.CELLSIZEPIX - 1, SG2D.Consts.CELLSIZEPIX - 1, {
@@ -43,13 +47,18 @@ class SG2DTileBody extends SG2DTile {
 		return this.body;
 	}
 	
-	// overrided
-	onGeometric() {
+	_onGeometric() { // overrided
 		/*this.calcBoundsPX(); => bounds формируется MatterJS*/
-		this.calcCXY();
-		this.calcClustersBody();
+		this._calcCXY();
+		this._calcClustersBody();
 	}
 	
+	/**
+	 * Получить список физических тел тайлов рядом с точкой pxy
+	 * @param {object} pxy - Координаты точки, рядом с которой ищутся физические тела, например, {x: 250, y: 7200}
+	 * @param {number} [cells_indent=1] - Ширина поиска в кластерах
+	 * @param {array} [bodies=[]] - Результирующий массив
+	 */
 	getBodiesAround(pxy, cells_indent = 1, bodies = []) {
 		bodies.length = 0;
 		var cluster;
