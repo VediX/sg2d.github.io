@@ -54,7 +54,7 @@ class SG2DCustomSprite {
 		container.addChild(this.sprite);
 		
 		if (typeof data === "object") Object.assign(this, data);
-		this.sprite.SG2DCustomSprite = this;
+		this.sprite.sg2dSprite = this;
 	}
 }
 

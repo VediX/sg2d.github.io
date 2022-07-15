@@ -82,8 +82,8 @@ class SG2DTileBody extends SG2DTile {
 			Matter.Composite.remove(SG2D.matter.world, this.body);
 		}
 		SG2D.Clusters.bodies.delete(this);
+		super.destroy(); // before this.body=null !
 		this.body = null;
-		super.destroy();
 	}
 }
 
