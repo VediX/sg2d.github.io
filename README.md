@@ -57,7 +57,7 @@ SG2DTransitions.ready(()=>{
 ## Лицензия
 
 SG2D is licensed under [The MIT License (MIT)](https://opensource.org/licenses/MIT)  
-Copyright (c) 2021 Ilya Kalashnikov
+Copyright (c) 2022 Ilya Kalashnikov
 
 This license is also supplied with the release and source code.
 As stated in the license, absolutely no warranty is provided.
