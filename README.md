@@ -61,7 +61,6 @@ E-mail: sg2d@yandex.ru
 ## Лицензия
 
 SG2D is licensed under [The MIT License (MIT)](https://opensource.org/licenses/MIT)  
-Copyright (c) 2024 Ilya Kalashnikov
 
 This license is also supplied with the release and source code.
 As stated in the license, absolutely no warranty is provided.

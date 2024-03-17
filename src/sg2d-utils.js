@@ -1,7 +1,6 @@
 /**
  * SG2D Utilities
  * https://github.com/VediX/sg2d.github.io
- * (c) Kalashnikov Ilya
  */
 
 "use strict";

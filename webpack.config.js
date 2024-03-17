@@ -12,7 +12,7 @@ module.exports = (env = {}) => {
 	const resolve = relativePath => path.resolve(__dirname, relativePath);
 
 	const banner = 
-`${pkg.name} ${version} by @ Kalashnikov Ilya
+`${pkg.name} ${version} by @ Vedix Group
 ${pkg.homepage}
 License ${pkg.license}${!minimize ? '\n\n' + license : ''}`;
 

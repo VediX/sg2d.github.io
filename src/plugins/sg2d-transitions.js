@@ -7,7 +7,7 @@
  * Плагин обрабатывает плитки только со статическим свойством **useTransition=true** и использует текстуру из статического свойства плитки!
  * @see https://github.com/VediX/sg2d.github.io
  * @license SG2DTransitions may be freely distributed under the MIT license
- * @copyright Kalashnikov Ilya
+ * @copyright Vedix Group
  */
 class SG2DTransitions extends SG2D.PluginBase {
 		

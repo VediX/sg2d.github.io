@@ -2,7 +2,7 @@
  * 2D игровой движок использующий PixiJS и MatterJS. Кластерная оптимизация отрисовки тайлов.
  * @version 1.0.0
  * @license MIT
- * @copyright Kalashnikov Ilya 2019-2021 (https://github.com/VediX/sg2d.github.io)
+ * @copyright Vedix Group 2019-2021 (https://github.com/VediX/sg2d.github.io)
  */
 
 "use strict";
