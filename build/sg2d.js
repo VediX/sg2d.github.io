@@ -1,11 +1,11 @@
 /*!
- * SG2D 1.0.0 by @ Vedix Group
+ * SG2D 1.0.0 by @ SG2D
  * https://sg2d.ru
  * License MIT
  * 
  * MIT License
  * 
- * Copyright (c) Vedix Group
+ * Copyright (c) SG2D
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -132,7 +132,7 @@ return /******/ (function(modules) { // webpackBootstrap
  * SGModel 1.0.2
  * A fast lightweight library (ES6) for structuring web applications using binding models and custom events. This is a faster and more simplified analogue of Backbone.js!
  * https://github.com/VediX/SGModel
- * (c) 2019-2021 Vedix Group
+ * (c) 2019-2021 SG2D
  * SGModel may be freely distributed under the MIT license
  */
 
@@ -919,7 +919,7 @@ var sg_model = __webpack_require__(0);
 /**
  * SG2DDeferred
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -1010,7 +1010,7 @@ let SG2DConsts = {
 /**
  * SG2DMath
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -1235,7 +1235,7 @@ let SG2DMath = {};
 /**
  * SG2D Utilities
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -1805,7 +1805,7 @@ var SG2DUtils = {
 /**
  * SG2DBounds
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -1864,7 +1864,7 @@ class SG2DBounds {
 /**
  * SG2DCluster
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -1951,7 +1951,7 @@ sg2d_cluster_SG2DCluster._tiles = [];
 /**
  * SG2DClusters
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -2113,7 +2113,7 @@ sg2d_clusters_SG2DClusters.nearestClusters45 = function(cluster, checker) { retu
 /**
  * SG2DDebugging
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -2395,7 +2395,7 @@ var SG2DDebugging = {
 /**
  * SG2DCamera
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -2990,7 +2990,7 @@ sg2d_camera_SG2DCamera._moveToTarget = {x: 0, y: 0};
 /**
  * SG2DSound
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -3459,7 +3459,7 @@ if (typeof window !== "undefined" && window.document) {
 /**
  * SG2DTile
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -4106,7 +4106,7 @@ sg2d_tile_SG2DTile._spritesFromOptions = new Set();
 /**
  * SG2DPointer
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  * TODO: To prevent the browser from creating a new request every time you change cursor url, you need to display cursor using PixiJS
  */
 
@@ -4340,7 +4340,7 @@ sg2d_pointer_SG2DPointer._startPointPXY = { x: 0, y: 0 };
 /**
  * SG2DEffects
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -4473,7 +4473,7 @@ sg2d_effects_SG2DEffects.TYPE_DISPLACEMENT = 3;
 /**
  * SG2DPlugins
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -4519,7 +4519,7 @@ SG2DPlugins.load = function(asPlugins) {
  * SG2DPluginBase
  * Base class for the plugin
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -4566,7 +4566,7 @@ class SG2DPluginBase {
 /**
  * SG2DApplication 1.0.0
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -5012,7 +5012,7 @@ sg2d_application_SG2DApplication.setCellSizePix = function(v) {
 /**
  * SG2DBody
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -5106,7 +5106,7 @@ sg2d_tilebody_SG2DTileBody.MATTER = {
 /**
  * SG2DFonts
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -5221,7 +5221,7 @@ class sg2d_fonts_SG2DLabelCanvas {
 /**
  * SG2DSprite
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -5288,7 +5288,7 @@ sg2d_sprite_SG2DSprite._options = {};
 /**
  * SG2DMessageToast
  * https://github.com/VediX/sg2d.github.io
- * (c) Vedix Group
+ * (c) SG2D
  */
 
 
@@ -5374,7 +5374,7 @@ let SG2DMessageToast = {
  * 2D game engine based on PixiJS and MatterJS, optimized by tile clustering
  * https://github.com/VediX/sg2d.github.io
  * SG2D may be freely distributed under the MIT license
- * (c) Vedix Group 2019-2021
+ * (c) SG2D 2019-2021
  */
 
 
